@@ -1,0 +1,296 @@
+/* General Reset and Box Sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    padding: 20px;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/background.jpg'); /* Path to your background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    filter: grayscale(40%); /* Apply 40% grayscale to the background */
+    z-index: -1; /* Ensure the background is behind all content */
+    pointer-events: none; /* Make sure the background doesn't block interactions */
+}
+
+/* Header Styling */
+header {
+    text-align: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0); /* Black background */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Full-width header */
+    z-index: 10; /* Ensures header stays above content */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0); /* Header shadow */
+}
+
+/* Hamburger Menu Button in Header */
+.menu-button {
+    position: fixed; /* Keep it fixed to the viewport */
+    top: 10px; /* Adjust as needed */
+    left: 20px; /* Adjust as needed */
+    width: 25px;
+    height: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    cursor: pointer;
+    z-index: 9999; /* Very high z-index to ensure it's on top */
+}
+
+/* Style the hamburger lines */
+.hamburger {
+    width: 100%;
+    height: 3px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+/* Menu Overlay Background */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    z-index: 20; /* Keep the overlay below the button */
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Show the overlay when active */
+.menu-overlay.active {
+    opacity: 1;
+    transform: translateX(0);
+    z-index: 20; /* Keep the overlay below the button */
+}
+
+/* Menu Items List */
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    z-index: 21; /* Above the overlay */
+    position: relative; /* Create a stacking context for its children if needed */
+}
+
+/* Styling Each Menu Item */
+.menu-item {
+    padding: 15px 20px;
+    color: #fff;
+    text-decoration: none;
+    width: 100%;
+    transition: background 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    z-index: 22; /* Above the overlay */
+    position: relative; /* Create a stacking context if needed */
+}
+
+/* Show active menu item */
+.menu-item.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ... rest of your CSS ... */
+
+/* Menu Item Hover Effect */
+.menu-item:hover {
+    background: rgba(255, 165, 0, 0.5); /* Change background on hover */
+}
+
+/* Keep the hamburger icon visible when menu is active */
+.menu-button.active {
+    opacity: 1; /* Ensure button is visible */
+}
+
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    padding-top: 60px; /* Increased top padding to push items down */
+    z-index: 21; /* Above the overlay */
+    position: relative; /* Create a stacking context for its children if needed */
+}
+
+/* Styling Each Menu Item */
+.menu-item {
+    font-size: 1.2em; /* Adjusted font size */
+    color: #fff;
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Menu Items Appear Sequentially */
+.menu-item.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.menu-item:hover {
+    color: orange;
+}
+
+/* Logo Styling */
+.logo {
+    width: 150px;
+    margin-bottom: 0; /* Remove extra margin */
+    filter: invert(1); /* Light grey color for the logo */
+    border: none; /* Remove any border from the logo */
+}
+
+/* Main Content Area */
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-top: 80px; /* Adjust padding-top to create space under fixed header */
+}
+
+/* Article List Container (Flexbox) */
+.articles-list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 40px; /* Gap between the columns */
+}
+
+/* Individual Article Box */
+.articles-list article {
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly transparent black background */
+    width: calc(50% - 40px); /* Two columns, with gap */
+    min-height: 350px; /* Set minimum height for article boxes */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Add shadow */
+    transition: transform 0.2s ease;
+    text-align: left;
+    border-radius: 0; /* Remove rounded corners */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    position: relative;
+    border: none; /* Remove border */
+}
+
+/* Styling for article images */
+.article-image {
+    width: 100%;
+    height: 150px; /* Adjust image height */
+    object-fit: cover; /* Ensure image fits without distortion */
+    border-bottom: none; /* Remove border under image */
+}
+
+/* Added consistent padding below article images */
+.articles-list article h2 {
+    margin-top: 15px; /* Ensure consistent padding between image and title */
+}
+
+/* Hover Effect on Articles */
+.articles-list article:hover {
+    transform: translateY(-5px); /* Lift the article box slightly on hover */
+}
+
+/* Article Title Styling */
+.articles-list h2 {
+    font-size: 1.8em;
+    font-family: 'adobe-caslon-pro', serif; /* Adobe Caslon Pro font */
+    font-weight: 700; /* Bolder title */
+    color: #fff; /* White text for titles */
+    text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.3; /* Adjust for readability */
+    margin-bottom: 10px;
+}
+
+/* Remove underline from article titles links */
+.articles-list h2 a {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 2px;
+    text-decoration-style: solid;
+    color: inherit;
+    transition: text-decoration-color 0.2s ease;
+}
+
+/* Hover effect for the underline */
+.articles-list h2 a:hover {
+    text-decoration-color: orange;
+    color: #fff;
+}
+
+/* Article Subtitle Styling */
+.articles-list p {
+    font-family: 'Fira Code', monospace;
+    color: #ddd;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+/* Article Metadata Styling (Date and Reading Time) */
+.article-meta {
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-family: 'Fira Code', monospace;
+    color: #bbb;
+    text-align: center; /* Center-align the metadata */
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #333;
+    color: #fff;
+    margin-top: 3000px;
+}
+
+/* ========================
+   Responsive Design
+======================== */
+
+/* For medium screens (tablets and small desktops) */
+@media (max-width: 768px) {
+    .articles-list article {
+        width: calc(50% - 20px); /* Keep two columns on medium screens */
+    }
+}
+
+/* For small screens (mobile devices) */
+@media (max-width: 480px) {
+    .articles-list article {
+        width: 100%; /* Full-width article boxes on small screens */
+        height: auto; /* Let height adjust automatically */
+    }
+}

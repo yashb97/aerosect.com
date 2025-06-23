@@ -32,7 +32,7 @@ body::before {
 /* Header Styling */
 header {
     text-align: center;
-    padding: 10px;
+    padding: 0px;
     background-color: rgba(0, 0, 0, 0); /* Black background */
     position: fixed;
     top: 0;
@@ -163,16 +163,21 @@ header {
 /* Logo Styling */
 .logo {
     width: 150px;
-    margin-bottom: 0; /* Remove extra margin */
-    filter: invert(1); /* Light grey color for the logo */
-    border: none; /* Remove any border from the logo */
+    margin: 0 auto; /* Center horizontally */
+    display: block;
+    filter: invert(1); /* Makes it visible on dark background */
+    z-index: 12;
+    position: relative;
+    vertical-align: top; /* Add this */
+    margin-top: 0px
 }
+
 
 /* Main Content Area */
 main {
     max-width: 1000px;
     margin: 0 auto;
-    padding-top: 80px; /* Adjust padding-top to create space under fixed header */
+    padding-top: 0px; /* Adjust padding-top to create space under fixed header */
 }
 
 /* Article List Container (Flexbox) */
@@ -187,7 +192,7 @@ main {
 .articles-list article {
     background-color: rgba(0, 0, 0, 0.6); /* Slightly transparent black background */
     width: calc(50% - 40px); /* Two columns, with gap */
-    min-height: 350px; /* Set minimum height for article boxes */
+    min-height: 30px; /* Set minimum height for article boxes */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -291,4 +296,31 @@ footer {
         width: 100%; /* Full-width article boxes on small screens */
         height: auto; /* Let height adjust automatically */
     }
+}
+
+.coming-soon-message {
+    text-align: center;
+    margin-top: 150px; /* Adjust depending on layout */
+    color: #fefefe; /* Light text, adjust if needed */
+    font-family: 'Georgia', serif; /* Example font */
+}
+
+.coming-soon-message h1 {
+    font-size: 3rem;
+    font-family: 'Fira Code', serif; /* Matches your existing font theme */
+    font-weight: 700;
+    color: White; /* Customize this */
+    margin-bottom: 10px;
+}
+
+.coming-soon-message p {
+    font-size: 1.2rem;
+    color: #eee;
+    font-family: 'Fira Code', monospace;
+}
+
+.coming-soon-message a {
+    font-size: 1.2rem;
+    color: #eee;
+    font-family: 'Fira Code', monospace;
 }
