@@ -1,0 +1,125 @@
+---
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aerosect | Aerospace Knowledge Archive</title>
+  </head>
+
+  <body>
+    <main class="page">
+      <nav class="nav">
+        <div class="logo">AEROSECT</div>
+        <div class="links">
+          <a href="/">Home</a>
+          <a href="/articles">Articles</a>
+          <a href="/about">About</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <p class="eyebrow">Aerospace · Aeroacoustics · Simulation · Engineering</p>
+        <h1>Exploring the ideas shaping aerospace engineering.</h1>
+        <p class="subtitle">
+          Aerosect is a technical archive for articles, explainers, and visual essays
+          on aerodynamics, aeroacoustics, aircraft noise, simulation, and engineering systems.
+        </p>
+
+        <div class="actions">
+          <a class="button primary" href="/articles">View Articles</a>
+          <a class="button secondary" href="/about">About Aerosect</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #05070d;
+    color: #f5f7fb;
+  }
+
+  .page {
+    min-height: 100vh;
+    padding: 32px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(57, 120, 255, 0.25), transparent 30%),
+      radial-gradient(circle at 80% 10%, rgba(0, 255, 209, 0.12), transparent 30%),
+      #05070d;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    letter-spacing: 0.18em;
+    font-weight: 700;
+  }
+
+  .links {
+    display: flex;
+    gap: 24px;
+  }
+
+  .links a {
+    color: #cbd5e1;
+    text-decoration: none;
+  }
+
+  .hero {
+    max-width: 900px;
+    margin-top: 140px;
+  }
+
+  .eyebrow {
+    color: #7dd3fc;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height: 0.95;
+    margin: 20px 0;
+    max-width: 1000px;
+  }
+
+  .subtitle {
+    max-width: 680px;
+    color: #cbd5e1;
+    font-size: 1.2rem;
+    line-height: 1.7;
+  }
+
+  .actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .button {
+    padding: 14px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .primary {
+    background: #f5f7fb;
+    color: #05070d;
+  }
+
+  .secondary {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #f5f7fb;
+  }
+</style>
