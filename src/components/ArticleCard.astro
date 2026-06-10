@@ -9,6 +9,8 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
 ---
 
 <a class="card" href={`/articles/${article.id}`}>
+<img class="image" src={article.data.image} alt="" />
+
   <div class="meta">
     <p class="topic">{article.data.topic}</p>
     <p class="date">{formattedDate}</p>
@@ -67,4 +69,12 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
     color: #cbd5e1;
     line-height: 1.6;
   }
+
+  .image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-bottom: 22px;
+}
 </style>

@@ -4,6 +4,7 @@ description: "A future article introducing the physical mechanisms behind aerofo
 date: "2026-06-10"
 topic: "Aeroacoustics"
 draft: false
+image: "/images/articles/aerofoil-self-noise.jpg"
 ---
 
 This is the first Aerosect article placeholder.
