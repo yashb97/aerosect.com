@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="About | Aerosect">
+  <section class="about">
+    <p class="eyebrow">About Aerosect</p>
+
+    <h1>A technical archive for aerospace ideas.</h1>
+
+    <p class="lead">
+      Aerosect is being built as a home for clear, visual, and technically grounded
+      articles on aerospace engineering, aeroacoustics, simulation, aircraft noise,
+      and engineering systems.
+    </p>
+
+    <p>
+      The aim is to make complex aerospace topics easier to understand without
+      oversimplifying the underlying physics, modelling assumptions, or engineering context.
+    </p>
+
+    <p>
+      Over time, Aerosect will grow into a platform for technical articles, visual
+      explainers, modelling workflows, and resources for engineers, researchers, and
+      technically curious readers.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: 820px;
+    margin-top: 110px;
+  }
+
+  .eyebrow {
+    color: #7dd3fc;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 7vw, 5.4rem);
+    line-height: 1;
+    margin: 18px 0 28px;
+  }
+
+  .lead {
+    font-size: 1.3rem;
+    color: #dbeafe;
+  }
+
+  p {
+    color: #cbd5e1;
+    font-size: 1.12rem;
+    line-height: 1.75;
+  }
+</style>
