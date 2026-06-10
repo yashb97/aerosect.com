@@ -30,6 +30,8 @@ const { Content } = await render(article);
       })}
     </p>
 
+    <img class="hero-image" src={article.data.image} alt="" />
+
     <div class="content">
       <Content />
     </div>
@@ -82,4 +84,12 @@ const { Content } = await render(article);
   .content :global(p) {
     margin-bottom: 1.4rem;
   }
+
+  .hero-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 28px;
+  margin-top: 44px;
+}
 </style>
