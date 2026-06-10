@@ -1,5 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const articles = await getCollection("articles", ({ data }) => !data.draft);
+
+articles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <BaseLayout title="Articles | Aerosect">
@@ -12,25 +17,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     </p>
   </section>
 
-  <section class="grid">
-    <article class="card">
-      <p class="topic">Aeroacoustics</p>
-      <h2>How Aerofoil Self-Noise Works</h2>
-      <p>A future article introducing the physical mechanisms behind aerofoil noise generation.</p>
-    </article>
-
-    <article class="card">
-      <p class="topic">Airport Noise</p>
-      <h2>From Aircraft Noise to Airport Noise Contours</h2>
-      <p>A future article explaining how individual aircraft noise contributes to airport-level exposure.</p>
-    </article>
-
-    <article class="card">
-      <p class="topic">Simulation</p>
-      <h2>Why Engineering Models Need Reproducible Workflows</h2>
-      <p>A future article on simulation credibility, assumptions, documentation, and repeatability.</p>
-    </article>
-  </section>
+ <section class="grid">
+  {articles.map((article) => (
+    <a class="card" href={`/articles/${article.id}`}>
+      <p class="topic">{article.data.topic}</p>
+      <h2>{article.data.title}</h2>
+      <p>{article.data.description}</p>
+    </a>
+  ))}
+</section>
 </BaseLayout>
 
 <style>
@@ -65,11 +60,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   }
 
   .card {
-    padding: 28px;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.055);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-  }
+  display: block;
+  padding: 28px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(125, 211, 252, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+}
 
   .topic {
     color: #7dd3fc;
