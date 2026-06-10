@@ -1,0 +1,44 @@
+---
+const { article } = Astro.props;
+---
+
+<a class="card" href={`/articles/${article.id}`}>
+  <p class="topic">{article.data.topic}</p>
+  <h2>{article.data.title}</h2>
+  <p>{article.data.description}</p>
+</a>
+
+<style>
+  .card {
+    display: block;
+    padding: 28px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(125, 211, 252, 0.45);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .topic {
+    color: #7dd3fc;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  h2 {
+    margin-top: 16px;
+  }
+
+  p {
+    color: #cbd5e1;
+    line-height: 1.6;
+  }
+</style>
