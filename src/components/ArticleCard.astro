@@ -1,9 +1,19 @@
 ---
 const { article } = Astro.props;
+
+const formattedDate = article.data.date.toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 ---
 
 <a class="card" href={`/articles/${article.id}`}>
-  <p class="topic">{article.data.topic}</p>
+  <div class="meta">
+    <p class="topic">{article.data.topic}</p>
+    <p class="date">{formattedDate}</p>
+  </div>
+
   <h2>{article.data.title}</h2>
   <p>{article.data.description}</p>
 </a>
@@ -26,15 +36,31 @@ const { article } = Astro.props;
     background: rgba(255, 255, 255, 0.08);
   }
 
-  .topic {
-    color: #7dd3fc;
-    font-size: 0.8rem;
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .topic,
+  .date {
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
+    margin: 0;
+  }
+
+  .topic {
+    color: #7dd3fc;
+  }
+
+  .date {
+    color: #94a3b8;
   }
 
   h2 {
-    margin-top: 16px;
+    margin-top: 18px;
   }
 
   p {
