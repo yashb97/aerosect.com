@@ -1,93 +1,39 @@
 ---
+import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Articles | Aerosect</title>
-  </head>
+<BaseLayout title="Articles | Aerosect">
+  <section class="intro">
+    <p class="eyebrow">Knowledge Archive</p>
+    <h1>Articles</h1>
+    <p>
+      A growing archive of technical essays, explainers, and visual notes on
+      aerospace engineering, aeroacoustics, aircraft noise, simulation, and engineering systems.
+    </p>
+  </section>
 
-  <body>
-    <main class="page">
-      <nav class="nav">
-        <a class="logo" href="/">AEROSECT</a>
-        <div class="links">
-          <a href="/">Home</a>
-          <a href="/articles">Articles</a>
-          <a href="/about">About</a>
-        </div>
-      </nav>
+  <section class="grid">
+    <article class="card">
+      <p class="topic">Aeroacoustics</p>
+      <h2>How Aerofoil Self-Noise Works</h2>
+      <p>A future article introducing the physical mechanisms behind aerofoil noise generation.</p>
+    </article>
 
-      <section class="intro">
-        <p class="eyebrow">Knowledge Archive</p>
-        <h1>Articles</h1>
-        <p>
-          A growing archive of technical essays, explainers, and visual notes on
-          aerospace engineering, aeroacoustics, aircraft noise, simulation, and engineering systems.
-        </p>
-      </section>
+    <article class="card">
+      <p class="topic">Airport Noise</p>
+      <h2>From Aircraft Noise to Airport Noise Contours</h2>
+      <p>A future article explaining how individual aircraft noise contributes to airport-level exposure.</p>
+    </article>
 
-      <section class="grid">
-        <article class="card">
-          <p class="topic">Aeroacoustics</p>
-          <h2>How Aerofoil Self-Noise Works</h2>
-          <p>A future article introducing the physical mechanisms behind aerofoil noise generation.</p>
-        </article>
-
-        <article class="card">
-          <p class="topic">Airport Noise</p>
-          <h2>From Aircraft Noise to Airport Noise Contours</h2>
-          <p>A future article explaining how individual aircraft noise contributes to airport-level exposure.</p>
-        </article>
-
-        <article class="card">
-          <p class="topic">Simulation</p>
-          <h2>Why Engineering Models Need Reproducible Workflows</h2>
-          <p>A future article on simulation credibility, assumptions, documentation, and repeatability.</p>
-        </article>
-      </section>
-    </main>
-  </body>
-</html>
+    <article class="card">
+      <p class="topic">Simulation</p>
+      <h2>Why Engineering Models Need Reproducible Workflows</h2>
+      <p>A future article on simulation credibility, assumptions, documentation, and repeatability.</p>
+    </article>
+  </section>
+</BaseLayout>
 
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #05070d;
-    color: #f5f7fb;
-  }
-
-  .page {
-    min-height: 100vh;
-    padding: 32px;
-    background: #05070d;
-  }
-
-  .nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .logo {
-    color: #f5f7fb;
-    text-decoration: none;
-    letter-spacing: 0.18em;
-    font-weight: 700;
-  }
-
-  .links {
-    display: flex;
-    gap: 24px;
-  }
-
-  .links a {
-    color: #cbd5e1;
-    text-decoration: none;
-  }
-
   .intro {
     max-width: 760px;
     margin-top: 100px;
