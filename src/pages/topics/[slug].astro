@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import { getCollection } from "astro:content";
+
+const allArticles = await getCollection("articles", ({ data }) => !data.draft);
+
+const topics = Array.from(
+  new Map(
+    allArticles.map((article) => [
+      article.data.topicSlug,
+      {
+        name: article.data.topic,
+        slug: article.data.topicSlug,
+      },
+    ])
+  ).values()
+);
+
+export async function getStaticPaths() {
+  const articles = await getCollection("articles", ({ data }) => !data.draft);
+
+  const topics = Array.from(
+    new Map(
+      articles.map((article) => [
+        article.data.topicSlug,
+        {
+          name: article.data.topic,
+          slug: article.data.topicSlug,
+        },
+      ])
+    ).values()
+  );
+
+  return topics.map((topic) => ({
+    params: { slug: topic.slug },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props;
+
+const articles = allArticles
+  .filter((article) => article.data.topicSlug === topic.slug)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title={`${topic.name} | Aerosect`}>
+  <section class="intro">
+    <p class="eyebrow">Topic</p>
+    <h1>{topic.name}</h1>
+    <p>
+      Articles and explainers from the Aerosect archive related to {topic.name}.
+    </p>
+  </section>
+
+  <section class="grid">
+    {articles.map((article) => (
+      <ArticleCard article={article} />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .intro {
+    max-width: 760px;
+    margin-top: 100px;
+  }
+
+  .eyebrow {
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    margin: 16px 0;
+  }
+
+  .intro p {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    line-height: 1.7;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 56px;
+  }
+</style>
