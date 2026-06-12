@@ -8,17 +8,24 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
 });
 ---
 
-<a class="card" href={`/articles/${article.id}`}>
-<img class="image" src={article.data.image} alt="" />
+<article class="card">
+  <a class="image-link" href={`/articles/${article.id}`} aria-label={article.data.title}>
+    <img class="image" src={article.data.image} alt="" />
+  </a>
 
   <div class="meta">
-    <p class="topic">{article.data.topic}</p>
+    <a class="topic" href={`/topics/${article.data.topicSlug}`}>
+      {article.data.topic}
+    </a>
     <p class="date">{formattedDate}</p>
   </div>
 
-  <h2>{article.data.title}</h2>
+  <h2>
+    <a href={`/articles/${article.id}`}>{article.data.title}</a>
+  </h2>
+
   <p>{article.data.description}</p>
-</a>
+</article>
 
 <style>
   .card {
@@ -27,7 +34,6 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
     border-radius: 24px;
     background: var(--card);
     border: 1px solid var(--card-border);
-    text-decoration: none;
     color: inherit;
     transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
   }
@@ -36,6 +42,18 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
     transform: translateY(-4px);
     border-color: var(--accent-soft);
     background: rgba(255, 255, 255, 0.08);
+  }
+
+  .image-link {
+    display: block;
+  }
+
+  .image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 18px;
+    margin-bottom: 22px;
   }
 
   .meta {
@@ -55,6 +73,11 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
 
   .topic {
     color: var(--accent);
+    text-decoration: none;
+  }
+
+  .topic:hover {
+    text-decoration: underline;
   }
 
   .date {
@@ -65,16 +88,17 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
     margin-top: 18px;
   }
 
+  h2 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--accent);
+  }
+
   p {
     color: var(--text-muted);
     line-height: 1.6;
   }
-
-  .image {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 18px;
-  margin-bottom: 22px;
-}
 </style>
