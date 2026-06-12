@@ -1,7 +1,10 @@
 ---
 import "../styles/global.css";
 
-const { title = "Aerosect" } = Astro.props;
+const {
+  title = "Aerosect",
+  description = "Aerosect is a technical archive for aerospace engineering, aeroacoustics, aircraft noise, simulation, and engineering systems.",
+} = Astro.props;
 ---
 
 <html lang="en">
@@ -9,6 +12,15 @@ const { title = "Aerosect" } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
   </head>
 
   <body>
