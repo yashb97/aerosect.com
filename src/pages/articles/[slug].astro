@@ -15,7 +15,10 @@ const { article } = Astro.props;
 const { Content } = await render(article);
 ---
 
-<BaseLayout title={`${article.data.title} | Aerosect`}>
+<BaseLayout
+  title={`${article.data.title} | Aerosect`}
+  description={article.data.description}
+>
   <article class="article">
     <a class="back" href="/articles">← Back to articles</a>
 
