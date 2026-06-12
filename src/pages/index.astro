@@ -25,7 +25,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 
   .eyebrow {
-    color: #7dd3fc;
+    color: var(--accent);
     letter-spacing: 0.12em;
     text-transform: uppercase;
     font-size: 0.8rem;
@@ -40,7 +40,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   .subtitle {
     max-width: 680px;
-    color: #cbd5e1;
+    color: var(--text-muted);
     font-size: 1.2rem;
     line-height: 1.7;
   }
@@ -59,12 +59,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 
   .primary {
-    background: #f5f7fb;
-    color: #05070d;
+    background: var(--text);
+    color: var(--bg);
   }
 
   .secondary {
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #f5f7fb;
+    border: 1px solid var(--card-border);
+    color: var(--text);
   }
 </style>

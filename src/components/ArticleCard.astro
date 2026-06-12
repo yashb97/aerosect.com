@@ -25,8 +25,8 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
     display: block;
     padding: 28px;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.055);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--card);
+    border: 1px solid var(--card-border);
     text-decoration: none;
     color: inherit;
     transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -34,7 +34,7 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
 
   .card:hover {
     transform: translateY(-4px);
-    border-color: rgba(125, 211, 252, 0.45);
+    border-color: var(--accent-soft);
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -54,11 +54,11 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
   }
 
   .topic {
-    color: #7dd3fc;
+    color: var(--accent);
   }
 
   .date {
-    color: #94a3b8;
+    color: var(--text-soft);
   }
 
   h2 {
@@ -66,7 +66,7 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
   }
 
   p {
-    color: #cbd5e1;
+    color: var(--text-muted);
     line-height: 1.6;
   }
 
