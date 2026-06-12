@@ -30,40 +30,35 @@ const { title = "Aerosect" } = Astro.props;
 </html>
 
 <style is:global>
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #05070d;
-    color: #f5f7fb;
-  }
-
   .page {
     min-height: 100vh;
     padding: 32px;
     background:
       radial-gradient(circle at 20% 20%, rgba(57, 120, 255, 0.25), transparent 30%),
       radial-gradient(circle at 80% 10%, rgba(0, 255, 209, 0.12), transparent 30%),
-      #05070d;
+      var(--bg);
   }
 
   .nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: var(--max-width);
+    margin: 0 auto;
   }
 
-.logo {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-}
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
 
-.logo img {
-  height: 34px;
-  width: auto;
-  display: block;
-  filter: invert(1);
-}
+  .logo img {
+    height: 34px;
+    width: auto;
+    display: block;
+    filter: invert(1);
+  }
 
   .links {
     display: flex;
@@ -71,7 +66,11 @@ const { title = "Aerosect" } = Astro.props;
   }
 
   .links a {
-    color: #cbd5e1;
+    color: var(--text-muted);
     text-decoration: none;
+  }
+
+  .links a:hover {
+    color: var(--text);
   }
 </style>
