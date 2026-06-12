@@ -45,13 +45,13 @@ const { Content } = await render(article);
   }
 
   .back {
-    color: #7dd3fc;
+    color: var(--accent);
     text-decoration: none;
   }
 
   .topic {
     margin-top: 48px;
-    color: #7dd3fc;
+    color: var(--accent);
     letter-spacing: 0.12em;
     text-transform: uppercase;
     font-size: 0.8rem;
@@ -64,19 +64,19 @@ const { Content } = await render(article);
   }
 
   .description {
-    color: #cbd5e1;
+    color: var(--text-muted);
     font-size: 1.2rem;
     line-height: 1.7;
   }
 
   .date {
-    color: #94a3b8;
+    color: var(--text-soft);
     margin-top: 20px;
   }
 
   .content {
     margin-top: 56px;
-    color: #dbe4f0;
+    color: var(--text-muted);
     font-size: 1.08rem;
     line-height: 1.8;
   }
