@@ -5,6 +5,7 @@ date: "2026-06-10"
 topic: "Aeroacoustics"
 draft: false
 image: "/images/articles/aerofoil-self-noise.jpg"
+topicSlug: "aeroacoustics"
 ---
 
 This is the first Aerosect article placeholder.

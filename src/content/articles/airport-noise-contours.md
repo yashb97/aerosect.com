@@ -5,6 +5,7 @@ date: "2026-06-11"
 topic: "Airport Noise"
 draft: false
 image: "/images/articles/airport-noise-contours.jpg"
+topicSlug: "airport-noise"
 ---
 
 This is a placeholder for a future Aerosect article on airport noise contours.
