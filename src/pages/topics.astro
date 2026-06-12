@@ -1,0 +1,100 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const articles = await getCollection("articles", ({ data }) => !data.draft);
+
+const topics = Array.from(
+  new Map(
+    articles.map((article) => [
+      article.data.topicSlug,
+      {
+        name: article.data.topic,
+        slug: article.data.topicSlug,
+        count: articles.filter((a) => a.data.topicSlug === article.data.topicSlug).length,
+      },
+    ])
+  ).values()
+);
+---
+
+<BaseLayout title="Topics | Aerosect">
+  <section class="intro">
+    <p class="eyebrow">Explore by Topic</p>
+    <h1>Topics</h1>
+    <p>
+      Browse Aerosect articles by aerospace subject area, from aeroacoustics and airport noise
+      to simulation, modelling workflows, and engineering systems.
+    </p>
+  </section>
+
+  <section class="topic-grid">
+    {topics.map((topic) => (
+      <a class="topic-card" href={`/topics/${topic.slug}`}>
+        <p class="label">{topic.count} article{topic.count === 1 ? "" : "s"}</p>
+        <h2>{topic.name}</h2>
+      </a>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .intro {
+    max-width: 760px;
+    margin-top: 100px;
+  }
+
+  .eyebrow {
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    margin: 16px 0;
+  }
+
+  .intro p {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    line-height: 1.7;
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 56px;
+  }
+
+  .topic-card {
+    display: block;
+    padding: 32px;
+    border-radius: 24px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    text-decoration: none;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .topic-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-soft);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .label {
+    color: var(--accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0;
+  }
+
+  .topic-card h2 {
+    margin: 18px 0 0;
+    color: var(--text);
+  }
+</style>
