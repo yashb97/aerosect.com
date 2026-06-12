@@ -1,5 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import { getCollection } from "astro:content";
+
+const articles = await getCollection("articles", ({ data }) => !data.draft);
+
+articles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const featuredArticles = articles.slice(0, 2);
 ---
 
 <BaseLayout title="Aerosect | Aerospace Knowledge Archive">
@@ -16,6 +24,20 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <a class="button secondary" href="/about">About Aerosect</a>
     </div>
   </section>
+
+  <section class="featured">
+  <div class="section-heading">
+    <p class="eyebrow">Featured Articles</p>
+    <h2>Latest from the archive</h2>
+  </div>
+
+  <div class="featured-grid">
+    {featuredArticles.map((article) => (
+      <ArticleCard article={article} />
+    ))}
+  </div>
+</section>
+
 </BaseLayout>
 
 <style>
@@ -66,5 +88,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .secondary {
     border: 1px solid var(--card-border);
     color: var(--text);
+  }
+
+  .featured {
+    max-width: var(--max-width);
+    margin: 120px auto 0;
+  }
+
+  .section-heading {
+    margin-bottom: 32px;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    margin: 12px 0 0;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
   }
 </style>
