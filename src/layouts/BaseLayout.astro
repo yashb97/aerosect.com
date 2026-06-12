@@ -38,6 +38,16 @@ const {
       </nav>
 
       <slot />
+
+      <footer class="footer">
+        <p>© {new Date().getFullYear()} Aerosect. All rights reserved.</p>
+
+        <div class="footer-links">
+          <a href="/articles">Articles</a>
+          <a href="/topics">Topics</a>
+          <a href="/about">About</a>
+        </div>
+      </footer>
     </main>
   </body>
 </html>
@@ -85,5 +95,45 @@ const {
 
   .links a:hover {
     color: var(--text);
+  }
+
+  .footer {
+    max-width: var(--max-width);
+    margin: 120px auto 0;
+    padding: 32px 0 0;
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+  }
+
+  .footer p {
+    margin: 0;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 20px;
+  }
+
+  .footer-links a {
+    color: var(--text-soft);
+    text-decoration: none;
+  }
+
+  .footer-links a:hover {
+    color: var(--text);
+  }
+
+  @media (max-width: 700px) {
+    .footer {
+      flex-direction: column;
+    }
+
+    .footer-links {
+      flex-wrap: wrap;
+    }
   }
 </style>
