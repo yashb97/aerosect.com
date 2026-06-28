@@ -12,6 +12,7 @@ import Figure from "../../components/Figure.astro";
 import VideoEmbed from "../../components/VideoEmbed.astro";
 import ImageGallery from "../../components/ImageGallery.astro";
 import BeforeAfterSlider from "../../components/BeforeAfterSlider.astro";
+import ChartBlock from "../../components/ChartBlock.astro";
 
 This is the first Aerosect article placeholder.
 
@@ -49,4 +50,17 @@ The full article will be added later.
   beforeLabel="Baseline"
   afterLabel="Modified"
   caption="A placeholder comparison slider. This can later show baseline versus controlled flow, raw versus processed plots, or model comparison visuals."
+/>
+
+<ChartBlock
+  title="Example comparison"
+  description="A simple visual comparison block that can be used for technical or non-technical articles."
+  valueSuffix="%"
+  data={[
+    { label: "Visual clarity", value: 90 },
+    { label: "Reader engagement", value: 75 },
+    { label: "Technical depth", value: 65 },
+    { label: "Entertainment value", value: 55 }
+  ]}
+  caption="A placeholder chart showing how Aerosect articles can include simple embedded visual comparisons."
 />
