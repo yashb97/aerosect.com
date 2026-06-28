@@ -89,10 +89,77 @@ const { Content } = await render(article);
   }
 
   .hero-image {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 28px;
-  margin-top: 44px;
-}
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 28px;
+    margin-top: 44px;
+  }
+
+    .content :global(h2) {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.15;
+  }
+
+  .content :global(h3) {
+    margin-top: 2.4rem;
+    margin-bottom: 0.8rem;
+    color: var(--text);
+    font-size: 1.45rem;
+    line-height: 1.25;
+  }
+
+  .content :global(a) {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .content :global(ul),
+  .content :global(ol) {
+    padding-left: 1.4rem;
+    margin: 1.4rem 0;
+  }
+
+  .content :global(li) {
+    margin-bottom: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .content :global(strong) {
+    color: var(--text);
+  }
+
+  .content :global(blockquote) {
+    margin: 2rem 0;
+    padding-left: 1.4rem;
+    border-left: 3px solid var(--accent);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .content :global(code) {
+    padding: 0.18rem 0.38rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--accent);
+    font-size: 0.95em;
+  }
+
+  .content :global(pre) {
+    overflow-x: auto;
+    padding: 1.2rem;
+    border-radius: 18px;
+    background: var(--bg-soft);
+    border: 1px solid var(--card-border);
+  }
+
+  .content :global(pre code) {
+    padding: 0;
+    background: transparent;
+    color: var(--text-muted);
+  }
 </style>
