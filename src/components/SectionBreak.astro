@@ -1,0 +1,36 @@
+---
+const {
+  label = "",
+} = Astro.props;
+---
+
+<div class="section-break">
+  <span></span>
+  {label && <p>{label}</p>}
+  <span></span>
+</div>
+
+<style>
+  .section-break {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 18px;
+    margin: 64px 0;
+  }
+
+  span {
+    height: 1px;
+    background: var(--card-border);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    transform: translateY(10px);
+    }
+</style>
