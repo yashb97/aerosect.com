@@ -12,16 +12,38 @@ const featuredArticles = articles.slice(0, 2);
 
 <BaseLayout title="Aerosect | Aerospace Knowledge Archive">
   <section class="hero">
-    <p class="eyebrow">Aerospace · Aeroacoustics · Simulation · Engineering</p>
-    <h1>Exploring the ideas shaping aerospace engineering.</h1>
-    <p class="subtitle">
-      Aerosect is a technical archive for articles, explainers, and visual essays
-      on aerodynamics, aeroacoustics, aircraft noise, simulation, and engineering systems.
-    </p>
+    <div class="hero-copy">
+      <p class="eyebrow">Aerospace · Ideas · Simulation · Stories</p>
 
-    <div class="actions">
-      <a class="button primary" href="/articles">View Articles</a>
-      <a class="button secondary" href="/about">About Aerosect</a>
+      <h1>Exploring the ideas shaping aerospace engineering.</h1>
+
+      <p class="subtitle">
+        Aerosect is a visual knowledge archive for aerospace, aeroacoustics,
+        aircraft noise, simulation, engineering systems, and the wider ideas that
+        make technology worth thinking about.
+      </p>
+
+      <div class="actions">
+        <a class="button primary" href="/articles">View Articles</a>
+        <a class="button secondary" href="/topics">Explore Topics</a>
+      </div>
+    </div>
+
+    <div class="hero-panel" aria-hidden="true">
+      <div class="panel-grid">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="orbit orbit-one"></div>
+      <div class="orbit orbit-two"></div>
+
+      <div class="panel-content">
+        <p>Archive focus</p>
+        <h2>Aerospace ideas, made visual.</h2>
+      </div>
     </div>
   </section>
 
@@ -42,8 +64,84 @@ const featuredArticles = articles.slice(0, 2);
 
 <style>
   .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: 64px;
+    align-items: center;
+    max-width: var(--max-width);
+    margin: 140px auto 0;
+  }
+
+  .hero-copy {
     max-width: 900px;
-    margin-top: 140px;
+  }
+
+  .hero-panel {
+    position: relative;
+    min-height: 420px;
+    border-radius: 36px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(125, 211, 252, 0.28), transparent 28%),
+      radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.18), transparent 32%),
+      rgba(255, 255, 255, 0.045);
+    border: 1px solid var(--card-border);
+  }
+
+  .panel-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    opacity: 0.18;
+  }
+
+  .panel-grid span {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .orbit {
+    position: absolute;
+    border: 1px solid rgba(125, 211, 252, 0.35);
+    border-radius: 50%;
+  }
+
+  .orbit-one {
+    width: 280px;
+    height: 280px;
+    right: -60px;
+    top: 48px;
+  }
+
+  .orbit-two {
+    width: 420px;
+    height: 160px;
+    left: -120px;
+    bottom: 68px;
+    transform: rotate(-18deg);
+  }
+
+  .panel-content {
+    position: absolute;
+    left: 32px;
+    right: 32px;
+    bottom: 32px;
+  }
+
+  .panel-content p {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    margin: 0 0 12px;
+  }
+
+  .panel-content h2 {
+    margin: 0;
+    max-width: 420px;
+    color: var(--text);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1;
   }
 
   .eyebrow {
@@ -108,5 +206,16 @@ const featuredArticles = articles.slice(0, 2);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+      margin-top: 100px;
+    }
+
+    .hero-panel {
+      min-height: 300px;
+    }
   }
 </style>
