@@ -48,17 +48,21 @@ const featuredArticles = articles.slice(0, 2);
   </section>
 
   <section class="featured">
-  <div class="section-heading">
-    <p class="eyebrow">Featured Articles</p>
-    <h2>Latest from the archive</h2>
-  </div>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Featured Articles</p>
+        <h2>Latest from the archive</h2>
+      </div>
 
-  <div class="featured-grid">
-    {featuredArticles.map((article) => (
-      <ArticleCard article={article} />
-    ))}
-  </div>
-</section>
+      <a class="section-link" href="/articles">View all articles →</a>
+    </div>
+
+    <div class="featured-grid">
+      {featuredArticles.map((article) => (
+        <ArticleCard article={article} />
+      ))}
+    </div>
+  </section>
 
 </BaseLayout>
 
@@ -190,7 +194,48 @@ const featuredArticles = articles.slice(0, 2);
 
   .featured {
     max-width: var(--max-width);
-    margin: 120px auto 0;
+    margin: 140px auto 0;
+    padding-top: 56px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    margin: 12px 0 0;
+    line-height: 1;
+  }
+
+  .section-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .section-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  @media (max-width: 700px) {
+    .section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
   }
 
   .section-heading {
