@@ -1,0 +1,126 @@
+---
+const {
+  before,
+  after,
+  beforeAlt = "Before image",
+  afterAlt = "After image",
+  beforeLabel = "Before",
+  afterLabel = "After",
+  caption = "",
+} = Astro.props;
+---
+
+<figure class="slider-block">
+  <div class="before-after" style="--position: 50%;">
+    <img class="base-image" src={before} alt={beforeAlt} loading="lazy" />
+
+    <div class="after-layer">
+      <img src={after} alt={afterAlt} loading="lazy" />
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="labels">
+      <span>{beforeLabel}</span>
+      <span>{afterLabel}</span>
+    </div>
+
+    <input
+      class="slider"
+      type="range"
+      min="0"
+      max="100"
+      value="50"
+      aria-label="Compare before and after images"
+    />
+  </div>
+
+  {caption && (
+    <figcaption>{caption}</figcaption>
+  )}
+</figure>
+
+<script>
+  document.querySelectorAll(".before-after").forEach((container) => {
+    const slider = container.querySelector(".slider");
+
+    slider?.addEventListener("input", (event) => {
+      const value = event.target.value;
+      container.style.setProperty("--position", `${value}%`);
+    });
+  });
+</script>
+
+<style>
+  .slider-block {
+    margin: 48px 0;
+  }
+
+  .before-after {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid var(--card-border);
+    background: var(--bg-soft);
+  }
+
+  .base-image,
+  .after-layer img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+  }
+
+  .after-layer {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(0 calc(100% - var(--position)) 0 0);
+  }
+
+  .divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--position);
+    width: 2px;
+    background: var(--text);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .labels {
+    position: absolute;
+    inset: 16px 16px auto;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .labels span {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(5, 7, 13, 0.72);
+    color: var(--text);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .slider {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: ew-resize;
+  }
+
+  figcaption {
+    margin-top: 12px;
+    color: var(--text-soft);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+</style>

@@ -11,6 +11,7 @@ topicSlug: "aeroacoustics"
 import Figure from "../../components/Figure.astro";
 import VideoEmbed from "../../components/VideoEmbed.astro";
 import ImageGallery from "../../components/ImageGallery.astro";
+import BeforeAfterSlider from "../../components/BeforeAfterSlider.astro";
 
 This is the first Aerosect article placeholder.
 
@@ -40,4 +41,12 @@ The full article will be added later.
     }
   ]}
   caption="A placeholder image gallery showing how multiple visuals can be embedded inside an Aerosect article."
+/>
+
+<BeforeAfterSlider
+  before="/images/articles/aerofoil-self-noise.jpg"
+  after="/images/articles/airport-noise-contours.jpg"
+  beforeLabel="Baseline"
+  afterLabel="Modified"
+  caption="A placeholder comparison slider. This can later show baseline versus controlled flow, raw versus processed plots, or model comparison visuals."
 />
