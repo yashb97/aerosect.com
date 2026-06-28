@@ -1,0 +1,52 @@
+---
+const {
+  title = "Key takeaways",
+  items = [],
+} = Astro.props;
+---
+
+<section class="takeaways">
+  <h3>{title}</h3>
+
+  <ul>
+    {items.map((item) => (
+      <li>{item}</li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .takeaways {
+    margin: 48px 0;
+    padding: 28px;
+    border-radius: 24px;
+    background: linear-gradient(
+      135deg,
+      rgba(125, 211, 252, 0.12),
+      rgba(255, 255, 255, 0.045)
+    );
+    border: 1px solid var(--accent-soft);
+  }
+
+  h3 {
+    margin: 0 0 18px;
+    color: var(--text);
+    font-size: 1.35rem;
+  }
+
+  ul {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  li {
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  li::marker {
+    color: var(--accent);
+  }
+</style>

@@ -17,6 +17,7 @@ import ArticleCallout from "../../components/ArticleCallout.astro";
 import ExpandableSection from "../../components/ExpandableSection.astro";
 import SectionBreak from "../../components/SectionBreak.astro";
 import PullQuote from "../../components/PullQuote.astro";
+import KeyTakeaways from "../../components/KeyTakeaways.astro";
 
 This is the first Aerosect article placeholder.
 
@@ -84,4 +85,13 @@ The full article will be added later.
 <PullQuote
   quote="The best engineering stories make invisible forces feel visible."
   attribution="Aerosect"
+/>
+
+<KeyTakeaways
+  title="What this section is really about"
+  items={[
+    "Articles can be technical without feeling dry.",
+    "Visual components help readers stay oriented.",
+    "Aerosect can mix science, storytelling, philosophy, and design."
+  ]}
 />
