@@ -10,12 +10,24 @@ draft: true
 
 # Article Title Here
 
-Start writing the article here.
+A short opening paragraph that hooks the reader and explains why this topic matters.
 
-## Section Heading
+## The core idea
 
-Write the first main section here.
+Explain the main idea in simple terms.
 
-## Another Section
+## Why it matters
 
-Continue the article here.
+Explain the relevance, consequence, or wider meaning.
+
+## A closer look
+
+Add deeper explanation, examples, visuals, equations, history, or storytelling here.
+
+## What to remember
+
+Summarise the article in a few clear points.
+
+- First key point.
+- Second key point.
+- Third key point.
