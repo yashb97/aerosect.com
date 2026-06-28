@@ -43,8 +43,10 @@ const topics = Array.from(
 
 <style>
   .intro {
-    max-width: 760px;
-    margin-top: 100px;
+    max-width: var(--max-width);
+    margin: 110px auto 0;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--card-border);
   }
 
   .eyebrow {
@@ -55,37 +57,46 @@ const topics = Array.from(
   }
 
   h1 {
-    font-size: clamp(3rem, 7vw, 5.5rem);
-    margin: 16px 0;
+    font-size: clamp(3.5rem, 9vw, 7rem);
+    line-height: 0.95;
+    margin: 16px 0 24px;
   }
 
   .intro p {
+    max-width: 760px;
     color: var(--text-muted);
-    font-size: 1.15rem;
+    font-size: 1.18rem;
     line-height: 1.7;
   }
 
   .topic-grid {
+    max-width: var(--max-width);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
-    margin-top: 56px;
+    gap: 28px;
+    margin: 56px auto 0;
   }
 
   .topic-card {
     display: block;
     padding: 32px;
-    border-radius: 24px;
-    background: var(--card);
+    min-height: 180px;
+    border-radius: 28px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)),
+      var(--card);
     border: 1px solid var(--card-border);
     text-decoration: none;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition:
+      transform 0.22s ease,
+      border-color 0.22s ease,
+      box-shadow 0.22s ease;
   }
 
   .topic-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
     border-color: var(--accent-soft);
-    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
   }
 
   .label {
@@ -97,7 +108,9 @@ const topics = Array.from(
   }
 
   .topic-card h2 {
-    margin: 18px 0 0;
+    margin: 22px 0 0;
     color: var(--text);
+    font-size: 1.7rem;
+    line-height: 1.1;
   }
 </style>
