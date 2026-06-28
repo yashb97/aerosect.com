@@ -1,0 +1,80 @@
+---
+const {
+  title = "Read more",
+  label = "Expandable note",
+} = Astro.props;
+---
+
+<details class="expandable">
+  <summary>
+    <span class="label">{label}</span>
+    <span class="title">{title}</span>
+  </summary>
+
+  <div class="content">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .expandable {
+    margin: 40px 0;
+    padding: 0;
+    border-radius: 22px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    overflow: hidden;
+  }
+
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 22px 24px;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: "+";
+    float: right;
+    color: var(--accent);
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+
+  details[open] summary::after {
+    content: "−";
+  }
+
+  .label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+
+  .title {
+    color: var(--text);
+    font-size: 1.08rem;
+    font-weight: 700;
+  }
+
+  .content {
+    padding: 0 24px 24px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .content :global(p) {
+    margin-top: 0;
+  }
+
+  .content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+</style>
