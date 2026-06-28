@@ -65,3 +65,34 @@ Commit and push the changes.
 The article appears only when:
 
 draft: false
+
+## 6. Using visual components
+
+For simple articles, use `.md`.
+
+For articles with custom visuals or interactive blocks, use `.mdx`.
+
+Available reusable components:
+
+- Figure
+- VideoEmbed
+- ImageGallery
+- BeforeAfterSlider
+- ChartBlock
+- ArticleCallout
+- ExpandableSection
+- SectionBreak
+- PullQuote
+- KeyTakeaways
+
+To use a component in an `.mdx` article, import it at the top after the frontmatter, for example:
+
+import Figure from "../../components/Figure.astro";
+
+Then insert it in the article body:
+
+<Figure
+  src="/images/articles/example-image.jpg"
+  alt="Example image"
+  caption="Example caption."
+/>
