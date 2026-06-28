@@ -10,6 +10,7 @@ topicSlug: "aeroacoustics"
 
 import Figure from "../../components/Figure.astro";
 import VideoEmbed from "../../components/VideoEmbed.astro";
+import ImageGallery from "../../components/ImageGallery.astro";
 
 This is the first Aerosect article placeholder.
 
@@ -25,4 +26,18 @@ The full article will be added later.
   src="https://www.youtube.com/embed/dQw4w9WgXcQ"
   title="Placeholder video"
   caption="A placeholder embedded video. This can later be replaced with a real Aerosect visual explainer."
+/>
+
+<ImageGallery
+  images={[
+    {
+      src: "/images/articles/aerofoil-self-noise.jpg",
+      alt: "Aerofoil self-noise visual"
+    },
+    {
+      src: "/images/articles/airport-noise-contours.jpg",
+      alt: "Airport noise contour visual"
+    }
+  ]}
+  caption="A placeholder image gallery showing how multiple visuals can be embedded inside an Aerosect article."
 />
