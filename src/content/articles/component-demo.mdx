@@ -1,0 +1,97 @@
+---
+title: "Aerosect Component Demo"
+description: "A hidden internal article used to test Aerosect visual and interactive article components."
+date: "2026-06-12"
+topic: "Internal"
+topicSlug: "internal"
+image: "/images/articles/aerofoil-self-noise.jpg"
+draft: true
+---
+
+import Figure from "../../components/Figure.astro";
+import VideoEmbed from "../../components/VideoEmbed.astro";
+import ImageGallery from "../../components/ImageGallery.astro";
+import BeforeAfterSlider from "../../components/BeforeAfterSlider.astro";
+import ChartBlock from "../../components/ChartBlock.astro";
+import ArticleCallout from "../../components/ArticleCallout.astro";
+import ExpandableSection from "../../components/ExpandableSection.astro";
+import SectionBreak from "../../components/SectionBreak.astro";
+import PullQuote from "../../components/PullQuote.astro";
+import KeyTakeaways from "../../components/KeyTakeaways.astro";
+
+This is the first Aerosect article placeholder.
+
+The full article will be added later.
+
+<Figure
+  src="/images/articles/aerofoil-self-noise.jpg"
+  alt="Aerofoil self-noise visual"
+  caption="A placeholder visual for a future Aerosect article on aerofoil self-noise."
+/>
+
+<VideoEmbed
+  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+  title="Placeholder video"
+  caption="A placeholder embedded video. This can later be replaced with a real Aerosect visual explainer."
+/>
+
+<ImageGallery
+  images={[
+    {
+      src: "/images/articles/aerofoil-self-noise.jpg",
+      alt: "Aerofoil self-noise visual"
+    },
+    {
+      src: "/images/articles/airport-noise-contours.jpg",
+      alt: "Airport noise contour visual"
+    }
+  ]}
+  caption="A placeholder image gallery showing how multiple visuals can be embedded inside an Aerosect article."
+/>
+
+<BeforeAfterSlider
+  before="/images/articles/aerofoil-self-noise.jpg"
+  after="/images/articles/airport-noise-contours.jpg"
+  beforeLabel="Baseline"
+  afterLabel="Modified"
+  caption="A placeholder comparison slider. This can later show baseline versus controlled flow, raw versus processed plots, or model comparison visuals."
+/>
+
+<ChartBlock
+  title="Example comparison"
+  description="A simple visual comparison block that can be used for technical or non-technical articles."
+  valueSuffix="%"
+  data={[
+    { label: "Visual clarity", value: 90 },
+    { label: "Reader engagement", value: 75 },
+    { label: "Technical depth", value: 65 },
+    { label: "Entertainment value", value: 55 }
+  ]}
+  caption="A placeholder chart showing how Aerosect articles can include simple embedded visual comparisons."
+/>
+
+<ArticleCallout type="question" title="Pause and think">
+  Is engineering mainly about solving equations, or about learning how to ask better questions?
+</ArticleCallout>
+
+<SectionBreak label="A shift in perspective" />
+
+<ExpandableSection label="Optional depth" title="Show the technical note">
+  This section can hide deeper explanations, maths, assumptions, references, or behind-the-scenes commentary.
+
+  It keeps the main article readable while still giving curious readers the option to go deeper.
+</ExpandableSection>
+
+<PullQuote
+  quote="The best engineering stories make invisible forces feel visible."
+  attribution="Aerosect"
+/>
+
+<KeyTakeaways
+  title="What this section is really about"
+  items={[
+    "Articles can be technical without feeling dry.",
+    "Visual components help readers stay oriented.",
+    "Aerosect can mix science, storytelling, philosophy, and design."
+  ]}
+/>
