@@ -26,11 +26,24 @@ const {
 
   <body>
     <main class="page">
-      <nav class="nav">
+      <nav class="nav" aria-label="Main navigation">
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-label="Open menu"
+          aria-controls="site-menu"
+          aria-expanded="false"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         <a class="logo" href="/" aria-label="Aerosect homepage">
-  <img src="/images/aerosect-logo-white.svg" alt="Aerosect" />
-</a>
-        <div class="links">
+          <img src="/images/aerosect-logo-white.svg" alt="Aerosect" />
+        </a>
+
+        <div class="menu-panel" id="site-menu" hidden>
           <a href="/">Home</a>
           <a href="/articles">Articles</a>
           <a href="/topics">Topics</a>
@@ -50,6 +63,53 @@ const {
         </div>
       </footer>
     </main>
+
+    <script>
+      const nav = document.querySelector(".nav");
+      const menuToggle = document.querySelector(".menu-toggle");
+      const menuPanel = document.querySelector(".menu-panel");
+
+      const updateHeader = () => {
+        nav?.classList.toggle("is-scrolled", window.scrollY > 24);
+      };
+
+      const closeMenu = () => {
+        menuPanel?.setAttribute("hidden", "");
+        menuToggle?.setAttribute("aria-expanded", "false");
+        nav?.classList.remove("menu-is-open");
+      };
+
+      const openMenu = () => {
+        menuPanel?.removeAttribute("hidden");
+        menuToggle?.setAttribute("aria-expanded", "true");
+        nav?.classList.add("menu-is-open", "is-scrolled");
+      };
+
+      menuToggle?.addEventListener("click", () => {
+        const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+
+        if (isOpen) {
+          closeMenu();
+          updateHeader();
+        } else {
+          openMenu();
+        }
+      });
+
+      menuPanel?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", closeMenu);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeMenu();
+          updateHeader();
+        }
+      });
+
+      window.addEventListener("scroll", updateHeader, { passive: true });
+      updateHeader();
+    </script>
   </body>
 </html>
 
@@ -64,36 +124,163 @@ const {
   }
 
   .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    max-width: var(--max-width);
-    margin: 0 auto;
+    min-height: 58px;
+    padding: 8px 32px;
+    background: rgba(0, 0, 0, 0);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0);
+    transition:
+      background 0.32s ease,
+      box-shadow 0.32s ease,
+      backdrop-filter 0.32s ease;
+  }
+
+  .nav::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -76px;
+    height: 76px;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.64) 34%,
+      rgba(0, 0, 0, 0.28) 68%,
+      rgba(0, 0, 0, 0)
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.32s ease;
+  }
+
+  .nav > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .nav.is-scrolled,
+  .nav.menu-is-open {
+    background: #000;
+    box-shadow: none;
+    backdrop-filter: blur(14px);
+  }
+
+  .nav.is-scrolled::after,
+  .nav.menu-is-open::after {
+    opacity: 1;
+  }
+
+  .menu-toggle {
+    position: absolute;
+    left: 32px;
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 9px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0);
+    color: var(--text);
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .menu-toggle:hover,
+  .menu-toggle:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--card-border);
+  }
+
+  .menu-toggle:focus-visible,
+  .menu-panel a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .menu-toggle span {
+    display: block;
+    height: 2px;
+    margin: 5px 0;
+    border-radius: 999px;
+    background: currentColor;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
   }
 
   .logo {
     display: inline-flex;
     align-items: center;
     text-decoration: none;
+    transform: translateY(-3px);
   }
 
   .logo img {
-    height: 34px;
+    height: 28px;
     width: auto;
     display: block;
   }
 
-  .links {
+  .menu-panel {
+    position: fixed;
+    top: 58px;
+    left: 32px;
+    width: min(280px, calc(100vw - 64px));
     display: flex;
-    gap: 24px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 18px;
+    border: 1px solid var(--card-border);
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.82);
+    box-shadow: 0 24px 90px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(18px);
   }
 
-  .links a {
+  .menu-panel[hidden] {
+    display: none;
+  }
+
+  .menu-panel a {
+    padding: 14px 16px;
     color: var(--text-muted);
+    border-radius: 0;
     text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition:
+      color 0.2s ease,
+      background 0.2s ease;
   }
 
-  .links a:hover {
+  .menu-panel a:hover {
+    background: rgba(255, 255, 255, 0.08);
     color: var(--text);
   }
 
@@ -143,19 +330,24 @@ const {
     }
 
     .nav {
-      align-items: flex-start;
-      gap: 20px;
+      min-height: 54px;
+      padding: 8px 24px;
+    }
+
+    .menu-toggle {
+      left: 20px;
+      width: 38px;
+      height: 38px;
     }
 
     .logo img {
-      height: 28px;
+      height: 22px;
     }
 
-    .links {
-      gap: 14px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      font-size: 0.9rem;
+    .menu-panel {
+      top: 54px;
+      left: 24px;
+      width: calc(100vw - 48px);
     }
   }
 </style>
