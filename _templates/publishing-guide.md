@@ -42,11 +42,11 @@ when ready to publish.
 
 Place the image in:
 
-public/images/articles/
+src/assets/articles/
 
 Then reference it like:
 
-image: "/images/articles/example-image.jpg"
+image: "../../assets/articles/example-image.jpg"
 
 ## 4. Preview locally
 
@@ -71,6 +71,12 @@ draft: false
 For simple articles, use `.md`.
 
 For articles with custom visuals or interactive blocks, use `.mdx`.
+
+The main article image in the frontmatter uses Astro's optimized image system.
+Extra images inside article components can still use public paths for now.
+Place those supporting images in:
+
+public/images/articles/
 
 Available reusable components:
 

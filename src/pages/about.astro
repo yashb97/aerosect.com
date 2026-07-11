@@ -4,36 +4,37 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <BaseLayout
   title="About | Aerosect"
-  description="Learn about Aerosect, a technical archive for clear and visual aerospace engineering articles."
+  description="Learn about Aerosect, a visual article archive for aerospace, technology, history, ideas, and stories connected to flight."
 >
   <section class="about">
     <p class="eyebrow">About Aerosect</p>
 
-    <h1>A technical archive for aerospace ideas.</h1>
+    <h1>A visual archive for flight, technology, and ideas.</h1>
 
     <p class="lead">
-      Aerosect is being built as a home for clear, visual, and technically grounded
-      articles on aerospace engineering, aeroacoustics, simulation, aircraft noise,
-      and engineering systems.
+      Aerosect is being built as a home for clear, visual, and curious articles
+      on aerospace, technology, history, culture, travel, and the wider ideas
+      connected to flight.
     </p>
 
     <p>
-      The aim is to make complex aerospace topics easier to understand without
-      oversimplifying the underlying physics, modelling assumptions, or engineering context.
+      The aim is to make complex subjects easier to explore without losing the
+      texture, context, or human stories that make them memorable.
     </p>
 
     <p>
-      Over time, Aerosect will grow into a platform for technical articles, visual
-      explainers, modelling workflows, and resources for engineers, researchers, and
-      technically curious readers.
+      Over time, Aerosect will grow into a platform for visual essays,
+      explainers, interactive pieces, and resources for engineers, researchers,
+      travellers, history enthusiasts, and curious readers.
     </p>
   </section>
 </BaseLayout>
 
 <style>
   .about {
-    max-width: var(--max-width);
-    margin: 110px auto 0;
+    width: 100%;
+    max-width: none;
+    margin: 110px 0 0;
   }
 
   .eyebrow {
@@ -45,7 +46,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   h1 {
     max-width: 980px;
-    font-size: clamp(3.5rem, 8vw, 6.4rem);
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
     line-height: 0.95;
     margin: 18px 0 36px;
   }

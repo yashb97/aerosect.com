@@ -20,14 +20,14 @@ const topics = Array.from(
 
 <BaseLayout
   title="Topics | Aerosect"
-  description="Explore Aerosect articles by topic, including aeroacoustics, airport noise, simulation, modelling workflows, and engineering systems."
+  description="Explore Aerosect articles by topic, from aerospace and technology to history, culture, ideas, travel, and visual storytelling."
 >
   <section class="intro">
     <p class="eyebrow">Explore by Topic</p>
     <h1>Topics</h1>
     <p>
-      Browse Aerosect articles by aerospace subject area, from aeroacoustics and airport noise
-      to simulation, modelling workflows, and engineering systems.
+      Browse Aerosect articles by subject area, from aerospace and engineering
+      to technology, history, culture, travel, and visual storytelling.
     </p>
   </section>
 
@@ -43,8 +43,9 @@ const topics = Array.from(
 
 <style>
   .intro {
-    max-width: var(--max-width);
-    margin: 110px auto 0;
+    width: 100%;
+    max-width: none;
+    margin: 110px 0 0;
     padding-bottom: 48px;
     border-bottom: 1px solid var(--card-border);
   }
@@ -57,7 +58,7 @@ const topics = Array.from(
   }
 
   h1 {
-    font-size: clamp(3.5rem, 9vw, 7rem);
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
     line-height: 0.95;
     margin: 16px 0 24px;
   }
@@ -70,11 +71,12 @@ const topics = Array.from(
   }
 
   .topic-grid {
-    max-width: var(--max-width);
+    width: 100%;
+    max-width: none;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 28px;
-    margin: 56px auto 0;
+    margin: 56px 0 0;
   }
 
   .topic-card {

@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+
 const { article } = Astro.props;
 
 const formattedDate = article.data.date.toLocaleDateString("en-GB", {
@@ -10,7 +12,15 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
 
 <article class="card">
   <a class="image-link" href={`/articles/${article.id}`} aria-label={article.data.title}>
-    <img class="image" src={article.data.image} alt="" />
+    <Image
+      class="image"
+      src={article.data.image}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      widths={[640, 960, 1280, 1600, 1920]}
+      sizes="(max-width: 900px) calc(100vw - 84px), calc((100vw - 92px) / 2)"
+    />
   </a>
 
   <div class="meta">
@@ -52,15 +62,18 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
 
   .image-link {
     display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 22px;
   }
 
   .image {
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
-    border-radius: 4px;
-    margin-bottom: 22px;
   }
 
   .meta {

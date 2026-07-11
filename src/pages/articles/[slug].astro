@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -33,7 +34,17 @@ const { Content } = await render(article);
       })}
     </p>
 
-    <img class="hero-image" src={article.data.image} alt="" />
+    <div class="hero-image-frame">
+      <Image
+        class="hero-image"
+        src={article.data.image}
+        alt=""
+        loading="eager"
+        decoding="async"
+        widths={[720, 960, 1280, 1600, 1920]}
+        sizes="(max-width: 900px) calc(100vw - 48px), 860px"
+      />
+    </div>
 
     <div class="content">
       <Content />
@@ -44,7 +55,7 @@ const { Content } = await render(article);
 <style>
   .article {
     max-width: 860px;
-    margin: 110px auto 0;
+    margin: 110px 0 0;
   }
 
   .back {
@@ -67,7 +78,7 @@ const { Content } = await render(article);
   }
 
   h1 {
-    font-size: clamp(3rem, 8vw, 6.4rem);
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
     line-height: 0.95;
     margin: 18px 0 24px;
   }
@@ -85,13 +96,21 @@ const { Content } = await render(article);
     font-size: 0.95rem;
   }
 
-  .hero-image {
+  .hero-image-frame {
     width: 100%;
     aspect-ratio: 16 / 9;
-    object-fit: cover;
     border-radius: 8px;
     margin-top: 48px;
     border: 1px solid var(--card-border);
+    overflow: hidden;
+  }
+
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
 
   .content {
@@ -177,7 +196,7 @@ const { Content } = await render(article);
       margin-top: 90px;
     }
 
-    .hero-image {
+    .hero-image-frame {
       border-radius: 8px;
     }
   }

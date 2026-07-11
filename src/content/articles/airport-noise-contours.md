@@ -4,7 +4,7 @@ description: "A future article explaining how individual aircraft noise events a
 date: "2026-06-11"
 topic: "Airport Noise"
 draft: false
-image: "/images/articles/airport-noise-contours.jpg"
+image: "../../assets/articles/airport-noise-contours.jpg"
 topicSlug: "airport-noise"
 ---
 

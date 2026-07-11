@@ -1,9 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleCard from "../components/ArticleCard.astro";
-import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
-import homepageDream from "../assets/backgrounds/homepage-dream.jpg";
 
 const articles = await getCollection("articles", ({ data }) => !data.draft);
 
@@ -12,29 +10,20 @@ articles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const featuredArticles = articles.slice(0, 2);
 ---
 
-<BaseLayout title="Aerosect | Aerospace Knowledge Archive">
-  <div class="home-background" aria-hidden="true">
-    <Image
-      class="home-background-image"
-      src={homepageDream}
-      alt=""
-      loading="eager"
-      decoding="async"
-      sizes="100vw"
-      widths={[960, 1280, 1600, 1920, 2400]}
-    />
-  </div>
-
+<BaseLayout
+  title="Aerosect | Visual Article Archive"
+  description="Aerosect is a visual article archive for aerospace, technology, history, ideas, travel, and curious stories connected to flight and engineering."
+>
   <section class="home-hero">
     <div class="hero-copy">
       <p class="eyebrow">Aerospace · Ideas · Simulation · Stories</p>
 
-      <h1>Exploring the ideas shaping aerospace engineering.</h1>
+      <h1>Exploring flight, ideas, and the stories behind technology.</h1>
 
       <p class="subtitle">
-        Aerosect is a visual knowledge archive for aerospace, aeroacoustics,
-        aircraft noise, simulation, engineering systems, and the wider ideas that
-        make technology worth thinking about.
+        Aerosect is a visual article archive for aerospace, technology, history,
+        culture, travel, and the wider ideas that make engineering worth thinking
+        about.
       </p>
 
       <div class="actions">
@@ -64,49 +53,6 @@ const featuredArticles = articles.slice(0, 2);
 </BaseLayout>
 
 <style>
-  .home-background {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    background: #000;
-    pointer-events: none;
-  }
-
-  .home-background::before,
-  .home-background::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .home-background::before {
-    z-index: 1;
-    background:
-      linear-gradient(90deg, rgba(5, 7, 13, 0.68), rgba(5, 7, 13, 0.34) 44%, rgba(5, 7, 13, 0.46)),
-      linear-gradient(180deg, rgba(5, 7, 13, 0.38), rgba(5, 7, 13, 0.12) 38%, rgba(5, 7, 13, 0.7));
-  }
-
-  .home-background::after {
-    z-index: 2;
-    background:
-      radial-gradient(circle at 18% 24%, rgba(125, 211, 252, 0.14), transparent 28%),
-      radial-gradient(circle at 72% 62%, rgba(245, 158, 11, 0.16), transparent 34%);
-    mix-blend-mode: screen;
-    opacity: 0.52;
-  }
-
-  .home-background-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    object-position: center;
-    filter: saturate(0.92) brightness(0.92) contrast(1.02);
-    transform: scale(1.03);
-  }
-
   .home-hero {
     display: block;
     position: relative;
@@ -206,12 +152,6 @@ const featuredArticles = articles.slice(0, 2);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
-  }
-
-  :global(.page) {
-    position: relative;
-    isolation: isolate;
-    background: transparent;
   }
 
   @media (max-width: 700px) {

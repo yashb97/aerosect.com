@@ -10,14 +10,14 @@ articles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 <BaseLayout
   title="Articles | Aerosect"
-  description="Browse Aerosect articles on aerospace engineering, aeroacoustics, aircraft noise, simulation, and engineering systems."
+  description="Browse Aerosect articles on aerospace, technology, history, ideas, visual explainers, and stories connected to flight and engineering."
 >
   <section class="intro">
     <p class="eyebrow">Knowledge Archive</p>
     <h1>Articles</h1>
     <p>
-      A growing archive of technical essays, explainers, and visual notes on
-      aerospace engineering, aeroacoustics, aircraft noise, simulation, and engineering systems.
+      A growing archive of visual essays, explainers, and stories on aerospace,
+      technology, history, ideas, travel, and the culture around flight.
     </p>
   </section>
 
@@ -30,8 +30,9 @@ articles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 <style>
   .intro {
-    max-width: var(--max-width);
-    margin: 110px auto 0;
+    width: 100%;
+    max-width: none;
+    margin: 110px 0 0;
     padding-bottom: 48px;
     border-bottom: 1px solid var(--card-border);
   }
@@ -44,7 +45,7 @@ articles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
   }
 
   h1 {
-    font-size: clamp(3.5rem, 9vw, 7rem);
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
     line-height: 0.95;
     margin: 16px 0 24px;
   }
@@ -57,10 +58,11 @@ articles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
   }
 
   .grid {
-    max-width: var(--max-width);
+    width: 100%;
+    max-width: none;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 28px;
-    margin: 56px auto 0;
+    margin: 56px 0 0;
   }
 </style>
