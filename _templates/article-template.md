@@ -1,6 +1,7 @@
 ---
 title: "Article Title Here"
 description: "One or two sentences explaining what this article is about."
+author: "Yash B"
 date: "2026-06-12"
 topic: "Aeroacoustics"
 topicSlug: "aeroacoustics"

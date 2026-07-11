@@ -1,6 +1,7 @@
 ---
 title: "From Aircraft Noise to Airport Noise Contours"
 description: "A future article explaining how individual aircraft noise events are translated into airport-level noise exposure contours."
+author: "Yash B"
 date: "2026-06-11"
 topic: "Airport Noise"
 draft: false

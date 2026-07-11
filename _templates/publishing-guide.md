@@ -20,6 +20,7 @@ Required fields:
 
 title:
 description:
+author:
 date:
 topic:
 topicSlug:

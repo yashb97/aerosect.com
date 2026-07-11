@@ -22,6 +22,8 @@ const { Content } = await render(article);
   image={article.data.image}
   imageAlt={article.data.title}
   ogType="article"
+  author={article.data.author}
+  publishedTime={article.data.date.toISOString()}
 >
   <article class="article">
     <a class="back" href="/articles">← Back to articles</a>
