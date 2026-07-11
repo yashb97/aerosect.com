@@ -6,6 +6,7 @@ date: "2026-06-12"
 topic: "Aeroacoustics"
 topicSlug: "aeroacoustics"
 image: "../../assets/articles/example-image.jpg"
+socialImage: "../../assets/social/articles/example-social-card.jpg"
 draft: true
 ---
 

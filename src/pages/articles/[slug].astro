@@ -19,7 +19,7 @@ const { Content } = await render(article);
 <BaseLayout
   title={`${article.data.title} | Aerosect`}
   description={article.data.description}
-  image={article.data.image}
+  image={article.data.socialImage ?? article.data.image}
   imageAlt={article.data.title}
   ogType="article"
   author={article.data.author}

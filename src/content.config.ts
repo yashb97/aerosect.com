@@ -12,6 +12,7 @@ const articles = defineCollection({
     topic: z.string(),
     topicSlug: z.string(),
     image: image(),
+    socialImage: image().optional(),
     draft: z.boolean().default(false),
   }),
 });

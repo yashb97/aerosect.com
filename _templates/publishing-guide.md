@@ -25,6 +25,7 @@ date:
 topic:
 topicSlug:
 image:
+socialImage:
 draft:
 
 Use:
@@ -48,6 +49,14 @@ src/assets/articles/
 Then reference it like:
 
 image: "../../assets/articles/example-image.jpg"
+
+For the social sharing card, place a 1200 x 630 image in:
+
+src/assets/social/articles/
+
+Then reference it like:
+
+socialImage: "../../assets/social/articles/example-social-card.jpg"
 
 ## 4. Preview locally
 
