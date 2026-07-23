@@ -1,114 +1,372 @@
 # Aerosect Article Publishing Guide
 
-## 1. Create a new article file
+This guide is the repeatable process for writing, previewing, and publishing new Aerosect articles.
+
+Aerosect articles live in `src/content/articles/`. Each article is a Markdown or MDX file with frontmatter at the top. The frontmatter controls the archive card, topic page, social sharing preview, publication date, author, and whether the article is public.
+
+## 1. Start From The Template
 
 Copy:
 
+```text
 _templates/article-template.md
+```
 
-Into:
+Paste it into:
 
+```text
 src/content/articles/
+```
 
-Rename it using a clean slug, for example:
+Rename the copied file using a clean URL-style slug:
 
-aerofoil-self-noise.md
+```text
+future-of-airports.md
+```
 
-## 2. Update the frontmatter
+The filename becomes the public article URL:
 
-Required fields:
+```text
+https://aerosect.com/articles/future-of-airports/
+```
 
-title:
-description:
-author:
-date:
-topic:
-topicSlug:
-image:
-socialImage:
-draft:
+Use lowercase letters, numbers, and hyphens. Avoid spaces, underscores, punctuation, and very long filenames.
 
-Use:
+## 2. Choose Markdown Or MDX
 
+Use `.md` for normal text articles.
+
+Use `.mdx` when the article needs Astro components such as figures, galleries, pull quotes, callouts, sliders, charts, expandable sections, or other interactive blocks.
+
+Simple article:
+
+```text
+future-of-airports.md
+```
+
+Component-rich article:
+
+```text
+future-of-airports.mdx
+```
+
+## 3. Fill In The Frontmatter
+
+Every article starts with frontmatter:
+
+```md
+---
+title: "Article Title"
+description: "Short preview text for archive cards and social sharing."
+author: "Yash B"
+date: "2026-07-23"
+topic: "Aviation History"
+topicSlug: "aviation-history"
+image: "../../assets/articles/article-image.jpg"
+socialImage: "../../assets/social/articles/article-social-card.jpg"
 draft: true
+---
+```
 
-while writing.
+Field meanings:
 
-Use:
+`title`: The article title shown on the article page, archive card, browser tab, and social preview.
 
+`description`: A concise summary used on archive cards and social previews. Aim for one clear sentence.
+
+`author`: The author name used in metadata. Most articles can use `Yash B`, but future contributors can have their own name.
+
+`date`: Publication date in `YYYY-MM-DD` format.
+
+`topic`: The human-readable topic label shown to readers.
+
+`topicSlug`: The URL-friendly topic identifier. Use lowercase letters and hyphens.
+
+`image`: The main article image used on archive cards and inside the article page.
+
+`socialImage`: The image used when the article is shared on LinkedIn, WhatsApp, Teams, Slack, and similar platforms.
+
+`draft`: Controls whether the article is public.
+
+## 4. Keep Drafts Hidden
+
+While writing, keep:
+
+```md
+draft: true
+```
+
+Draft articles are hidden from the public archive and topic pages.
+
+When the article is ready to publish, change it to:
+
+```md
 draft: false
+```
 
-when ready to publish.
+## 5. Add Article Images
 
-## 3. Add the article image
+The main article image goes here:
 
-Place the image in:
-
+```text
 src/assets/articles/
+```
 
-Then reference it like:
+Reference it in frontmatter like this:
 
-image: "../../assets/articles/example-image.jpg"
+```md
+image: "../../assets/articles/article-image.jpg"
+```
 
-For the social sharing card, place a 1200 x 630 image in:
+This image is processed by Astro's image system, which can generate optimized versions for the live site.
 
+## 6. Add The Social Sharing Image
+
+Each article can have its own social card image.
+
+Place article-specific social cards here:
+
+```text
 src/assets/social/articles/
+```
 
-Then reference it like:
+Reference one like this:
 
-socialImage: "../../assets/social/articles/example-social-card.jpg"
+```md
+socialImage: "../../assets/social/articles/article-social-card.jpg"
+```
 
-## 4. Preview locally
+Recommended social card size:
 
-Run:
+```text
+1200 x 630 px
+```
 
-npm.cmd run dev
+Recommended format:
 
-Open:
+```text
+JPG
+```
 
-http://localhost:4321/articles
+If `socialImage` is missing, the site falls back to the main article `image`.
 
-## 5. Publish
+The site-wide default social card is:
 
-Commit and push the changes.
+```text
+src/assets/social/aerosect-social-card.jpg
+```
 
-The article appears only when:
+Replace that file with the same name when you design the final Aerosect-wide social card.
 
-draft: false
+## 7. Write The Article Body
 
-## 6. Using visual components
+After the frontmatter, write the article using Markdown:
 
-For simple articles, use `.md`.
+```md
+# Article Title
 
-For articles with custom visuals or interactive blocks, use `.mdx`.
+Opening paragraph that hooks the reader and explains why the article matters.
 
-The main article image in the frontmatter uses Astro's optimized image system.
-Extra images inside article components can still use public paths for now.
-Place those supporting images in:
+## Section Heading
 
-public/images/articles/
+Main article text.
+
+## Another Section
+
+More detail, examples, context, or interpretation.
+```
+
+Use headings to make the article easy to scan. Prefer clear section titles over generic headings.
+
+Good article structure:
+
+```text
+Opening hook
+Core idea
+Why it matters
+Detailed explanation
+Visuals or examples
+What to remember
+```
+
+## 8. Use Visual Components In MDX Articles
 
 Available reusable components:
 
-- Figure
-- VideoEmbed
-- ImageGallery
-- BeforeAfterSlider
-- ChartBlock
-- ArticleCallout
-- ExpandableSection
-- SectionBreak
-- PullQuote
-- KeyTakeaways
+```text
+Figure
+VideoEmbed
+ImageGallery
+BeforeAfterSlider
+ChartBlock
+ArticleCallout
+ExpandableSection
+SectionBreak
+PullQuote
+KeyTakeaways
+```
 
-To use a component in an `.mdx` article, import it at the top after the frontmatter, for example:
+For MDX articles, import a component after the frontmatter:
 
+```mdx
 import Figure from "../../components/Figure.astro";
+```
 
-Then insert it in the article body:
+Then use it in the article:
 
+```mdx
 <Figure
   src="/images/articles/example-image.jpg"
   alt="Example image"
   caption="Example caption."
 />
+```
+
+Supporting images used inside article components can currently live here:
+
+```text
+public/images/articles/
+```
+
+Then they can be referenced with public paths:
+
+```text
+/images/articles/example-image.jpg
+```
+
+## 9. Preview Locally
+
+Run:
+
+```text
+npm.cmd run dev
+```
+
+Open:
+
+```text
+http://localhost:4321
+```
+
+Useful pages to check:
+
+```text
+/
+/articles/
+/articles/your-article-slug/
+/topics/
+/topics/your-topic-slug/
+```
+
+Check desktop and mobile widths. On mobile, make sure the headline, article card, image crop, and hamburger menu all behave properly.
+
+## 10. Run The Production Build
+
+Before publishing, run:
+
+```text
+npm.cmd run build
+```
+
+If the build fails, fix the error before publishing. Common causes are:
+
+- an image path is wrong;
+- a required frontmatter field is missing;
+- a date is not in the right format;
+- an MDX component import path is wrong.
+
+## 11. Publish The Article
+
+When the article is ready:
+
+1. Set `draft: false`.
+2. Run `npm.cmd run build`.
+3. Commit the changes.
+4. Push to `astro-rebuild`.
+
+Typical commands:
+
+```text
+git add .
+git commit -m "Add article title"
+git push origin astro-rebuild
+```
+
+GitHub Actions will deploy the site automatically after the push.
+
+Check deployment here:
+
+```text
+GitHub -> yashb97/aerosect.com -> Actions
+```
+
+Wait for `Deploy to GitHub Pages` to finish successfully.
+
+## 12. Check The Live Article
+
+After deployment, open the live URL:
+
+```text
+https://aerosect.com/articles/your-article-slug/
+```
+
+If the old version appears, use a hard refresh:
+
+```text
+Ctrl + F5
+```
+
+## 13. Check Social Sharing
+
+Use LinkedIn Post Inspector:
+
+```text
+https://www.linkedin.com/post-inspector/
+```
+
+Paste the live article URL and check that it shows:
+
+- article title;
+- description;
+- author;
+- article social image;
+- correct URL.
+
+LinkedIn and other platforms can cache previews. If a preview looks stale, wait a few minutes and inspect the URL again.
+
+## 14. Topic Pages
+
+Topic pages are generated automatically from article frontmatter.
+
+If you create an article with:
+
+```md
+topic: "Aviation History"
+topicSlug: "aviation-history"
+```
+
+the site will generate or update:
+
+```text
+https://aerosect.com/topics/aviation-history/
+```
+
+Use the same `topic` and `topicSlug` consistently across articles that belong together.
+
+## 15. Quick Publishing Checklist
+
+Before publishing, confirm:
+
+- `draft` is set to `false`;
+- title is polished;
+- description is concise;
+- author is correct;
+- date is correct;
+- topic and topicSlug match;
+- main article image exists;
+- socialImage exists, or fallback to main image is acceptable;
+- article works on mobile;
+- `npm.cmd run build` passes;
+- GitHub Actions deployment succeeds;
+- live article opens correctly;
+- LinkedIn Post Inspector sees the expected preview.

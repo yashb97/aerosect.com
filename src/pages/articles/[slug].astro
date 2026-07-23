@@ -59,8 +59,44 @@ const { Content } = await render(article);
 
 <style>
   .article {
-    max-width: 860px;
-    margin: 110px 0 0;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    max-width: 920px;
+    margin: 110px auto 0;
+  }
+
+  .article::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: calc(-110px - 32px);
+    bottom: -260px;
+    left: 50%;
+    width: min(1120px, calc(100vw - 32px));
+    transform: translateX(-50%);
+    background: rgba(5, 7, 13, 0.16);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.72) 5%,
+      #000 24%,
+      #000 76%,
+      rgba(0, 0, 0, 0.72) 95%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.72) 5%,
+      #000 24%,
+      #000 76%,
+      rgba(0, 0, 0, 0.72) 95%,
+      transparent 100%
+    );
+    pointer-events: none;
   }
 
   .back {
