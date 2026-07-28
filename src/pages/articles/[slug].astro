@@ -26,6 +26,7 @@ const { Content } = await render(article);
   publishedTime={article.data.date.toISOString()}
 >
   <article class="article">
+    <div class="article-band" aria-hidden="true"></div>
     <a class="back" href="/articles">← Back to articles</a>
 
     <p class="topic">{article.data.topic}</p>
@@ -60,14 +61,11 @@ const { Content } = await render(article);
 <style>
   .article {
     position: relative;
-    z-index: 1;
-    isolation: isolate;
     max-width: 920px;
     margin: 110px auto 0;
   }
 
-  .article::before {
-    content: "";
+  .article-band {
     position: absolute;
     z-index: 0;
     top: calc(-110px - 32px);
@@ -100,7 +98,7 @@ const { Content } = await render(article);
     pointer-events: none;
   }
 
-  .article > * {
+  .article > :not(.article-band) {
     position: relative;
     z-index: 1;
   }
