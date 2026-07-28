@@ -69,11 +69,12 @@ const { Content } = await render(article);
   .article::before {
     content: "";
     position: absolute;
-    z-index: -1;
+    z-index: 0;
     top: calc(-110px - 32px);
     bottom: -260px;
     left: 50%;
-    width: min(1120px, calc(100vw - 32px));
+    width: 1120px;
+    max-width: calc(100vw - 32px);
     transform: translateX(-50%);
     background: rgba(5, 7, 13, 0.16);
     backdrop-filter: blur(18px);
@@ -97,6 +98,11 @@ const { Content } = await render(article);
       transparent 100%
     );
     pointer-events: none;
+  }
+
+  .article > * {
+    position: relative;
+    z-index: 1;
   }
 
   .back {
