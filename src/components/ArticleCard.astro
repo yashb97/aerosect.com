@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 
 const { article } = Astro.props;
 const topics = article.data.topics;
+const isLocalDraft = import.meta.env.DEV && article.data.draft;
 
 const formattedDate = article.data.date.toLocaleDateString("en-GB", {
   day: "numeric",
@@ -32,7 +33,10 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
         </a>
       ))}
     </div>
-    <p class="date">{formattedDate}</p>
+    <div class="card-status">
+      {isLocalDraft && <span class="draft-label">Draft</span>}
+      <p class="date">{formattedDate}</p>
+    </div>
   </div>
 
   <h2>
@@ -95,6 +99,13 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
     gap: 8px 12px;
   }
 
+  .card-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
   .topic,
   .date {
     font-size: 0.72rem;
@@ -115,6 +126,18 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
 
   .date {
     color: var(--text-soft);
+  }
+
+  .draft-label {
+    padding: 4px 7px;
+    border: 1px solid rgba(125, 211, 252, 0.35);
+    border-radius: 4px;
+    color: var(--accent);
+    background: rgba(125, 211, 252, 0.08);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   h2 {

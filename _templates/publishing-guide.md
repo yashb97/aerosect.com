@@ -108,6 +108,14 @@ draft: true
 
 Draft articles are hidden from the public archive and topic pages.
 
+Draft articles are still visible when you run the site locally with:
+
+```text
+npm.cmd run dev
+```
+
+This lets you preview unfinished articles without making them public. Local draft articles show a small draft label on article cards and article pages.
+
 When the article is ready to publish, change it to:
 
 ```md
@@ -146,6 +154,8 @@ imageCredit:
 ```
 
 Do not invent a credit. If the source is uncertain, keep the article as a draft until the image source is confirmed or replace the image.
+
+Credits only appear on article pages after you manually add `imageCredit`. Existing articles without `imageCredit` will not show a credit line.
 
 ## 6. Add The Social Sharing Image
 
@@ -316,6 +326,26 @@ Open:
 ```text
 http://localhost:4321
 ```
+
+To preview a draft article directly, open:
+
+```text
+http://localhost:4321/articles/your-article-slug/
+```
+
+The slug comes from the article filename. For example:
+
+```text
+src/content/articles/future-of-airports.mdx
+```
+
+can be previewed at:
+
+```text
+http://localhost:4321/articles/future-of-airports/
+```
+
+You do not need to change `draft: true` while previewing locally. Production builds still hide drafts.
 
 Useful pages to check:
 
