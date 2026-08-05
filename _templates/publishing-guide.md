@@ -60,9 +60,15 @@ title: "Article Title"
 description: "Short preview text for archive cards and social sharing."
 author: "Yash B"
 date: "2026-07-23"
-topic: "Aviation History"
-topicSlug: "aviation-history"
+topics:
+  - name: "Aviation History"
+    slug: "aviation-history"
+  - name: "Ideas"
+    slug: "ideas"
 image: "../../assets/articles/article-image.jpg"
+imageCredit:
+  text: "Photographer or source name"
+  url: "https://example.com/source-page"
 socialImage: "../../assets/social/articles/article-social-card.jpg"
 draft: true
 ---
@@ -78,11 +84,15 @@ Field meanings:
 
 `date`: Publication date in `YYYY-MM-DD` format.
 
-`topic`: The human-readable topic label shown to readers.
+`topics`: A list of one or more topics attached to the article. Each topic needs a human-readable `name` and a URL-friendly `slug`.
 
-`topicSlug`: The URL-friendly topic identifier. Use lowercase letters and hyphens.
+`name`: The topic label shown to readers, for example `Aviation History`.
+
+`slug`: The URL-friendly topic identifier, for example `aviation-history`. Use lowercase letters and hyphens.
 
 `image`: The main article image used on archive cards and inside the article page.
+
+`imageCredit`: The credit shown under the main article image on the article page. Use this for externally sourced article photos. The `url` is optional, but recommended when the image came from a public source page.
 
 `socialImage`: The image used when the article is shared on LinkedIn, WhatsApp, Teams, Slack, and similar platforms.
 
@@ -119,6 +129,23 @@ image: "../../assets/articles/article-image.jpg"
 ```
 
 This image is processed by Astro's image system, which can generate optimized versions for the live site.
+
+If the image is externally sourced, add a credit below it in frontmatter:
+
+```md
+imageCredit:
+  text: "Photo by Photographer Name / Source"
+  url: "https://example.com/source-page"
+```
+
+If the image is your own render, diagram, or original Aerosect asset, you can either omit `imageCredit` or use:
+
+```md
+imageCredit:
+  text: "Aerosect"
+```
+
+Do not invent a credit. If the source is uncertain, keep the article as a draft until the image source is confirmed or replace the image.
 
 ## 6. Add The Social Sharing Image
 
@@ -219,6 +246,8 @@ Then use it in the article:
   src="/images/articles/example-image.jpg"
   alt="Example image"
   caption="Example caption."
+  credit="Photo by Photographer Name / Source"
+  creditUrl="https://example.com/source-page"
 />
 ```
 
@@ -233,6 +262,46 @@ Then they can be referenced with public paths:
 ```text
 /images/articles/example-image.jpg
 ```
+
+For galleries, add credits directly to each image object:
+
+```mdx
+<ImageGallery
+  images={[
+    {
+      src: "/images/articles/example-one.jpg",
+      alt: "Example image one",
+      credit: "Photo by Photographer One",
+      creditUrl: "https://example.com/source-one"
+    },
+    {
+      src: "/images/articles/example-two.jpg",
+      alt: "Example image two",
+      credit: "Photo by Photographer Two",
+      creditUrl: "https://example.com/source-two"
+    }
+  ]}
+  caption="A short gallery caption."
+/>
+```
+
+For before/after sliders, use:
+
+```mdx
+<BeforeAfterSlider
+  before="/images/articles/before.jpg"
+  after="/images/articles/after.jpg"
+  beforeLabel="Before"
+  afterLabel="After"
+  beforeCredit="Before image source"
+  beforeCreditUrl="https://example.com/before"
+  afterCredit="After image source"
+  afterCreditUrl="https://example.com/after"
+  caption="A short comparison caption."
+/>
+```
+
+Social card images and decorative site background images do not need article-page credits. Track those separately in `ASSET_CREDITS.md` when needed.
 
 ## 9. Preview Locally
 
@@ -341,17 +410,23 @@ Topic pages are generated automatically from article frontmatter.
 If you create an article with:
 
 ```md
-topic: "Aviation History"
-topicSlug: "aviation-history"
+topics:
+  - name: "Aviation History"
+    slug: "aviation-history"
+  - name: "Ideas"
+    slug: "ideas"
 ```
 
-the site will generate or update:
+the site will generate or update both:
 
 ```text
 https://aerosect.com/topics/aviation-history/
+https://aerosect.com/topics/ideas/
 ```
 
-Use the same `topic` and `topicSlug` consistently across articles that belong together.
+The article will appear on every topic page listed in its frontmatter.
+
+Use the same topic `name` and `slug` consistently across articles that belong together. The first topic in the list is treated as the primary topic when space is limited, so place the most important topic first.
 
 ## 15. Quick Publishing Checklist
 
@@ -362,8 +437,9 @@ Before publishing, confirm:
 - description is concise;
 - author is correct;
 - date is correct;
-- topic and topicSlug match;
+- topics have matching names and slugs;
 - main article image exists;
+- article photo credits are present where needed;
 - socialImage exists, or fallback to main image is acceptable;
 - article works on mobile;
 - `npm.cmd run build` passes;

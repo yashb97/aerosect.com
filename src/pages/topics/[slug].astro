@@ -7,13 +7,15 @@ const allArticles = await getCollection("articles", ({ data }) => !data.draft);
 
 const topics = Array.from(
   new Map(
-    allArticles.map((article) => [
-      article.data.topicSlug,
-      {
-        name: article.data.topic,
-        slug: article.data.topicSlug,
-      },
-    ])
+    allArticles
+      .flatMap((article) => article.data.topics)
+      .map((topic) => [
+        topic.slug,
+        {
+          name: topic.name,
+          slug: topic.slug,
+        },
+      ])
   ).values()
 );
 
@@ -22,13 +24,15 @@ export async function getStaticPaths() {
 
   const topics = Array.from(
     new Map(
-      articles.map((article) => [
-        article.data.topicSlug,
-        {
-          name: article.data.topic,
-          slug: article.data.topicSlug,
-        },
-      ])
+      articles
+        .flatMap((article) => article.data.topics)
+        .map((topic) => [
+          topic.slug,
+          {
+            name: topic.name,
+            slug: topic.slug,
+          },
+        ])
     ).values()
   );
 
@@ -41,7 +45,7 @@ export async function getStaticPaths() {
 const { topic } = Astro.props;
 
 const articles = allArticles
-  .filter((article) => article.data.topicSlug === topic.slug)
+  .filter((article) => article.data.topics.some((articleTopic) => articleTopic.slug === topic.slug))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 

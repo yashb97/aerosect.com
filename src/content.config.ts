@@ -9,9 +9,17 @@ const articles = defineCollection({
     description: z.string(),
     author: z.string().default("Yash B"),
     date: z.coerce.date(),
-    topic: z.string(),
-    topicSlug: z.string(),
+    topics: z.array(
+      z.object({
+        name: z.string(),
+        slug: z.string(),
+      })
+    ).min(1),
     image: image(),
+    imageCredit: z.object({
+      text: z.string(),
+      url: z.string().url().optional(),
+    }).optional(),
     socialImage: image().optional(),
     draft: z.boolean().default(false),
   }),

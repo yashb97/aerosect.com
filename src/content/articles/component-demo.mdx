@@ -3,9 +3,12 @@ title: "Aerosect Component Demo"
 description: "A hidden internal article used to test Aerosect visual and interactive article components."
 author: "Yash B"
 date: "2026-06-12"
-topic: "Internal"
-topicSlug: "internal"
+topics:
+  - name: "Internal"
+    slug: "internal"
 image: "../../assets/articles/aerofoil-self-noise.jpg"
+imageCredit:
+  text: "Aerosect test image"
 draft: true
 ---
 
@@ -28,6 +31,7 @@ The full article will be added later.
   src="/images/articles/aerofoil-self-noise.jpg"
   alt="Aerofoil self-noise visual"
   caption="A placeholder visual for a future Aerosect article on aerofoil self-noise."
+  credit="Aerosect test image"
 />
 
 <VideoEmbed
@@ -40,11 +44,13 @@ The full article will be added later.
   images={[
     {
       src: "/images/articles/aerofoil-self-noise.jpg",
-      alt: "Aerofoil self-noise visual"
+      alt: "Aerofoil self-noise visual",
+      credit: "Aerosect test image"
     },
     {
       src: "/images/articles/airport-noise-contours.jpg",
-      alt: "Airport noise contour visual"
+      alt: "Airport noise contour visual",
+      credit: "Aerosect test image"
     }
   ]}
   caption="A placeholder image gallery showing how multiple visuals can be embedded inside an Aerosect article."
@@ -55,6 +61,8 @@ The full article will be added later.
   after="/images/articles/airport-noise-contours.jpg"
   beforeLabel="Baseline"
   afterLabel="Modified"
+  beforeCredit="Aerosect test image"
+  afterCredit="Aerosect test image"
   caption="A placeholder comparison slider. This can later show baseline versus controlled flow, raw versus processed plots, or model comparison visuals."
 />
 

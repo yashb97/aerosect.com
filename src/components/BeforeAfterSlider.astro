@@ -6,8 +6,17 @@ const {
   afterAlt = "After image",
   beforeLabel = "Before",
   afterLabel = "After",
+  beforeCredit = "",
+  beforeCreditUrl = "",
+  afterCredit = "",
+  afterCreditUrl = "",
   caption = "",
 } = Astro.props;
+
+const credits = [
+  { label: beforeLabel, text: beforeCredit, url: beforeCreditUrl },
+  { label: afterLabel, text: afterCredit, url: afterCreditUrl },
+].filter((credit) => credit.text);
 ---
 
 <figure class="slider-block">
@@ -35,8 +44,24 @@ const {
     />
   </div>
 
-  {caption && (
-    <figcaption>{caption}</figcaption>
+  {(caption || credits.length > 0) && (
+    <figcaption>
+      {caption && <span>{caption}</span>}
+      {credits.length > 0 && (
+        <span class="credits">
+          Images: {credits.map((credit, index) => (
+            <>
+              {index > 0 && " · "}
+              {credit.label}: {credit.url ? (
+                <a href={credit.url} target="_blank" rel="noopener noreferrer">{credit.text}</a>
+              ) : (
+                credit.text
+              )}
+            </>
+          ))}
+        </span>
+      )}
+    </figcaption>
   )}
 </figure>
 
@@ -117,10 +142,21 @@ const {
   }
 
   figcaption {
+    display: grid;
+    gap: 4px;
     margin-top: 12px;
     color: var(--text-soft);
     font-size: 0.92rem;
     line-height: 1.6;
     text-align: center;
+  }
+
+  .credits {
+    font-size: 0.82rem;
+  }
+
+  .credits a {
+    color: inherit;
+    text-underline-offset: 3px;
   }
 </style>

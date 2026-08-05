@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 
 const { article } = Astro.props;
+const topics = article.data.topics;
 
 const formattedDate = article.data.date.toLocaleDateString("en-GB", {
   day: "numeric",
@@ -24,9 +25,13 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
   </a>
 
   <div class="meta">
-    <a class="topic" href={`/topics/${article.data.topicSlug}`}>
-      {article.data.topic}
-    </a>
+    <div class="topics" aria-label="Article topics">
+      {topics.map((topic) => (
+        <a class="topic" href={`/topics/${topic.slug}`}>
+          {topic.name}
+        </a>
+      ))}
+    </div>
     <p class="date">{formattedDate}</p>
   </div>
 
@@ -80,8 +85,14 @@ const formattedDate = article.data.date.toLocaleDateString("en-GB", {
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    align-items: center;
+    align-items: flex-start;
     padding: 0 10px;
+  }
+
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
   }
 
   .topic,

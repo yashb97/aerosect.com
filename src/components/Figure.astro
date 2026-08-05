@@ -3,6 +3,8 @@ const {
   src,
   alt = "",
   caption = "",
+  credit = "",
+  creditUrl = "",
   wide = false,
 } = Astro.props;
 ---
@@ -10,8 +12,19 @@ const {
 <figure class:list={["figure", { wide }]}>
   <img src={src} alt={alt} loading="lazy" />
 
-  {caption && (
-    <figcaption>{caption}</figcaption>
+  {(caption || credit) && (
+    <figcaption>
+      {caption && <span>{caption}</span>}
+      {credit && (
+        <span class="credit">
+          Image: {creditUrl ? (
+            <a href={creditUrl} target="_blank" rel="noopener noreferrer">{credit}</a>
+          ) : (
+            credit
+          )}
+        </span>
+      )}
+    </figcaption>
   )}
 </figure>
 
@@ -34,10 +47,21 @@ const {
   }
 
   figcaption {
+    display: grid;
+    gap: 4px;
     margin-top: 12px;
     color: var(--text-soft);
     font-size: 0.92rem;
     line-height: 1.6;
     text-align: center;
+  }
+
+  .credit {
+    font-size: 0.82rem;
+  }
+
+  .credit a {
+    color: inherit;
+    text-underline-offset: 3px;
   }
 </style>

@@ -6,14 +6,18 @@ const articles = await getCollection("articles", ({ data }) => !data.draft);
 
 const topics = Array.from(
   new Map(
-    articles.map((article) => [
-      article.data.topicSlug,
-      {
-        name: article.data.topic,
-        slug: article.data.topicSlug,
-        count: articles.filter((a) => a.data.topicSlug === article.data.topicSlug).length,
-      },
-    ])
+    articles
+      .flatMap((article) => article.data.topics)
+      .map((topic) => [
+        topic.slug,
+        {
+          name: topic.name,
+          slug: topic.slug,
+          count: articles.filter((article) =>
+            article.data.topics.some((articleTopic) => articleTopic.slug === topic.slug)
+          ).length,
+        },
+      ])
   ).values()
 );
 ---

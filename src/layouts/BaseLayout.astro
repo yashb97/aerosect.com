@@ -56,7 +56,7 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
     <meta name="twitter:image:alt" content={imageAlt} />
   </head>
 
-  <body>
+  <body data-page-kind={ogType}>
     <main class="page">
       <div class="site-background" aria-hidden="true">
         <Image
@@ -93,6 +93,8 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
           <a href="/topics">Topics</a>
           <a href="/about">About</a>
         </div>
+
+        <div class="scroll-progress" aria-hidden="true"></div>
       </nav>
 
       <slot />
@@ -112,9 +114,45 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
       const nav = document.querySelector(".nav");
       const menuToggle = document.querySelector(".menu-toggle");
       const menuPanel = document.querySelector(".menu-panel");
+      const progressBar = document.querySelector(".scroll-progress");
+      const siteBackground = document.querySelector(".site-background-image");
+      const canAnimate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let ticking = false;
 
-      const updateHeader = () => {
+      const getScrollProgress = () => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+
+        if (scrollable <= 0) {
+          return 0;
+        }
+
+        return Math.min(window.scrollY / scrollable, 1);
+      };
+
+      const updateScrollEffects = () => {
+        const progress = getScrollProgress();
+
         nav?.classList.toggle("is-scrolled", window.scrollY > 24);
+        progressBar?.style.setProperty("--scroll-progress", `${progress}`);
+
+        if (canAnimate) {
+          siteBackground?.style.setProperty("--background-drift-x", `${progress * -28}px`);
+          siteBackground?.style.setProperty("--background-drift-y", `${progress * -52}px`);
+          siteBackground?.style.setProperty("--background-scale", `${1.08 + progress * 0.025}`);
+        }
+      };
+
+      const requestScrollUpdate = () => {
+        if (ticking) {
+          return;
+        }
+
+        ticking = true;
+
+        window.requestAnimationFrame(() => {
+          updateScrollEffects();
+          ticking = false;
+        });
       };
 
       const closeMenu = () => {
@@ -134,7 +172,7 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
 
         if (isOpen) {
           closeMenu();
-          updateHeader();
+          updateScrollEffects();
         } else {
           openMenu();
         }
@@ -147,12 +185,40 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           closeMenu();
-          updateHeader();
+          updateScrollEffects();
         }
       });
 
-      window.addEventListener("scroll", updateHeader, { passive: true });
-      updateHeader();
+      if (canAnimate && "IntersectionObserver" in window) {
+        const revealTargets = document.querySelectorAll(
+          ".featured, .card, .topic-card, .hero-image-frame, .content > h2, .content > h3, .content > figure, .content > blockquote, .content > pre, .content > ul, .content > ol"
+        );
+
+        const revealObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-revealed");
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            rootMargin: "0px 0px -12% 0px",
+            threshold: 0.14,
+          }
+        );
+
+        revealTargets.forEach((target, index) => {
+          target.classList.add("scroll-reveal");
+          target.style.setProperty("--reveal-delay", `${Math.min(index % 3, 2) * 70}ms`);
+          revealObserver.observe(target);
+        });
+      }
+
+      window.addEventListener("scroll", requestScrollUpdate, { passive: true });
+      window.addEventListener("resize", requestScrollUpdate);
+      updateScrollEffects();
     </script>
   </body>
 </html>
@@ -206,7 +272,9 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
     object-fit: cover;
     object-position: center;
     filter: saturate(0.92) brightness(0.92) contrast(1.02);
-    transform: scale(1.03);
+    transform: translate3d(var(--background-drift-x, 0), var(--background-drift-y, 0), 0)
+      scale(var(--background-scale, 1.08));
+    will-change: transform;
   }
 
   .nav {
@@ -280,6 +348,48 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
   .nav.is-scrolled::before,
   .nav.menu-is-open::before {
     opacity: 1;
+  }
+
+  .scroll-progress {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    bottom: -1px;
+    width: min(520px, calc(100vw - 120px));
+    height: 1px;
+    background: linear-gradient(90deg, rgba(125, 211, 252, 0), rgba(245, 247, 251, 0.72), rgba(125, 211, 252, 0));
+    opacity: 0;
+    transform: translateX(-50%) scaleX(var(--scroll-progress, 0));
+    transform-origin: center;
+    transition: opacity 0.24s ease;
+    pointer-events: none;
+  }
+
+  body[data-page-kind="article"] .nav.is-scrolled .scroll-progress,
+  body[data-page-kind="article"] .nav.menu-is-open .scroll-progress {
+    opacity: 1;
+  }
+
+  .scroll-reveal {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s ease var(--reveal-delay, 0ms),
+      filter 0.7s ease var(--reveal-delay, 0ms),
+      transform 0.7s ease var(--reveal-delay, 0ms);
+    will-change: opacity, filter, transform;
+  }
+
+  .scroll-reveal.is-revealed {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+
+  .card.scroll-reveal.is-revealed:hover,
+  .topic-card.scroll-reveal.is-revealed:hover {
+    transform: translateY(-5px);
   }
 
   .menu-toggle {
@@ -502,6 +612,18 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
     .menu-panel {
       width: min(300px, 86vw);
       padding: 92px 24px 28px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-background-image {
+      transform: scale(1.03);
+      will-change: auto;
+    }
+
+    .scroll-progress,
+    .scroll-reveal {
+      transition: none;
     }
   }
 </style>
