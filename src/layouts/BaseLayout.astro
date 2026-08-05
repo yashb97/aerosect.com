@@ -116,7 +116,10 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
       const menuPanel = document.querySelector(".menu-panel");
       const progressBar = document.querySelector(".scroll-progress");
       const siteBackground = document.querySelector(".site-background-image");
-      const canAnimate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const desktopMotionQuery = window.matchMedia("(min-width: 701px)");
+      const canAnimate = !reducedMotionQuery.matches;
+      const canDriftBackground = () => canAnimate && desktopMotionQuery.matches;
       let ticking = false;
 
       const getScrollProgress = () => {
@@ -135,10 +138,14 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
         nav?.classList.toggle("is-scrolled", window.scrollY > 24);
         progressBar?.style.setProperty("--scroll-progress", `${progress}`);
 
-        if (canAnimate) {
+        if (canDriftBackground()) {
           siteBackground?.style.setProperty("--background-drift-x", `${progress * -28}px`);
           siteBackground?.style.setProperty("--background-drift-y", `${progress * -52}px`);
           siteBackground?.style.setProperty("--background-scale", `${1.08 + progress * 0.025}`);
+        } else {
+          siteBackground?.style.removeProperty("--background-drift-x");
+          siteBackground?.style.removeProperty("--background-drift-y");
+          siteBackground?.style.removeProperty("--background-scale");
         }
       };
 
@@ -580,6 +587,11 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
   }
 
   @media (max-width: 700px) {
+    .site-background-image {
+      transform: scale(1.03);
+      will-change: auto;
+    }
+
     .footer {
       flex-direction: column;
     }
