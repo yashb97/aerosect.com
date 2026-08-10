@@ -197,11 +197,9 @@ Replace that file with the same name when you design the final Aerosect-wide soc
 
 ## 7. Write The Article Body
 
-After the frontmatter, write the article using Markdown:
+After the frontmatter, start with the article's opening paragraph. Do not add a second `# Article Title` heading in the body, because the article page already displays the title from frontmatter above the main image.
 
 ```md
-# Article Title
-
 Opening paragraph that hooks the reader and explains why the article matters.
 
 ## Section Heading

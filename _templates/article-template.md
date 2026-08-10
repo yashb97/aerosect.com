@@ -15,8 +15,6 @@ imageCredit:
 draft: true
 ---
 
-# Article Title Here
-
 A short opening paragraph that hooks the reader and explains why this topic matters.
 
 ## The core idea
