@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <defs>
+    <radialGradient id="bg"><stop stop-color="#27303a"/><stop offset="1" stop-color="#080f19"/></radialGradient>
+    <radialGradient id="core"><stop stop-color="#ffbc66" stop-opacity=".35"/><stop offset="1" stop-color="#ffbc66" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M60 0H0V60" fill="none" stroke="#7dd3fc" stroke-opacity=".08"/></pattern>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <rect width="960" height="540" fill="url(#grid)"/>
+  <circle cx="480" cy="270" r="195" fill="url(#core)"/>
+  <g fill="none" stroke="#7dd3fc" stroke-width="2" opacity=".6">
+    <path d="M0 95C310 95 320 34 510 62S750 149 960 130"/>
+    <path d="M0 160C300 160 320 70 500 100S690 226 960 200"/>
+    <path d="M0 230C220 230 260 102 430 117S715 390 555 413 280 338 380 220 630 238 549 303 405 280 460 243"/>
+    <path d="M0 320C215 320 267 486 510 463S738 321 960 302"/>
+    <path d="M0 405C220 405 340 516 555 490S765 384 960 388"/>
+  </g>
+  <circle cx="480" cy="270" r="72" fill="none" stroke="#ffbd66" stroke-dasharray="7 8" opacity=".7"/>
+  <circle cx="480" cy="270" r="12" fill="#ffbd66"/>
+  <text x="580" y="270" fill="#ffbd66" font-family="Georgia,serif" font-size="32">Γ</text>
+  <text x="42" y="492" fill="#adc4d5" font-family="Arial,sans-serif" font-size="16" letter-spacing="4">CIRCULATION / DIFFUSION</text>
+</svg>

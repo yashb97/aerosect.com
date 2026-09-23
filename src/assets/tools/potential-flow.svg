@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#112d33"/><stop offset="1" stop-color="#080f19"/></linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M60 0H0V60" fill="none" stroke="#7dd3fc" stroke-opacity=".08"/></pattern>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <rect width="960" height="540" fill="url(#grid)"/>
+  <g fill="none" stroke="#7dd3fc" stroke-width="2" opacity=".6">
+    <path d="M0 105C230 105 250 75 480 75S730 105 960 105M0 435C230 435 250 465 480 465S730 435 960 435"/>
+    <path d="M0 170C230 170 260 120 480 120S730 170 960 170M0 370C230 370 260 420 480 420S730 370 960 370"/>
+    <path d="M0 235C245 235 240 160 480 160S715 235 960 235M0 305C245 305 240 380 480 380S715 305 960 305"/>
+    <ellipse cx="480" cy="270" rx="250" ry="88"/>
+    <path d="M335 270Q480 155 625 270M335 270Q480 385 625 270M335 270H625"/>
+  </g>
+  <circle cx="335" cy="270" r="22" fill="#102b2d" stroke="#7be4c3" stroke-width="2"/>
+  <circle cx="625" cy="270" r="22" fill="#29201c" stroke="#ffbd66" stroke-width="2"/>
+  <path d="M325 270H345M335 260V280" stroke="#7be4c3" stroke-width="2"/>
+  <path d="M615 270H635" stroke="#ffbd66" stroke-width="2"/>
+  <text x="42" y="492" fill="#adc4d5" font-family="Arial,sans-serif" font-size="16" letter-spacing="4">ELEMENTS / SUPERPOSITION</text>
+</svg>

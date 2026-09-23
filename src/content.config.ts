@@ -25,4 +25,17 @@ const articles = defineCollection({
   }),
 });
 
-export const collections = { articles };
+const tools = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/tools" }),
+  schema: ({ image }) => z.object({
+    title: z.string(),
+    description: z.string(),
+    category: z.string(),
+    image: image(),
+    socialImage: image().optional(),
+    order: z.number().default(0),
+    draft: z.boolean().default(true),
+  }),
+});
+
+export const collections = { articles, tools };

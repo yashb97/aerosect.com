@@ -1,0 +1,96 @@
+---
+title: "Lamb–Oseen Vortex Explorer"
+description: "See a viscous vortex reshape a passing flow. Explore circulation, diffusion and the paths of particles swept around its core."
+category: "Fluid mechanics"
+image: "../../assets/tools/vortex.svg"
+order: 2
+draft: false
+---
+
+import PointVortexExplorer from "../../components/PointVortexExplorer.astro";
+import ToolGuide from "../../components/ToolGuide.astro";
+
+<PointVortexExplorer />
+
+<ToolGuide>
+
+## Getting started
+
+Explore a **viscous Lamb–Oseen vortex in a uniform freestream**. Its distributed core removes the infinite centre velocity of an ideal point vortex. The view spans x = −6 to 6 m and y = −3.5 to 3.5 m, with positive y upwards.
+
+1. Change **Circulation Γ** to control the vortex strength. Positive values rotate counterclockwise; negative values rotate clockwise. Zero circulation leaves only the freestream.
+2. Change **Freestream U∞** to vary the left-to-right background velocity. The vortex centre stays where you place it.
+3. Increase **Kinematic viscosity ν** or **Vortex age t** to spread the core and reduce the magnitude of its central vorticity. The viscosity slider is logarithmic: its position represents log₁₀(ν).
+4. Drag on the canvas to reposition the vortex. Hover to read position, velocity components, speed and vorticity at a point. Switch the visual layers on and off to separate their meanings.
+
+Particle trails start switched off; enable **Particle trails** to see recent trajectories. **Pause** stops particle advection while leaving the controls and probe active. **Reset** restores the default settings with trails off, centres the vortex, reseeds the particles and resumes playback.
+
+<p className="note">Vortex age is a chosen snapshot parameter. It does not increase as the animation runs. Moving particles show the flow through that snapshot; they do not show the vortex getting older.</p>
+
+## The mathematics
+
+Let the vortex centre be $(x_0,y_0)$, with $X=x-x_0$, $Y=y-y_0$ and $r^2=X^2+Y^2$. For circulation $\Gamma$ in $\mathrm{m^2\,s^{-1}}$, kinematic viscosity $\nu$ in $\mathrm{m^2\,s^{-1}}$ and chosen age $t$ in seconds, the diffusion scale and tangential velocity are:
+
+$$
+\begin{aligned}
+a^2 &= 4\nu t,\qquad a=\sqrt{4\nu t},\\[6pt]
+u_\theta(r) &= \frac{\Gamma}{2\pi r}
+\left(1-\mathrm{e}^{-r^2/a^2}\right).
+\end{aligned}
+$$
+
+Far outside the core, the exponential term vanishes and the tangential velocity approaches $\Gamma/(2\pi r)$, the ideal point-vortex result. Near the centre, $u_\theta$ approaches $\Gamma r/(2\pi a^2)$, so it tends to zero rather than infinity. The Cartesian velocity, including the freestream, is:
+
+$$
+\begin{aligned}
+F(r) &= \frac{1-\mathrm{e}^{-r^2/a^2}}{r^2},\\[6pt]
+u &= U_\infty-\frac{\Gamma}{2\pi}F(r)\,Y,\\[4pt]
+v &= \frac{\Gamma}{2\pi}F(r)\,X,\\[4pt]
+\lVert\mathbf{V}\rVert &= \sqrt{u^2+v^2}.
+\end{aligned}
+$$
+
+The spanwise vorticity is the curl of the velocity field. The uniform freestream contributes no vorticity:
+
+$$
+\begin{aligned}
+\omega_z &= \frac{\partial v}{\partial x}-\frac{\partial u}{\partial y},\\[6pt]
+\omega_z(r) &= \frac{\Gamma}{\pi a^2}\,\mathrm{e}^{-r^2/a^2},\\[6pt]
+\omega_z(0) &= \frac{\Gamma}{4\pi\nu t}.
+\end{aligned}
+$$
+
+The **Diffusion radius** readout is $a$; at this radius the vorticity is $\mathrm{e}^{-1}$ of its central value. It is not a solid boundary or the radius of maximum tangential speed. **Peak vorticity** reports the signed central value in $\mathrm{s^{-1}}$, so it becomes negative for clockwise circulation. Doubling either $\nu$ or $t$ multiplies $a$ by $\sqrt{2}$ and halves the central vorticity at fixed $\Gamma$.
+
+<p className="reference">For the Lamb–Oseen profile and its diffusion scale, see the model definition in <a href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/trapped-free-surface-waves-for-a-lamboseen-vortex-flow/687A7E5A83A22CDC143D3E66ECA90EDB">Trapped free surface waves for a Lamb–Oseen vortex flow, Journal of Fluid Mechanics</a>. The explorer uses the vortex profile only, without a free-surface wave model.</p>
+
+## How it is computed
+
+The velocity and vorticity are evaluated analytically. Near the core, the small difference $1-\mathrm{e}^{-r^2/a^2}$ is evaluated with the numerical function <code>expm1</code>, which accurately computes $\mathrm{e}^z-1$ for small $z$, then negates the result. For $r^2$ below $10^{-12}\,\mathrm{m^2}$, the code uses the limiting value $F(0)=1/a^2$.
+
+The 2,000 passive tracers follow $\frac{\mathrm{d}\mathbf{x}}{\mathrm{d}\tau}=\mathbf{V}(\mathbf{x})$, where $\tau$ is particle animation time, distinct from the chosen vortex age $t$. Each frame is capped at 0.03 s and split into two midpoint Runge–Kutta steps. With substep duration $h$:
+
+$$
+\begin{aligned}
+\mathbf{x}_{\mathrm{mid}} &= \mathbf{x}_n+\frac{h}{2}\,\mathbf{V}(\mathbf{x}_n),\\[6pt]
+\mathbf{x}_{n+1} &= \mathbf{x}_n+h\,\mathbf{V}(\mathbf{x}_{\mathrm{mid}}).
+\end{aligned}
+$$
+
+Particles leaving the domain are reseeded at its left edge. Streamlines use the same midpoint idea applied to the unit velocity direction, $\frac{\mathrm{d}\mathbf{x}}{\mathrm{d}s}=\frac{\mathbf{V}}{\lVert\mathbf{V}\rVert}$, with a spatial step of 0.055 m, up to 420 steps from each of 19 inlet seeds. These seeds do not necessarily reveal every closed orbit near the core.
+
+Slider changes are smoothed with an exponential response of time constant 0.12 s. The controls and derived readouts show the requested values immediately; the field and probe approach those values over the transition.
+
+## Reading the flow
+
+**Particle trails** record recent trajectories. **Streamlines** follow the instantaneous velocity direction; after the controls settle, they are tangent to particle paths. While settings change, the trails retain earlier motion and can differ from the current streamlines.
+
+The trail colours group speed into eight bands with a scale that adjusts to the freestream. Arrow lengths also use a capped display scale. The warm or pink **vorticity field** is a qualitative radial glow indicating spread and sign, rather than a calibrated contour plot of the Gaussian formula. Use the probe for numerical values. The dashed ring marks the diffusion radius, subject to a minimum visible size.
+
+## What the model assumes
+
+The model prescribes a two-dimensional, incompressible velocity field with fixed circulation and a selected viscosity and age. The centre does not convect with the freestream, and the age does not evolve. Consequently, this frozen, anchored superposition is a teaching field rather than a time-evolving solution for a freely advecting viscous vortex.
+
+The tracers do not interact, carry vorticity or alter the flow. There are no walls, boundary layers, pressure calculation or turbulence model. Fixed integration steps and finite screen resolution limit accuracy near a small, strong core. The horizontal and vertical physical domains are mapped independently to the canvas, so geometric proportions can stretch with the viewport.
+
+</ToolGuide>

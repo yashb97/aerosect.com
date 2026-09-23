@@ -1,0 +1,22 @@
+---
+import "katex/dist/katex.min.css";
+---
+
+<div class="tool-guide"><slot /></div>
+
+<style>
+  .tool-guide { margin-top: 56px; padding: clamp(22px, 5vw, 48px); background: rgba(5,7,13,0.8); border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-muted); font-size: 1.04rem; line-height: 1.85; }
+  .tool-guide :global(h2) { scroll-margin-top: 110px; margin: 3rem 0 1rem; color: var(--text); font-size: clamp(1.65rem, 3vw, 2.2rem); line-height: 1.2; }
+  .tool-guide :global(h2:first-child) { margin-top: 0; }
+  .tool-guide :global(h3) { margin: 2rem 0 0.7rem; color: var(--text); font-size: 1.25rem; line-height: 1.4; }
+  .tool-guide :global(p) { margin: 0 0 1.2rem; }
+  .tool-guide :global(ul), .tool-guide :global(ol) { padding-left: 1.4rem; }
+  .tool-guide :global(li) { margin-bottom: 0.7rem; }
+  .tool-guide :global(strong) { color: var(--text); }
+  .tool-guide :global(a) { color: var(--accent); text-underline-offset: 4px; overflow-wrap: anywhere; }
+  .tool-guide :global(.katex-display) { padding: 20px; margin: 1.5rem 0; border-left: 2px solid var(--accent); background: rgba(125,211,252,0.055); color: var(--text); overflow-x: auto; overflow-y: hidden; }
+  .tool-guide :global(.katex-display > .katex) { width: max-content; min-width: 100%; text-align: center; }
+  .tool-guide :global(.katex) { font-size: 1.08em; }
+  .tool-guide :global(.note) { border-left: 2px solid #f59e0b; padding-left: 20px; }
+  .tool-guide :global(.reference) { color: var(--text-soft); font-size: 0.88rem; }
+</style>

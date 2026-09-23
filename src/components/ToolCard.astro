@@ -1,0 +1,47 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+
+interface Props { tool: CollectionEntry<"tools"> }
+const { tool } = Astro.props;
+const href = `/tools/${tool.id}`;
+const isLocalDraft = import.meta.env.DEV && tool.data.draft;
+---
+
+<article class="card">
+  <a class="image-link" href={href} aria-label={tool.data.title} tabindex="-1">
+    <Image class="image" src={tool.data.image} alt="" loading="lazy" decoding="async" />
+  </a>
+  <div class="meta">
+    <span>{tool.data.category}</span>
+    {isLocalDraft && <span class="draft-label">Draft</span>}
+  </div>
+  <h2><a href={href}>{tool.data.title}</a></h2>
+  <p>{tool.data.description}</p>
+  <a class="open-tool" href={href} aria-label={`Open ${tool.data.title}`}>Open tool <span aria-hidden="true">↗</span></a>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 18px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018)), var(--card);
+    border: 1px solid var(--card-border);
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  }
+  .card:hover { transform: translateY(-5px); border-color: var(--accent-soft); box-shadow: 0 24px 80px rgba(0,0,0,0.28); }
+  .image-link { display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; margin-bottom: 22px; }
+  .image { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 0 10px; color: var(--accent); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  .draft-label { padding: 4px 7px; border: 1px solid var(--accent-soft); border-radius: 4px; background: rgba(125,211,252,0.08); font-size: 0.68rem; font-weight: 700; }
+  h2 { margin: 18px 10px 0; font-size: 1.35rem; line-height: 1.18; }
+  h2 a { color: var(--text); text-decoration: none; }
+  h2 a:hover, .open-tool:hover { color: var(--accent); }
+  p { margin: 14px 10px 24px; color: var(--text-muted); line-height: 1.6; }
+  .open-tool { margin: auto 10px 4px; padding-top: 18px; border-top: 1px solid var(--card-border); text-decoration: none; font-size: 0.85rem; font-weight: 700; display: flex; justify-content: space-between; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+  @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+</style>

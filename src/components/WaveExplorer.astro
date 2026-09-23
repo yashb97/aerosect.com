@@ -1,0 +1,304 @@
+<section class="wave-explorer" data-wave-explorer>
+  <canvas aria-label="Animated travelling wave"></canvas>
+
+  <div class="controls">
+    <label>
+      <span>Amplitude</span>
+      <output data-amplitude-output>1.0</output>
+      <input
+        data-amplitude
+        type="range"
+        min="0.2"
+        max="1.5"
+        step="0.1"
+        value="1"
+      />
+    </label>
+
+    <label>
+      <span>Frequency</span>
+      <output data-frequency-output>1.0 Hz</output>
+      <input
+        data-frequency
+        type="range"
+        min="0.5"
+        max="5"
+        step="0.1"
+        value="1"
+      />
+    </label>
+
+    <label>
+      <span>Wave speed</span>
+      <output data-speed-output>4.0 m/s</output>
+      <input
+        data-speed
+        type="range"
+        min="1"
+        max="10"
+        step="0.5"
+        value="4"
+      />
+    </label>
+
+    <div class="bottom-row">
+      <span>
+        Wavelength:
+        <strong data-wavelength-output>4.00 m</strong>
+      </span>
+
+      <!-- NEW: Wrapped buttons in a group container and added the Reset button -->
+      <div class="button-group">
+        <button data-reset type="button">Reset</button>
+        <button data-pause type="button">Pause</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const explorers =
+    document.querySelectorAll("[data-wave-explorer]"); // Removed TS bracket for raw JS or keep if using TS
+
+  for (const root of explorers) {
+    const canvas = root.querySelector("canvas");
+    const amplitude = root.querySelector("[data-amplitude]");
+    const frequency = root.querySelector("[data-frequency]");
+    const speed = root.querySelector("[data-speed]");
+
+    const amplitudeOutput = root.querySelector("[data-amplitude-output]");
+    const frequencyOutput = root.querySelector("[data-frequency-output]");
+    const speedOutput = root.querySelector("[data-speed-output]");
+    const wavelengthOutput = root.querySelector("[data-wavelength-output]");
+    
+    const pauseButton = root.querySelector("[data-pause]");
+    // NEW: Select the reset button
+    const resetButton = root.querySelector("[data-reset]");
+
+    if (
+      !canvas ||
+      !amplitude ||
+      !frequency ||
+      !speed ||
+      !amplitudeOutput ||
+      !frequencyOutput ||
+      !speedOutput ||
+      !wavelengthOutput ||
+      !pauseButton ||
+      !resetButton // NEW: Ensure reset button exists
+    ) {
+      continue;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) continue;
+
+    let running = true;
+    let simulationTime = 0;
+    let previousTime = performance.now();
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function updateOutputs() {
+      const A = Number(amplitude.value);
+      const f = Number(frequency.value);
+      const c = Number(speed.value);
+
+      const wavelength = c / f;
+
+      amplitudeOutput.value = A.toFixed(1);
+      frequencyOutput.value = `${f.toFixed(1)} Hz`;
+      speedOutput.value = `${c.toFixed(1)} m/s`;
+      wavelengthOutput.textContent = `${wavelength.toFixed(2)} m`;
+    }
+
+    function drawWave() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      const A = Number(amplitude.value);
+      const f = Number(frequency.value);
+      const c = Number(speed.value);
+
+      const omega = 2 * Math.PI * f;
+      const k = omega / c;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Centre line
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+      ctx.lineTo(width, height / 2);
+      ctx.strokeStyle = "rgba(150, 150, 150, 0.3)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Travelling wave
+      ctx.beginPath();
+
+      const domainLength = 10; // metres
+      const verticalScale = height * 0.22;
+
+      for (let px = 0; px <= width; px += 2) {
+        const x = (px / width) * domainLength;
+
+        // y = A sin(kx - ωt)
+        const y =
+          A * Math.sin(k * x - omega * simulationTime);
+
+        const screenY =
+          height / 2 - (y / 1.5) * verticalScale;
+
+        if (px === 0) {
+          ctx.moveTo(px, screenY);
+        } else {
+          ctx.lineTo(px, screenY);
+        }
+      }
+
+      ctx.strokeStyle = "#ff6565";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    function animate(now) {
+      const dt = (now - previousTime) / 1000;
+      previousTime = now;
+
+      if (running) {
+        simulationTime += Math.min(dt, 0.05);
+      }
+
+      drawWave();
+
+      requestAnimationFrame(animate);
+    }
+
+    amplitude.addEventListener("input", updateOutputs);
+    frequency.addEventListener("input", updateOutputs);
+    speed.addEventListener("input", updateOutputs);
+
+    pauseButton.addEventListener("click", () => {
+      running = !running;
+      pauseButton.textContent = running ? "Pause" : "Play";
+    });
+
+    // NEW: Reset button functionality
+    resetButton.addEventListener("click", () => {
+      amplitude.value = "1";
+      frequency.value = "1";
+      speed.value = "4";
+      updateOutputs();
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+
+    resizeCanvas();
+    updateOutputs();
+    requestAnimationFrame(animate);
+  }
+</script>
+
+<style>
+  .wave-explorer {
+    max-width: 950px;
+    margin: 2rem auto;
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+
+    background:
+      radial-gradient(
+        circle at top,
+        #182532,
+        #090d12 70%
+      );
+
+    color: #f5f7fa;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 360px;
+  }
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+
+    padding: 1.4rem;
+
+    border-top:
+      1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  label {
+    display: grid;
+    grid-template-columns: 110px 80px 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  output {
+    color: #9ca9b5;
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-top: 0.5rem;
+  }
+
+  /* NEW: Flexbox container to keep buttons neatly side-by-side */
+  .button-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  button {
+    padding: 0.65rem 1rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  @media (max-width: 600px) {
+    label {
+      grid-template-columns: 1fr auto;
+    }
+
+    input[type="range"] {
+      grid-column: 1 / -1;
+    }
+
+    canvas {
+      height: 280px;
+    }
+  }
+</style>

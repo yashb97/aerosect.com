@@ -1,0 +1,4166 @@
+<section class="vortex-explorer" data-vortex-explorer>
+  <div class="canvas-wrap">
+    <canvas
+      aria-label="Interactive viscous Lamb–Oseen vortex flow visualisation"
+    ></canvas>
+
+    <div class="canvas-label">
+      Drag to move vortex · Hover to probe flow
+    </div>
+
+    <div class="speed-legend">
+      <span>Particle speed</span>
+      <div class="speed-gradient"></div>
+      <div class="speed-labels">
+        <span>slow</span>
+        <span>fast</span>
+      </div>
+    </div>
+
+    <div
+      class="probe-panel"
+      data-probe-panel
+      hidden
+    >
+      <div class="probe-title">
+        Local flow
+      </div>
+
+      <div class="probe-grid">
+        <span>x</span>
+        <strong data-probe-x>—</strong>
+
+        <span>y</span>
+        <strong data-probe-y>—</strong>
+
+        <span>u</span>
+        <strong data-probe-u>—</strong>
+
+        <span>v</span>
+        <strong data-probe-v>—</strong>
+
+        <span>|V|</span>
+        <strong data-probe-speed>—</strong>
+
+        <span>ωz</span>
+        <strong data-probe-vorticity>—</strong>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="controls">
+
+    <!-- CIRCULATION -->
+
+    <label class="control-row">
+      <span>Circulation Γ</span>
+
+      <output data-gamma-output>
+        8.0 m²/s
+      </output>
+
+      <input
+        data-gamma
+        type="range"
+        min="-20"
+        max="20"
+        step="0.5"
+        value="8"
+      />
+    </label>
+
+
+    <!-- FREESTREAM -->
+
+    <label class="control-row">
+      <span>Freestream U∞</span>
+
+      <output data-speed-output>
+        2.0 m/s
+      </output>
+
+      <input
+        data-speed
+        type="range"
+        min="0.2"
+        max="5"
+        step="0.1"
+        value="2"
+      />
+    </label>
+
+
+    <!-- VISCOSITY -->
+
+    <label class="control-row">
+      <span>Kinematic viscosity ν</span>
+
+      <output data-viscosity-output>
+        1.51e-5 m²/s
+      </output>
+
+      <!--
+        Slider represents log10(ν).
+
+        -4.82 ≈ 1.51 × 10⁻⁵ m²/s
+      -->
+      <input
+        data-viscosity
+        type="range"
+        min="-5"
+        max="-2"
+        step="0.02"
+        value="-4.82"
+      />
+    </label>
+
+
+    <!-- VORTEX AGE -->
+
+    <label class="control-row">
+      <span>Vortex age t</span>
+
+      <output data-age-output>
+        60 s
+      </output>
+
+      <input
+        data-age
+        type="range"
+        min="1"
+        max="180"
+        step="1"
+        value="60"
+      />
+    </label>
+
+
+    <!-- DERIVED VALUES -->
+
+    <div class="derived-values">
+      <div>
+        <span>Diffusion radius</span>
+
+        <strong data-core-output>
+          —
+        </strong>
+      </div>
+
+      <div>
+        <span>Peak vorticity</span>
+
+        <strong data-vorticity-output>
+          —
+        </strong>
+      </div>
+    </div>
+
+
+    <!-- VISUAL LAYERS -->
+
+    <div class="visual-controls">
+
+      <div class="visual-title">
+        Visual layers
+      </div>
+
+      <div class="toggle-grid">
+
+        <label class="toggle">
+          <input
+            data-trails-toggle
+            type="checkbox"
+          />
+
+          <span>
+            Particle trails
+          </span>
+        </label>
+
+
+        <label class="toggle">
+          <input
+            data-streamlines-toggle
+            type="checkbox"
+            checked
+          />
+
+          <span>
+            Streamlines
+          </span>
+        </label>
+
+
+        <label class="toggle">
+          <input
+            data-vectors-toggle
+            type="checkbox"
+          />
+
+          <span>
+            Velocity vectors
+          </span>
+        </label>
+
+
+        <label class="toggle">
+          <input
+            data-vorticity-toggle
+            type="checkbox"
+            checked
+          />
+
+          <span>
+            Vorticity field
+          </span>
+        </label>
+
+      </div>
+    </div>
+
+
+    <!-- MODEL ASSUMPTIONS -->
+
+    <details class="model-details">
+
+      <summary>
+        Model assumptions
+      </summary>
+
+      <div class="model-content">
+
+        <p>
+          The flow is represented by a steady,
+          two-dimensional uniform freestream
+          superposed with a viscous Lamb–Oseen
+          vortex.
+        </p>
+
+        <div class="equation">
+          uθ(r,t) =
+          Γ/(2πr)
+          [1 − exp(−r²/(4νt))]
+        </div>
+
+        <div class="equation">
+          ωz(r,t) =
+          Γ/(4πνt)
+          exp(−r²/(4νt))
+        </div>
+
+        <ul>
+          <li>
+            Incompressible flow
+          </li>
+
+          <li>
+            Two-dimensional vortex
+          </li>
+
+          <li>
+            Constant circulation Γ
+          </li>
+
+          <li>
+            Constant kinematic viscosity ν
+          </li>
+
+          <li>
+            Vortex centre does not convect
+          </li>
+
+          <li>
+            Particle trajectories are passive tracers
+          </li>
+        </ul>
+
+        <p class="model-note">
+          The particles visualise the velocity field;
+          they do not themselves represent vorticity,
+          mass parcels or a CFD solution.
+        </p>
+
+      </div>
+    </details>
+
+
+    <!-- BOTTOM BAR -->
+
+    <div class="bottom-row">
+
+      <div class="model-info">
+        <strong>Model:</strong>
+        uniform flow + Lamb–Oseen viscous vortex
+      </div>
+
+      <div class="buttons">
+
+        <button
+          data-pause
+          type="button"
+        >
+          Pause
+        </button>
+
+        <button
+          data-reset
+          type="button"
+        >
+          Reset
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<script>
+  const explorers =
+    document.querySelectorAll<HTMLElement>(
+      "[data-vortex-explorer]"
+    );
+
+
+  for (const root of explorers) {
+
+    // ==================================================
+    // ELEMENTS
+    // ==================================================
+
+    const canvas =
+      root.querySelector<HTMLCanvasElement>(
+        "canvas"
+      );
+
+
+    const gammaSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-gamma]"
+      );
+
+
+    const speedSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-speed]"
+      );
+
+
+    const viscositySlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-viscosity]"
+      );
+
+
+    const ageSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-age]"
+      );
+
+
+    const trailsToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-trails-toggle]"
+      );
+
+
+    const streamlinesToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-streamlines-toggle]"
+      );
+
+
+    const vectorsToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-vectors-toggle]"
+      );
+
+
+    const vorticityToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-vorticity-toggle]"
+      );
+
+
+    const gammaOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-gamma-output]"
+      );
+
+
+    const speedOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-speed-output]"
+      );
+
+
+    const viscosityOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-viscosity-output]"
+      );
+
+
+    const ageOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-age-output]"
+      );
+
+
+    const coreOutput =
+      root.querySelector<HTMLElement>(
+        "[data-core-output]"
+      );
+
+
+    const vorticityOutput =
+      root.querySelector<HTMLElement>(
+        "[data-vorticity-output]"
+      );
+
+
+    const pauseButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-pause]"
+      );
+
+
+    const resetButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-reset]"
+      );
+
+
+    const probePanel =
+      root.querySelector<HTMLElement>(
+        "[data-probe-panel]"
+      );
+
+
+    const probeXOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-x]"
+      );
+
+
+    const probeYOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-y]"
+      );
+
+
+    const probeUOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-u]"
+      );
+
+
+    const probeVOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-v]"
+      );
+
+
+    const probeSpeedOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-speed]"
+      );
+
+
+    const probeVorticityOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-vorticity]"
+      );
+
+
+    if (
+      !canvas ||
+      !gammaSlider ||
+      !speedSlider ||
+      !viscositySlider ||
+      !ageSlider ||
+      !trailsToggle ||
+      !streamlinesToggle ||
+      !vectorsToggle ||
+      !vorticityToggle ||
+      !gammaOutput ||
+      !speedOutput ||
+      !viscosityOutput ||
+      !ageOutput ||
+      !coreOutput ||
+      !vorticityOutput ||
+      !pauseButton ||
+      !resetButton ||
+      !probePanel ||
+      !probeXOutput ||
+      !probeYOutput ||
+      !probeUOutput ||
+      !probeVOutput ||
+      !probeSpeedOutput ||
+      !probeVorticityOutput
+    ) {
+      continue;
+    }
+
+
+    const ctx =
+      canvas.getContext("2d");
+
+
+    if (!ctx) {
+      continue;
+    }
+
+
+    // ==================================================
+    // TRAIL CANVAS
+    // ==================================================
+    //
+    // Particle trails are kept on their own transparent
+    // canvas. This lets us fade previous trajectory
+    // segments without fading the grid, streamlines,
+    // labels, vortex marker or other overlays.
+    // ==================================================
+
+    const trailCanvas =
+      document.createElement("canvas");
+
+
+    const trailCtx =
+      trailCanvas.getContext("2d");
+
+
+    if (!trailCtx) {
+      continue;
+    }
+
+
+    // ==================================================
+    // PHYSICAL DOMAIN
+    // ==================================================
+
+    const xmin = -6;
+    const xmax = 6;
+
+    const ymin = -3.5;
+    const ymax = 3.5;
+
+
+    const particleCount = 2000;
+
+
+    const particleX =
+      new Float32Array(
+        particleCount
+      );
+
+
+    const particleY =
+      new Float32Array(
+        particleCount
+      );
+
+
+    const previousParticleX =
+      new Float32Array(
+        particleCount
+      );
+
+
+    const previousParticleY =
+      new Float32Array(
+        particleCount
+      );
+
+
+    // ==================================================
+    // MODEL STATE
+    // ==================================================
+
+    /*
+      Slider values are TARGET values.
+
+      The actual model values smoothly approach them,
+      producing a more premium transition instead of
+      an abrupt visual jump.
+    */
+
+    let targetGamma = 8;
+    let targetFreestream = 2;
+
+    let targetViscosity =
+      Math.pow(
+        10,
+        -4.82
+      );
+
+    let targetVortexAge = 60;
+
+
+    let gamma =
+      targetGamma;
+
+    let freestream =
+      targetFreestream;
+
+    let viscosity =
+      targetViscosity;
+
+    let vortexAge =
+      targetVortexAge;
+
+
+    let vortexX = 0;
+    let vortexY = 0;
+
+
+    let showTrails = false;
+    let showStreamlines = true;
+    let showVectors = false;
+    let showVorticity = true;
+
+
+    let running = true;
+
+    let previousTime =
+      performance.now();
+
+
+    let isDragging = false;
+
+
+    // Hover probe state
+
+    let probeActive = false;
+
+    let probePhysicalX = 0;
+    let probePhysicalY = 0;
+
+
+    // ==================================================
+    // COORDINATE CONVERSION
+    // ==================================================
+
+    function physicalToScreenX(
+      x: number
+    ) {
+
+      const width =
+        canvas.clientWidth;
+
+
+      return (
+        ((x - xmin) /
+          (xmax - xmin)) *
+        width
+      );
+    }
+
+
+    function physicalToScreenY(
+      y: number
+    ) {
+
+      const height =
+        canvas.clientHeight;
+
+
+      return (
+        height -
+        ((y - ymin) /
+          (ymax - ymin)) *
+          height
+      );
+    }
+
+
+    function screenToPhysicalX(
+      px: number
+    ) {
+
+      const width =
+        canvas.clientWidth;
+
+
+      return (
+        xmin +
+        (px / width) *
+          (xmax - xmin)
+      );
+    }
+
+
+    function screenToPhysicalY(
+      py: number
+    ) {
+
+      const height =
+        canvas.clientHeight;
+
+
+      return (
+        ymax -
+        (py / height) *
+          (ymax - ymin)
+      );
+    }
+
+
+    // ==================================================
+    // LAMB–OSEEN PHYSICS
+    // ==================================================
+
+    function diffusionScaleSquared() {
+
+      /*
+        a² = 4 ν t
+      */
+
+      return (
+        4 *
+        viscosity *
+        vortexAge
+      );
+    }
+
+
+    function diffusionRadius() {
+
+      return Math.sqrt(
+        diffusionScaleSquared()
+      );
+    }
+
+
+    function peakVorticity() {
+
+      return (
+        gamma /
+        (
+          4 *
+          Math.PI *
+          viscosity *
+          vortexAge
+        )
+      );
+    }
+
+
+    function vorticityAt(
+      x: number,
+      y: number
+    ) {
+
+      const dx =
+        x - vortexX;
+
+      const dy =
+        y - vortexY;
+
+
+      const r2 =
+        dx * dx +
+        dy * dy;
+
+
+      const a2 =
+        diffusionScaleSquared();
+
+
+      return (
+        gamma /
+        (
+          Math.PI *
+          a2
+        )
+      ) *
+      Math.exp(
+        -r2 / a2
+      );
+    }
+
+
+    function velocityAt(
+      x: number,
+      y: number
+    ) {
+
+      const dx =
+        x - vortexX;
+
+      const dy =
+        y - vortexY;
+
+
+      const r2 =
+        dx * dx +
+        dy * dy;
+
+
+      const a2 =
+        diffusionScaleSquared();
+
+
+      /*
+        Lamb–Oseen radial factor:
+
+        [1 - exp(-r²/a²)] / r²
+
+        Its analytical limit as r → 0 is:
+
+        1/a²
+      */
+
+      let radialFactor: number;
+
+
+      if (
+        r2 < 1e-12
+      ) {
+
+        radialFactor =
+          1 / a2;
+
+      } else {
+
+        const diffusionFactor =
+          -Math.expm1(
+            -r2 / a2
+          );
+
+
+        radialFactor =
+          diffusionFactor /
+          r2;
+      }
+
+
+      const coefficient =
+        gamma /
+        (2 * Math.PI) *
+        radialFactor;
+
+
+      const u =
+        freestream -
+        coefficient * dy;
+
+
+      const v =
+        coefficient * dx;
+
+
+      return {
+        u,
+        v
+      };
+    }
+
+
+    function speedAt(
+      x: number,
+      y: number
+    ) {
+
+      const velocity =
+        velocityAt(
+          x,
+          y
+        );
+
+
+      return Math.hypot(
+        velocity.u,
+        velocity.v
+      );
+    }
+
+
+    // ==================================================
+    // SMOOTH CONTROL TRANSITIONS
+    // ==================================================
+
+    function smoothModelState(
+      dt: number
+    ) {
+
+      /*
+        Exponential smoothing.
+
+        Roughly:
+        smaller tau = faster response
+        larger tau = softer response
+      */
+
+      const tau =
+        0.12;
+
+
+      const response =
+        1 -
+        Math.exp(
+          -dt / tau
+        );
+
+
+      gamma +=
+        (
+          targetGamma -
+          gamma
+        ) *
+        response;
+
+
+      freestream +=
+        (
+          targetFreestream -
+          freestream
+        ) *
+        response;
+
+
+      viscosity +=
+        (
+          targetViscosity -
+          viscosity
+        ) *
+        response;
+
+
+      vortexAge +=
+        (
+          targetVortexAge -
+          vortexAge
+        ) *
+        response;
+    }
+
+
+    // ==================================================
+    // PARTICLE INITIALISATION
+    // ==================================================
+
+    function seedParticle(
+      i: number,
+      anywhere = true
+    ) {
+
+      if (
+        anywhere
+      ) {
+
+        particleX[i] =
+          xmin +
+          Math.random() *
+            (xmax - xmin);
+
+
+        particleY[i] =
+          ymin +
+          Math.random() *
+            (ymax - ymin);
+
+      } else {
+
+        particleX[i] =
+          xmin;
+
+
+        particleY[i] =
+          ymin +
+          Math.random() *
+            (ymax - ymin);
+      }
+
+
+      previousParticleX[i] =
+        particleX[i];
+
+
+      previousParticleY[i] =
+        particleY[i];
+    }
+
+
+    function seedAllParticles() {
+
+      for (
+        let i = 0;
+        i < particleCount;
+        i++
+      ) {
+
+        seedParticle(
+          i,
+          true
+        );
+      }
+
+
+      clearTrails();
+    }
+
+
+    // ==================================================
+    // RK2 PARTICLE INTEGRATION
+    // ==================================================
+
+    function integrateParticles(
+      dt: number
+    ) {
+
+      /*
+        Two numerical substeps improve stability near
+        regions of large vortex velocity while still
+        remaining inexpensive.
+      */
+
+      const substeps = 2;
+
+      const subDt =
+        dt / substeps;
+
+
+      for (
+        let step = 0;
+        step < substeps;
+        step++
+      ) {
+
+        for (
+          let i = 0;
+          i < particleCount;
+          i++
+        ) {
+
+          if (
+            step === 0
+          ) {
+
+            previousParticleX[i] =
+              particleX[i];
+
+
+            previousParticleY[i] =
+              particleY[i];
+          }
+
+
+          const x =
+            particleX[i];
+
+
+          const y =
+            particleY[i];
+
+
+          // RK2 midpoint method
+
+          const v1 =
+            velocityAt(
+              x,
+              y
+            );
+
+
+          const midX =
+            x +
+            0.5 *
+              v1.u *
+              subDt;
+
+
+          const midY =
+            y +
+            0.5 *
+              v1.v *
+              subDt;
+
+
+          const v2 =
+            velocityAt(
+              midX,
+              midY
+            );
+
+
+          particleX[i] =
+            x +
+            v2.u *
+              subDt;
+
+
+          particleY[i] =
+            y +
+            v2.v *
+              subDt;
+
+
+          const outside =
+            particleX[i] < xmin ||
+            particleX[i] > xmax ||
+            particleY[i] < ymin ||
+            particleY[i] > ymax;
+
+
+          if (
+            outside
+          ) {
+
+            seedParticle(
+              i,
+              false
+            );
+          }
+        }
+      }
+    }
+
+
+    // ==================================================
+    // PARTICLE SPEED COLOUR
+    // ==================================================
+
+    /*
+      A compact palette gives good performance because
+      we can batch many particle segments into a handful
+      of canvas paths instead of changing stroke colour
+      2000 times per frame.
+    */
+
+    const speedColours = [
+      "rgba(74, 124, 175, 0.34)",
+      "rgba(73, 145, 201, 0.40)",
+      "rgba(75, 168, 220, 0.46)",
+      "rgba(82, 190, 233, 0.54)",
+      "rgba(101, 207, 244, 0.62)",
+      "rgba(137, 221, 250, 0.72)",
+      "rgba(184, 234, 253, 0.82)",
+      "rgba(233, 248, 255, 0.92)"
+    ];
+
+
+    function speedBin(
+      speed: number
+    ) {
+
+      /*
+        Dynamic scaling keeps colouring useful as the
+        user changes circulation and freestream speed.
+      */
+
+      const characteristicSpeed =
+        Math.max(
+          2,
+          freestream * 2.5
+        );
+
+
+      const normalized =
+        Math.min(
+          speed /
+            characteristicSpeed,
+          1
+        );
+
+
+      return Math.min(
+        speedColours.length - 1,
+        Math.floor(
+          normalized *
+          speedColours.length
+        )
+      );
+    }
+
+
+    // ==================================================
+    // TRAIL RENDERING
+    // ==================================================
+
+    function clearTrails() {
+
+      trailCtx.save();
+
+      trailCtx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+
+      trailCtx.clearRect(
+        0,
+        0,
+        trailCanvas.width,
+        trailCanvas.height
+      );
+
+
+      trailCtx.restore();
+    }
+
+
+    function fadeTrails() {
+
+      /*
+        destination-out reduces the alpha of existing
+        trail pixels without painting black over them.
+      */
+
+      trailCtx.save();
+
+
+      trailCtx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+
+      trailCtx.globalCompositeOperation =
+        "destination-out";
+
+
+      trailCtx.fillStyle =
+        "rgba(0, 0, 0, 0.055)";
+
+
+      trailCtx.fillRect(
+        0,
+        0,
+        trailCanvas.width,
+        trailCanvas.height
+      );
+
+
+      trailCtx.restore();
+
+
+      trailCtx.globalCompositeOperation =
+        "source-over";
+    }
+
+
+    function drawNewTrailSegments() {
+
+      if (
+        !showTrails
+      ) {
+        return;
+      }
+
+
+      /*
+        One Path2D-like canvas path per speed bin.
+        This is considerably cheaper than changing
+        strokeStyle for each individual particle.
+      */
+
+      for (
+        let bin = 0;
+        bin < speedColours.length;
+        bin++
+      ) {
+
+        trailCtx.beginPath();
+
+
+        let hasSegments = false;
+
+
+        for (
+          let i = 0;
+          i < particleCount;
+          i++
+        ) {
+
+          const x0 =
+            previousParticleX[i];
+
+          const y0 =
+            previousParticleY[i];
+
+
+          const x1 =
+            particleX[i];
+
+          const y1 =
+            particleY[i];
+
+
+          /*
+            Avoid drawing a giant line across the canvas
+            when a particle has just been reseeded.
+          */
+
+          if (
+            Math.abs(
+              x1 - x0
+            ) > 1 ||
+            Math.abs(
+              y1 - y0
+            ) > 1
+          ) {
+            continue;
+          }
+
+
+          const midX =
+            0.5 *
+            (
+              x0 + x1
+            );
+
+
+          const midY =
+            0.5 *
+            (
+              y0 + y1
+            );
+
+
+          const speed =
+            speedAt(
+              midX,
+              midY
+            );
+
+
+          if (
+            speedBin(
+              speed
+            ) !== bin
+          ) {
+            continue;
+          }
+
+
+          const px0 =
+            physicalToScreenX(
+              x0
+            );
+
+
+          const py0 =
+            physicalToScreenY(
+              y0
+            );
+
+
+          const px1 =
+            physicalToScreenX(
+              x1
+            );
+
+
+          const py1 =
+            physicalToScreenY(
+              y1
+            );
+
+
+          trailCtx.moveTo(
+            px0,
+            py0
+          );
+
+
+          trailCtx.lineTo(
+            px1,
+            py1
+          );
+
+
+          hasSegments = true;
+        }
+
+
+        if (
+          hasSegments
+        ) {
+
+          trailCtx.strokeStyle =
+            speedColours[bin];
+
+
+          trailCtx.lineWidth =
+            1.05;
+
+
+          trailCtx.stroke();
+        }
+      }
+    }
+
+
+    // ==================================================
+    // BACKGROUND
+    // ==================================================
+
+    function drawBackground() {
+
+      const width =
+        canvas.clientWidth;
+
+
+      const height =
+        canvas.clientHeight;
+
+
+      const gradient =
+        ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          height
+        );
+
+
+      gradient.addColorStop(
+        0,
+        "#091018"
+      );
+
+
+      gradient.addColorStop(
+        1,
+        "#06090d"
+      );
+
+
+      ctx.fillStyle =
+        gradient;
+
+
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+
+      // Engineering grid
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.035)";
+
+
+      ctx.lineWidth = 1;
+
+
+      const spacing = 50;
+
+
+      for (
+        let x = 0;
+        x <= width;
+        x += spacing
+      ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          x,
+          0
+        );
+
+        ctx.lineTo(
+          x,
+          height
+        );
+
+        ctx.stroke();
+      }
+
+
+      for (
+        let y = 0;
+        y <= height;
+        y += spacing
+      ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          0,
+          y
+        );
+
+        ctx.lineTo(
+          width,
+          y
+        );
+
+        ctx.stroke();
+      }
+    }
+
+
+    // ==================================================
+    // VORTICITY FIELD
+    // ==================================================
+
+    function drawVorticityField() {
+
+      if (
+        !showVorticity ||
+        Math.abs(
+          gamma
+        ) < 0.01
+      ) {
+        return;
+      }
+
+
+      const a =
+        diffusionRadius();
+
+
+      const fieldRadius =
+        Math.max(
+          3.2 * a,
+          0.04
+        );
+
+
+      const px =
+        physicalToScreenX(
+          vortexX
+        );
+
+
+      const py =
+        physicalToScreenY(
+          vortexY
+        );
+
+
+      const pixelsPerMetreX =
+        canvas.clientWidth /
+        (xmax - xmin);
+
+
+      const pixelsPerMetreY =
+        canvas.clientHeight /
+        (ymax - ymin);
+
+
+      ctx.save();
+
+
+      ctx.translate(
+        px,
+        py
+      );
+
+
+      ctx.scale(
+        pixelsPerMetreX,
+        pixelsPerMetreY
+      );
+
+
+      const gradient =
+        ctx.createRadialGradient(
+          0,
+          0,
+          0,
+          0,
+          0,
+          fieldRadius
+        );
+
+
+      if (
+        gamma >= 0
+      ) {
+
+        gradient.addColorStop(
+          0,
+          "rgba(255,184,77,0.36)"
+        );
+
+        gradient.addColorStop(
+          0.18,
+          "rgba(255,155,58,0.28)"
+        );
+
+        gradient.addColorStop(
+          0.42,
+          "rgba(255,117,50,0.14)"
+        );
+
+        gradient.addColorStop(
+          0.72,
+          "rgba(255,90,45,0.04)"
+        );
+
+        gradient.addColorStop(
+          1,
+          "rgba(255,90,45,0)"
+        );
+
+      } else {
+
+        gradient.addColorStop(
+          0,
+          "rgba(255,105,155,0.36)"
+        );
+
+        gradient.addColorStop(
+          0.18,
+          "rgba(240,86,151,0.28)"
+        );
+
+        gradient.addColorStop(
+          0.42,
+          "rgba(209,73,160,0.14)"
+        );
+
+        gradient.addColorStop(
+          0.72,
+          "rgba(175,63,169,0.04)"
+        );
+
+        gradient.addColorStop(
+          1,
+          "rgba(175,63,169,0)"
+        );
+      }
+
+
+      ctx.fillStyle =
+        gradient;
+
+
+      ctx.beginPath();
+
+
+      ctx.arc(
+        0,
+        0,
+        fieldRadius,
+        0,
+        Math.PI * 2
+      );
+
+
+      ctx.fill();
+
+
+      ctx.restore();
+    }
+
+
+    // ==================================================
+    // DIFFUSION RADIUS
+    // ==================================================
+
+    function drawDiffusionCore() {
+
+      if (
+        !showVorticity
+      ) {
+        return;
+      }
+
+
+      const a =
+        diffusionRadius();
+
+
+      const px =
+        physicalToScreenX(
+          vortexX
+        );
+
+
+      const py =
+        physicalToScreenY(
+          vortexY
+        );
+
+
+      const radiusX =
+        a *
+        canvas.clientWidth /
+        (xmax - xmin);
+
+
+      const radiusY =
+        a *
+        canvas.clientHeight /
+        (ymax - ymin);
+
+
+      ctx.save();
+
+
+      ctx.setLineDash(
+        [5, 5]
+      );
+
+
+      ctx.beginPath();
+
+
+      ctx.ellipse(
+        px,
+        py,
+        Math.max(
+          radiusX,
+          2
+        ),
+        Math.max(
+          radiusY,
+          2
+        ),
+        0,
+        0,
+        Math.PI * 2
+      );
+
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.26)";
+
+
+      ctx.lineWidth =
+        1;
+
+
+      ctx.stroke();
+
+
+      ctx.restore();
+    }
+
+
+    // ==================================================
+    // STREAMLINES
+    // ==================================================
+
+    function normalizedDirectionAt(
+      x: number,
+      y: number
+    ) {
+
+      const velocity =
+        velocityAt(
+          x,
+          y
+        );
+
+
+      const magnitude =
+        Math.hypot(
+          velocity.u,
+          velocity.v
+        );
+
+
+      if (
+        magnitude < 1e-8
+      ) {
+
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+
+
+      return {
+        x:
+          velocity.u /
+          magnitude,
+
+        y:
+          velocity.v /
+          magnitude
+      };
+    }
+
+
+    function drawStreamlines() {
+
+      if (
+        !showStreamlines
+      ) {
+        return;
+      }
+
+
+      const seedCount =
+        19;
+
+
+      const spatialStep =
+        0.055;
+
+
+      const maxSteps =
+        420;
+
+
+      ctx.save();
+
+
+      ctx.lineWidth =
+        0.8;
+
+
+      ctx.strokeStyle =
+        "rgba(195,225,242,0.20)";
+
+
+      for (
+        let seed = 0;
+        seed < seedCount;
+        seed++
+      ) {
+
+        let x =
+          xmin +
+          0.025;
+
+
+        let y =
+          ymin +
+          (
+            seed +
+            0.5
+          ) /
+          seedCount *
+          (
+            ymax -
+            ymin
+          );
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+          physicalToScreenX(
+            x
+          ),
+          physicalToScreenY(
+            y
+          )
+        );
+
+
+        for (
+          let step = 0;
+          step < maxSteps;
+          step++
+        ) {
+
+          const d1 =
+            normalizedDirectionAt(
+              x,
+              y
+            );
+
+
+          if (
+            d1.x === 0 &&
+            d1.y === 0
+          ) {
+            break;
+          }
+
+
+          const midX =
+            x +
+            0.5 *
+            spatialStep *
+            d1.x;
+
+
+          const midY =
+            y +
+            0.5 *
+            spatialStep *
+            d1.y;
+
+
+          const d2 =
+            normalizedDirectionAt(
+              midX,
+              midY
+            );
+
+
+          x +=
+            spatialStep *
+            d2.x;
+
+
+          y +=
+            spatialStep *
+            d2.y;
+
+
+          if (
+            x < xmin ||
+            x > xmax ||
+            y < ymin ||
+            y > ymax
+          ) {
+            break;
+          }
+
+
+          ctx.lineTo(
+            physicalToScreenX(
+              x
+            ),
+            physicalToScreenY(
+              y
+            )
+          );
+        }
+
+
+        ctx.stroke();
+      }
+
+
+      ctx.restore();
+    }
+
+
+    // ==================================================
+    // VECTOR FIELD
+    // ==================================================
+
+    function drawArrow(
+      x: number,
+      y: number,
+      dx: number,
+      dy: number,
+      opacity: number
+    ) {
+
+      const endX =
+        x + dx;
+
+
+      const endY =
+        y + dy;
+
+
+      const angle =
+        Math.atan2(
+          dy,
+          dx
+        );
+
+
+      const headLength =
+        4.5;
+
+
+      ctx.strokeStyle =
+        `rgba(200,230,245,${opacity})`;
+
+
+      ctx.fillStyle =
+        `rgba(200,230,245,${opacity})`;
+
+
+      ctx.lineWidth =
+        0.8;
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        x,
+        y
+      );
+
+
+      ctx.lineTo(
+        endX,
+        endY
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        endX,
+        endY
+      );
+
+
+      ctx.lineTo(
+        endX -
+        headLength *
+        Math.cos(
+          angle -
+          Math.PI / 6
+        ),
+        endY -
+        headLength *
+        Math.sin(
+          angle -
+          Math.PI / 6
+        )
+      );
+
+
+      ctx.lineTo(
+        endX -
+        headLength *
+        Math.cos(
+          angle +
+          Math.PI / 6
+        ),
+        endY -
+        headLength *
+        Math.sin(
+          angle +
+          Math.PI / 6
+        )
+      );
+
+
+      ctx.closePath();
+
+      ctx.fill();
+    }
+
+
+    function drawVectorField() {
+
+      if (
+        !showVectors
+      ) {
+        return;
+      }
+
+
+      const horizontalCount =
+        Math.max(
+          10,
+          Math.floor(
+            canvas.clientWidth /
+            70
+          )
+        );
+
+
+      const verticalCount =
+        Math.max(
+          6,
+          Math.floor(
+            canvas.clientHeight /
+            70
+          )
+        );
+
+
+      for (
+        let iy = 0;
+        iy < verticalCount;
+        iy++
+      ) {
+
+        for (
+          let ix = 0;
+          ix < horizontalCount;
+          ix++
+        ) {
+
+          const x =
+            xmin +
+            (
+              ix +
+              0.5
+            ) /
+            horizontalCount *
+            (
+              xmax -
+              xmin
+            );
+
+
+          const y =
+            ymin +
+            (
+              iy +
+              0.5
+            ) /
+            verticalCount *
+            (
+              ymax -
+              ymin
+            );
+
+
+          const velocity =
+            velocityAt(
+              x,
+              y
+            );
+
+
+          const magnitude =
+            Math.hypot(
+              velocity.u,
+              velocity.v
+            );
+
+
+          if (
+            magnitude <
+            1e-8
+          ) {
+            continue;
+          }
+
+
+          const px =
+            physicalToScreenX(
+              x
+            );
+
+
+          const py =
+            physicalToScreenY(
+              y
+            );
+
+
+          const normalizedU =
+            velocity.u /
+            magnitude;
+
+
+          const normalizedV =
+            velocity.v /
+            magnitude;
+
+
+          const length =
+            8 +
+            16 *
+            Math.min(
+              magnitude /
+              Math.max(
+                2,
+                freestream * 2
+              ),
+              1
+            );
+
+
+          const opacity =
+            0.16 +
+            0.32 *
+            Math.min(
+              magnitude /
+              Math.max(
+                2,
+                freestream * 2
+              ),
+              1
+            );
+
+
+          drawArrow(
+            px,
+            py,
+            normalizedU *
+            length,
+            -normalizedV *
+            length,
+            opacity
+          );
+        }
+      }
+    }
+
+
+    // ==================================================
+    // PARTICLE HEADS
+    // ==================================================
+
+    function drawParticleHeads() {
+
+      ctx.fillStyle =
+        "rgba(223,244,255,0.65)";
+
+
+      /*
+        Particle heads are always visible.
+
+        The trail toggle only controls whether
+        previous particle paths are retained.
+      */
+
+      for (
+        let i = 0;
+        i < particleCount;
+        i += 2
+      ) {
+
+        const px =
+          physicalToScreenX(
+            particleX[i]
+          );
+
+
+        const py =
+          physicalToScreenY(
+            particleY[i]
+          );
+
+
+        ctx.fillRect(
+          px,
+          py,
+          1.5,
+          1.5
+        );
+      }
+    }
+
+
+    // ==================================================
+    // VORTEX MARKER
+    // ==================================================
+
+    function drawVortex() {
+
+      const px =
+        physicalToScreenX(
+          vortexX
+        );
+
+
+      const py =
+        physicalToScreenY(
+          vortexY
+        );
+
+
+      const colour =
+        gamma >= 0
+          ? "#ffbd66"
+          : "#ff7c9b";
+
+
+      // Soft halo
+
+      const halo =
+        ctx.createRadialGradient(
+          px,
+          py,
+          0,
+          px,
+          py,
+          22
+        );
+
+
+      if (
+        gamma >= 0
+      ) {
+
+        halo.addColorStop(
+          0,
+          "rgba(255,189,102,0.18)"
+        );
+
+        halo.addColorStop(
+          1,
+          "rgba(255,189,102,0)"
+        );
+
+      } else {
+
+        halo.addColorStop(
+          0,
+          "rgba(255,124,155,0.18)"
+        );
+
+        halo.addColorStop(
+          1,
+          "rgba(255,124,155,0)"
+        );
+      }
+
+
+      ctx.fillStyle =
+        halo;
+
+
+      ctx.beginPath();
+
+
+      ctx.arc(
+        px,
+        py,
+        22,
+        0,
+        Math.PI * 2
+      );
+
+
+      ctx.fill();
+
+
+      // Main marker ring
+
+      ctx.beginPath();
+
+
+      ctx.arc(
+        px,
+        py,
+        13,
+        0,
+        Math.PI * 2
+      );
+
+
+      ctx.strokeStyle =
+        colour;
+
+
+      ctx.lineWidth =
+        1.8;
+
+
+      ctx.stroke();
+
+
+      // Centre
+
+      ctx.beginPath();
+
+
+      ctx.arc(
+        px,
+        py,
+        3.3,
+        0,
+        Math.PI * 2
+      );
+
+
+      ctx.fillStyle =
+        colour;
+
+
+      ctx.fill();
+
+
+      ctx.font =
+        "12px system-ui, sans-serif";
+
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.75)";
+
+
+      ctx.fillText(
+        gamma >= 0
+          ? "Γ  ↺"
+          : "Γ  ↻",
+        px + 19,
+        py - 13
+      );
+    }
+
+
+    // ==================================================
+    // FREESTREAM INDICATOR
+    // ==================================================
+
+    function drawFreestreamArrow() {
+
+      const x = 26;
+      const y = 34;
+
+
+      const length =
+        34 +
+        Math.min(
+          freestream,
+          5
+        ) *
+        9;
+
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.58)";
+
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.68)";
+
+
+      ctx.lineWidth =
+        1.6;
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        x,
+        y
+      );
+
+
+      ctx.lineTo(
+        x + length,
+        y
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        x + length,
+        y
+      );
+
+
+      ctx.lineTo(
+        x + length - 7,
+        y - 4
+      );
+
+
+      ctx.lineTo(
+        x + length - 7,
+        y + 4
+      );
+
+
+      ctx.closePath();
+
+      ctx.fill();
+
+
+      ctx.font =
+        "12px system-ui, sans-serif";
+
+
+      ctx.fillText(
+        "U∞",
+        x,
+        y - 9
+      );
+    }
+
+
+    // ==================================================
+    // HOVER PROBE
+    // ==================================================
+
+    function drawProbeMarker() {
+
+      if (
+        !probeActive ||
+        isDragging
+      ) {
+        return;
+      }
+
+
+      const px =
+        physicalToScreenX(
+          probePhysicalX
+        );
+
+
+      const py =
+        physicalToScreenY(
+          probePhysicalY
+        );
+
+
+      ctx.save();
+
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.55)";
+
+
+      ctx.lineWidth =
+        1;
+
+
+      ctx.beginPath();
+
+
+      ctx.arc(
+        px,
+        py,
+        4,
+        0,
+        Math.PI * 2
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        px - 8,
+        py
+      );
+
+
+      ctx.lineTo(
+        px + 8,
+        py
+      );
+
+
+      ctx.moveTo(
+        px,
+        py - 8
+      );
+
+
+      ctx.lineTo(
+        px,
+        py + 8
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.restore();
+    }
+
+
+    function updateProbeOutputs() {
+
+      if (
+        !probeActive
+      ) {
+
+        probePanel.hidden =
+          true;
+
+        return;
+      }
+
+
+      probePanel.hidden =
+        false;
+
+
+      const velocity =
+        velocityAt(
+          probePhysicalX,
+          probePhysicalY
+        );
+
+
+      const speed =
+        Math.hypot(
+          velocity.u,
+          velocity.v
+        );
+
+
+      const omega =
+        vorticityAt(
+          probePhysicalX,
+          probePhysicalY
+        );
+
+
+      probeXOutput.textContent =
+        `${probePhysicalX.toFixed(2)} m`;
+
+
+      probeYOutput.textContent =
+        `${probePhysicalY.toFixed(2)} m`;
+
+
+      probeUOutput.textContent =
+        `${velocity.u.toFixed(2)} m/s`;
+
+
+      probeVOutput.textContent =
+        `${velocity.v.toFixed(2)} m/s`;
+
+
+      probeSpeedOutput.textContent =
+        `${speed.toFixed(2)} m/s`;
+
+
+      probeVorticityOutput.textContent =
+        `${omega.toFixed(2)} s⁻¹`;
+    }
+
+
+    // ==================================================
+    // COMPOSITING
+    // ==================================================
+
+    function drawTrailsToMainCanvas() {
+
+      if (
+        !showTrails
+      ) {
+        return;
+      }
+
+
+      /*
+        Trail canvas is stored at device-pixel
+        resolution, so temporarily remove the main
+        canvas CSS-pixel transform before compositing.
+      */
+
+      ctx.save();
+
+
+      ctx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+
+      ctx.drawImage(
+        trailCanvas,
+        0,
+        0
+      );
+
+
+      ctx.restore();
+    }
+
+
+    // ==================================================
+    // FULL FRAME
+    // ==================================================
+
+    function draw() {
+
+      drawBackground();
+
+      drawVorticityField();
+
+      drawStreamlines();
+
+      drawVectorField();
+
+      drawTrailsToMainCanvas();
+
+      drawParticleHeads();
+
+      drawDiffusionCore();
+
+      drawVortex();
+
+      drawFreestreamArrow();
+
+      drawProbeMarker();
+    }
+
+
+    // ==================================================
+    // ANIMATION LOOP
+    // ==================================================
+
+    function animate(
+      now: number
+    ) {
+
+      const rawDt =
+        (
+          now -
+          previousTime
+        ) /
+        1000;
+
+
+      previousTime =
+        now;
+
+
+      const dt =
+        Math.min(
+          rawDt,
+          0.03
+        );
+
+
+      smoothModelState(
+        dt
+      );
+
+
+      if (
+        running
+      ) {
+
+        integrateParticles(
+          dt
+        );
+
+
+        if (
+          showTrails
+        ) {
+
+          fadeTrails();
+
+          drawNewTrailSegments();
+
+        } else {
+
+          clearTrails();
+        }
+      }
+
+
+      updateProbeOutputs();
+
+      draw();
+
+
+      requestAnimationFrame(
+        animate
+      );
+    }
+
+
+    // ==================================================
+    // RESIZING
+    // ==================================================
+
+    function resizeCanvas() {
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+
+      const dpr =
+        Math.min(
+          window.devicePixelRatio ||
+          1,
+          2
+        );
+
+
+      const width =
+        Math.max(
+          1,
+          Math.round(
+            rect.width *
+            dpr
+          )
+        );
+
+
+      const height =
+        Math.max(
+          1,
+          Math.round(
+            rect.height *
+            dpr
+          )
+        );
+
+
+      if (
+        canvas.width === width &&
+        canvas.height === height
+      ) {
+        return;
+      }
+
+
+      canvas.width =
+        width;
+
+
+      canvas.height =
+        height;
+
+
+      trailCanvas.width =
+        width;
+
+
+      trailCanvas.height =
+        height;
+
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+
+      trailCtx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+
+      clearTrails();
+    }
+
+
+    // ==================================================
+    // UI STATE
+    // ==================================================
+
+    function readTargetsFromControls() {
+
+      targetGamma =
+        Number(
+          gammaSlider.value
+        );
+
+
+      targetFreestream =
+        Number(
+          speedSlider.value
+        );
+
+
+      targetViscosity =
+        Math.pow(
+          10,
+          Number(
+            viscositySlider.value
+          )
+        );
+
+
+      targetVortexAge =
+        Number(
+          ageSlider.value
+        );
+
+
+      showTrails =
+        trailsToggle.checked;
+
+
+      showStreamlines =
+        streamlinesToggle.checked;
+
+
+      showVectors =
+        vectorsToggle.checked;
+
+
+      showVorticity =
+        vorticityToggle.checked;
+    }
+
+
+    function updateOutputs() {
+
+      readTargetsFromControls();
+
+
+      gammaOutput.value =
+        `${targetGamma.toFixed(1)} m²/s`;
+
+
+      speedOutput.value =
+        `${targetFreestream.toFixed(1)} m/s`;
+
+
+      viscosityOutput.value =
+        `${targetViscosity.toExponential(2)} m²/s`;
+
+
+      ageOutput.value =
+        `${targetVortexAge.toFixed(0)} s`;
+
+
+      /*
+        Derived values use TARGET settings so the
+        numerical display responds instantly while
+        the animation transitions smoothly.
+      */
+
+      const targetA =
+        Math.sqrt(
+          4 *
+          targetViscosity *
+          targetVortexAge
+        );
+
+
+      const targetOmega0 =
+        targetGamma /
+        (
+          4 *
+          Math.PI *
+          targetViscosity *
+          targetVortexAge
+        );
+
+
+      coreOutput.textContent =
+        `${targetA.toFixed(3)} m`;
+
+
+      vorticityOutput.textContent =
+        `${targetOmega0.toFixed(2)} s⁻¹`;
+    }
+
+
+    function modelChanged() {
+
+      updateOutputs();
+    }
+
+
+    gammaSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+
+    speedSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+
+    viscositySlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+
+    ageSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+
+    trailsToggle.addEventListener(
+      "change",
+      () => {
+
+        updateOutputs();
+
+        if (
+          !trailsToggle.checked
+        ) {
+
+          clearTrails();
+        }
+      }
+    );
+
+
+    streamlinesToggle.addEventListener(
+      "change",
+      updateOutputs
+    );
+
+
+    vectorsToggle.addEventListener(
+      "change",
+      updateOutputs
+    );
+
+
+    vorticityToggle.addEventListener(
+      "change",
+      updateOutputs
+    );
+
+
+    // ==================================================
+    // PAUSE / RESET
+    // ==================================================
+
+    pauseButton.addEventListener(
+      "click",
+      () => {
+
+        running =
+          !running;
+
+
+        pauseButton.textContent =
+          running
+            ? "Pause"
+            : "Play";
+      }
+    );
+
+
+    resetButton.addEventListener(
+      "click",
+      () => {
+
+        gammaSlider.value =
+          "8";
+
+
+        speedSlider.value =
+          "2";
+
+
+        viscositySlider.value =
+          "-4.82";
+
+
+        ageSlider.value =
+          "60";
+
+
+        trailsToggle.checked =
+          false;
+
+
+        streamlinesToggle.checked =
+          true;
+
+
+        vectorsToggle.checked =
+          false;
+
+
+        vorticityToggle.checked =
+          true;
+
+
+        targetGamma = 8;
+        targetFreestream = 2;
+
+        targetViscosity =
+          Math.pow(
+            10,
+            -4.82
+          );
+
+        targetVortexAge = 60;
+
+
+        /*
+          On reset we snap rather than interpolate.
+        */
+
+        gamma =
+          targetGamma;
+
+
+        freestream =
+          targetFreestream;
+
+
+        viscosity =
+          targetViscosity;
+
+
+        vortexAge =
+          targetVortexAge;
+
+
+        vortexX = 0;
+        vortexY = 0;
+
+
+        running = true;
+
+
+        pauseButton.textContent =
+          "Pause";
+
+
+        probeActive =
+          false;
+
+
+        seedAllParticles();
+
+        updateOutputs();
+      }
+    );
+
+
+    // ==================================================
+    // POINTER / DRAGGING / PROBE
+    // ==================================================
+
+    function updatePointerPosition(
+      event: PointerEvent
+    ) {
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+
+      const px =
+        Math.max(
+          0,
+          Math.min(
+            rect.width,
+            event.clientX -
+            rect.left
+          )
+        );
+
+
+      const py =
+        Math.max(
+          0,
+          Math.min(
+            rect.height,
+            event.clientY -
+            rect.top
+          )
+        );
+
+
+      probePhysicalX =
+        screenToPhysicalX(
+          px
+        );
+
+
+      probePhysicalY =
+        screenToPhysicalY(
+          py
+        );
+    }
+
+
+    function moveVortexFromPointer(
+      event: PointerEvent
+    ) {
+
+      updatePointerPosition(
+        event
+      );
+
+
+      vortexX =
+        Math.max(
+          xmin,
+          Math.min(
+            xmax,
+            probePhysicalX
+          )
+        );
+
+
+      vortexY =
+        Math.max(
+          ymin,
+          Math.min(
+            ymax,
+            probePhysicalY
+          )
+        );
+
+
+      /*
+        Existing particle trails correspond to the old
+        vortex position, so remove them while dragging.
+      */
+
+      clearTrails();
+    }
+
+
+    canvas.addEventListener(
+      "pointerenter",
+      event => {
+
+        probeActive =
+          true;
+
+
+        updatePointerPosition(
+          event
+        );
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointermove",
+      event => {
+
+        updatePointerPosition(
+          event
+        );
+
+
+        probeActive =
+          true;
+
+
+        if (
+          isDragging
+        ) {
+
+          moveVortexFromPointer(
+            event
+          );
+        }
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointerleave",
+      () => {
+
+        if (
+          !isDragging
+        ) {
+
+          probeActive =
+            false;
+        }
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointerdown",
+      event => {
+
+        isDragging =
+          true;
+
+
+        probeActive =
+          false;
+
+
+        canvas.setPointerCapture(
+          event.pointerId
+        );
+
+
+        moveVortexFromPointer(
+          event
+        );
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointerup",
+      event => {
+
+        isDragging =
+          false;
+
+
+        probeActive =
+          true;
+
+
+        updatePointerPosition(
+          event
+        );
+
+
+        if (
+          canvas.hasPointerCapture(
+            event.pointerId
+          )
+        ) {
+
+          canvas.releasePointerCapture(
+            event.pointerId
+          );
+        }
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointercancel",
+      () => {
+
+        isDragging =
+          false;
+
+
+        probeActive =
+          false;
+      }
+    );
+
+
+    // ==================================================
+    // RESPONSIVE RESIZING
+    // ==================================================
+
+    if (
+      "ResizeObserver" in window
+    ) {
+
+      const resizeObserver =
+        new ResizeObserver(
+          resizeCanvas
+        );
+
+
+      resizeObserver.observe(
+        canvas
+      );
+
+    } else {
+
+      window.addEventListener(
+        "resize",
+        resizeCanvas
+      );
+    }
+
+
+    // ==================================================
+    // START
+    // ==================================================
+
+    resizeCanvas();
+
+    readTargetsFromControls();
+
+    seedAllParticles();
+
+    updateOutputs();
+
+
+    requestAnimationFrame(
+      animate
+    );
+  }
+</script>
+
+
+<style>
+
+  .vortex-explorer {
+    max-width: 950px;
+    margin: 2rem auto;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.12);
+
+    border-radius: 20px;
+
+    background: #080c11;
+
+    color: #f5f7fa;
+
+    box-shadow:
+      0 18px 50px
+      rgba(0, 0, 0, 0.18);
+  }
+
+
+  /* ================================================
+     CANVAS
+     ================================================ */
+
+  .canvas-wrap {
+    position: relative;
+
+    background: #080c11;
+  }
+
+
+  canvas {
+    display: block;
+
+    width: 100%;
+    height: 470px;
+
+    cursor: crosshair;
+
+    touch-action: none;
+  }
+
+
+  .canvas-label {
+    position: absolute;
+
+    right: 16px;
+    top: 14px;
+
+    padding:
+      0.42rem
+      0.68rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.09);
+
+    border-radius: 8px;
+
+    background:
+      rgba(3, 7, 11, 0.55);
+
+    backdrop-filter:
+      blur(8px);
+
+    color:
+      rgba(255, 255, 255, 0.50);
+
+    font-size: 0.72rem;
+
+    pointer-events: none;
+  }
+
+
+  /* ================================================
+     SPEED LEGEND
+     ================================================ */
+
+  .speed-legend {
+    position: absolute;
+
+    left: 16px;
+    bottom: 14px;
+
+    width: 120px;
+
+    padding:
+      0.55rem
+      0.65rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.08);
+
+    border-radius: 9px;
+
+    background:
+      rgba(3, 7, 11, 0.50);
+
+    backdrop-filter:
+      blur(8px);
+
+    color:
+      rgba(255, 255, 255, 0.58);
+
+    font-size: 0.66rem;
+
+    pointer-events: none;
+  }
+
+
+  .speed-gradient {
+    height: 4px;
+
+    margin:
+      0.35rem
+      0
+      0.22rem;
+
+    border-radius: 999px;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgb(74, 124, 175),
+        rgb(82, 190, 233),
+        rgb(137, 221, 250),
+        rgb(233, 248, 255)
+      );
+  }
+
+
+  .speed-labels {
+    display: flex;
+
+    justify-content:
+      space-between;
+
+    color:
+      rgba(255, 255, 255, 0.38);
+  }
+
+
+  /* ================================================
+     PROBE
+     ================================================ */
+
+  .probe-panel {
+    position: absolute;
+
+    right: 16px;
+    bottom: 14px;
+
+    width: 150px;
+
+    padding:
+      0.7rem
+      0.75rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.09);
+
+    border-radius: 10px;
+
+    background:
+      rgba(3, 7, 11, 0.68);
+
+    backdrop-filter:
+      blur(10px);
+
+    pointer-events: none;
+  }
+
+
+  .probe-title {
+    margin-bottom:
+      0.45rem;
+
+    color:
+      rgba(255, 255, 255, 0.72);
+
+    font-size:
+      0.68rem;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      0.04em;
+
+    text-transform:
+      uppercase;
+  }
+
+
+  .probe-grid {
+    display: grid;
+
+    grid-template-columns:
+      auto
+      1fr;
+
+    gap:
+      0.18rem
+      0.6rem;
+
+    font-size:
+      0.69rem;
+  }
+
+
+  .probe-grid span {
+    color:
+      rgba(255, 255, 255, 0.40);
+  }
+
+
+  .probe-grid strong {
+    text-align: right;
+
+    color:
+      rgba(255, 255, 255, 0.78);
+
+    font-weight:
+      500;
+
+    font-variant-numeric:
+      tabular-nums;
+  }
+
+
+  /* ================================================
+     CONTROL AREA
+     ================================================ */
+
+  .controls {
+    display: grid;
+
+    gap: 1rem;
+
+    padding: 1.45rem;
+
+    border-top:
+      1px solid
+      rgba(255, 255, 255, 0.09);
+
+    background:
+      linear-gradient(
+        180deg,
+        #0d131a,
+        #090d12
+      );
+  }
+
+
+  .control-row {
+    display: grid;
+
+    grid-template-columns:
+      180px
+      135px
+      1fr;
+
+    align-items: center;
+
+    gap: 1rem;
+  }
+
+
+  output {
+    color: #9ca9b5;
+
+    font-size:
+      0.86rem;
+
+    font-variant-numeric:
+      tabular-nums;
+  }
+
+
+  input[type="range"] {
+    width: 100%;
+
+    accent-color:
+      #65c7ff;
+
+    cursor: pointer;
+  }
+
+
+  /* ================================================
+     DERIVED VALUES
+     ================================================ */
+
+  .derived-values {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 0.75rem;
+
+    margin-top:
+      0.1rem;
+  }
+
+
+  .derived-values > div {
+    display: flex;
+
+    justify-content:
+      space-between;
+
+    gap: 1rem;
+
+    padding:
+      0.72rem
+      0.9rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.07);
+
+    border-radius: 10px;
+
+    background:
+      rgba(255, 255, 255, 0.025);
+
+    color: #7f8b96;
+
+    font-size:
+      0.78rem;
+  }
+
+
+  .derived-values strong {
+    color: #d6dee7;
+
+    font-weight: 500;
+
+    font-variant-numeric:
+      tabular-nums;
+  }
+
+
+  /* ================================================
+     VISUAL CONTROLS
+     ================================================ */
+
+  .visual-controls {
+    padding:
+      0.8rem
+      0;
+
+    border-top:
+      1px solid
+      rgba(255, 255, 255, 0.055);
+
+    border-bottom:
+      1px solid
+      rgba(255, 255, 255, 0.055);
+  }
+
+
+  .visual-title {
+    margin-bottom:
+      0.65rem;
+
+    color: #798692;
+
+    font-size:
+      0.72rem;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      0.06em;
+
+    text-transform:
+      uppercase;
+  }
+
+
+  .toggle-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 0.7rem;
+  }
+
+
+  .toggle {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.55rem;
+
+    min-width: 0;
+
+    color: #a1abb5;
+
+    font-size:
+      0.8rem;
+
+    cursor: pointer;
+  }
+
+
+  .toggle input {
+    flex:
+      0 0 auto;
+
+    width: 15px;
+    height: 15px;
+
+    accent-color:
+      #65c7ff;
+
+    cursor: pointer;
+  }
+
+
+  /* ================================================
+     MODEL DETAILS
+     ================================================ */
+
+  .model-details {
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.065);
+
+    border-radius:
+      10px;
+
+    overflow: hidden;
+
+    background:
+      rgba(255, 255, 255, 0.018);
+  }
+
+
+  .model-details summary {
+    padding:
+      0.72rem
+      0.9rem;
+
+    cursor: pointer;
+
+    color: #9ca7b2;
+
+    font-size:
+      0.8rem;
+
+    user-select: none;
+  }
+
+
+  .model-details summary:hover {
+    color: #d7dee6;
+  }
+
+
+  .model-content {
+    padding:
+      0
+      0.9rem
+      0.9rem;
+
+    color: #8d99a4;
+
+    font-size:
+      0.78rem;
+
+    line-height:
+      1.6;
+  }
+
+
+  .model-content p {
+    margin:
+      0.2rem
+      0
+      0.7rem;
+  }
+
+
+  .model-content ul {
+    margin:
+      0.65rem
+      0;
+
+    padding-left:
+      1.2rem;
+  }
+
+
+  .equation {
+    margin:
+      0.45rem
+      0;
+
+    padding:
+      0.55rem
+      0.7rem;
+
+    border-radius:
+      7px;
+
+    background:
+      rgba(255, 255, 255, 0.035);
+
+    color: #c7d1db;
+
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+
+    font-size:
+      0.75rem;
+
+    overflow-wrap:
+      anywhere;
+  }
+
+
+  .model-note {
+    color: #74808c;
+  }
+
+
+  /* ================================================
+     BOTTOM ROW
+     ================================================ */
+
+  .bottom-row {
+    display: flex;
+
+    justify-content:
+      space-between;
+
+    align-items: center;
+
+    gap: 1rem;
+
+    margin-top:
+      0.1rem;
+  }
+
+
+  .model-info {
+    color: #7f8b96;
+
+    font-size:
+      0.79rem;
+  }
+
+
+  .model-info strong {
+    color: #aeb8c2;
+
+    font-weight: 500;
+  }
+
+
+  .buttons {
+    display: flex;
+
+    gap: 0.6rem;
+  }
+
+
+  button {
+    min-height: 38px;
+
+    padding:
+      0.62rem
+      0.95rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.15);
+
+    border-radius:
+      9px;
+
+    background:
+      rgba(255, 255, 255, 0.055);
+
+    color:
+      rgba(255, 255, 255, 0.84);
+
+    cursor: pointer;
+
+    transition:
+      background 120ms ease,
+      border-color 120ms ease,
+      transform 120ms ease;
+  }
+
+
+  button:hover {
+    border-color:
+      rgba(255, 255, 255, 0.24);
+
+    background:
+      rgba(255, 255, 255, 0.10);
+  }
+
+
+  button:active {
+    transform:
+      translateY(1px);
+  }
+
+
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline:
+      2px solid
+      rgba(101, 199, 255, 0.8);
+
+    outline-offset:
+      3px;
+  }
+
+
+  /* ================================================
+     MOBILE
+     ================================================ */
+
+  @media (
+    max-width: 760px
+  ) {
+
+    canvas {
+      height: 380px;
+    }
+
+
+    .control-row {
+      grid-template-columns:
+        1fr
+        auto;
+    }
+
+
+    .control-row
+    input[type="range"] {
+      grid-column:
+        1 / -1;
+    }
+
+
+    .toggle-grid {
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(
+            0,
+            1fr
+          )
+        );
+    }
+
+
+    .derived-values {
+      grid-template-columns:
+        1fr;
+    }
+
+
+    .bottom-row {
+      align-items:
+        flex-start;
+
+      flex-direction:
+        column;
+    }
+
+
+    .probe-panel {
+      width:
+        138px;
+    }
+
+  }
+
+
+  @media (
+    max-width: 480px
+  ) {
+
+    canvas {
+      height: 330px;
+    }
+
+
+    .canvas-label {
+      display: none;
+    }
+
+
+    .speed-legend {
+      width:
+        100px;
+
+      left:
+        10px;
+
+      bottom:
+        10px;
+    }
+
+
+    .probe-panel {
+      right:
+        10px;
+
+      bottom:
+        10px;
+
+      width:
+        130px;
+    }
+
+
+    .controls {
+      padding:
+        1.1rem;
+    }
+
+
+    .toggle-grid {
+      grid-template-columns:
+        1fr;
+    }
+
+  }
+
+
+  @media (
+    prefers-reduced-motion:
+    reduce
+  ) {
+
+    button {
+      transition: none;
+    }
+
+  }
+
+</style>

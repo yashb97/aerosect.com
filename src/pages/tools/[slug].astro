@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const tools = await getCollection("tools", ({ data }) => import.meta.env.DEV || !data.draft);
+  return tools.map((tool) => ({ params: { slug: tool.id }, props: { tool } }));
+}
+
+interface Props { tool: CollectionEntry<"tools"> }
+const { tool } = Astro.props;
+const { Content, headings } = await render(tool);
+const isLocalDraft = import.meta.env.DEV && tool.data.draft;
+---
+
+<BaseLayout title={`${tool.data.title} | Aerosect`} description={tool.data.description} image={tool.data.socialImage} imageAlt={tool.data.socialImage ? tool.data.title : undefined}>
+  <article class="tool-page">
+    <header class="tool-header">
+      <a class="back" href="/tools">← All tools</a>
+      <div class="meta">
+        <p>{tool.data.category} <span aria-hidden="true">/</span> Interactive tool</p>
+        {isLocalDraft && <span class="draft-label">Draft preview</span>}
+      </div>
+      <h1>{tool.data.title}</h1>
+      <p class="description">{tool.data.description}</p>
+      <nav class="page-links" aria-label="On this page">
+        <a href="#explorer">Use the tool <span aria-hidden="true">↓</span></a>
+        {headings.filter((heading) => heading.depth === 2).map((heading) => (
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        ))}
+      </nav>
+    </header>
+    <div id="explorer" class="tool-body">
+      <Content />
+    </div>
+    <a class="back end-link" href="/tools">← Explore more tools</a>
+  </article>
+</BaseLayout>
+
+<style>
+  .tool-page { max-width: 950px; margin: 110px auto 0; }
+  .tool-header { padding-bottom: 8px; }
+  .back { color: var(--accent); font-weight: 700; text-decoration: none; font-size: 0.9rem; }
+  .back:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 44px; color: var(--accent); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  .meta p { margin: 0; line-height: 1.8; }
+  .meta p span { padding: 0 8px; color: var(--text-soft); }
+  .draft-label { padding: 6px 10px; border: 1px solid var(--accent-soft); border-radius: 4px; background: rgba(125,211,252,0.08); font-size: 0.68rem; font-weight: 700; }
+  h1 { max-width: 900px; font-size: clamp(2.6rem, 6vw, 4.8rem); line-height: 1.02; margin: 18px 0 24px; }
+  .description { max-width: 760px; color: var(--text-muted); font-size: 1.2rem; line-height: 1.7; }
+  .page-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 32px; padding: 22px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); }
+  .page-links a { color: var(--text-muted); text-decoration: none; font-size: 0.83rem; line-height: 1.5; }
+  .page-links a:first-child, .page-links a:hover { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+  #explorer { scroll-margin-top: 100px; }
+  .end-link { display: inline-block; margin-top: 40px; }
+  @media (max-width: 700px) { .tool-page { margin-top: 90px; } }
+</style>

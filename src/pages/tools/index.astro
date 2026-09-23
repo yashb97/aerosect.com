@@ -1,0 +1,35 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ToolCard from "../../components/ToolCard.astro";
+import { getCollection } from "astro:content";
+
+const tools = await getCollection("tools", ({ data }) => import.meta.env.DEV || !data.draft);
+tools.sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
+---
+
+<BaseLayout title="Tools | Aerosect" description="Explore waves and fluid flow through interactive tools, with the mathematics behind every model.">
+  <section class="intro">
+    <p class="eyebrow">The interactive lab</p>
+    <h1>Tools</h1>
+    <p>Change a parameter. Follow a particle. See the physics unfold.
+      Explore hands-on models of waves and fluid flow, with the mathematics behind every tool.</p>
+  </section>
+  {tools.length > 0 ? (
+    <section class="grid" aria-label="Interactive tools">
+      {tools.map((tool) => <ToolCard tool={tool} />)}
+    </section>
+  ) : (
+    <p class="empty-state">New tools are being prepared. Check back soon, or <a href="/articles">explore the articles</a>.</p>
+  )}
+</BaseLayout>
+
+<style>
+  .intro { margin: 110px 0 0; padding-bottom: 48px; border-bottom: 1px solid var(--card-border); }
+  .eyebrow { color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; }
+  h1 { font-size: clamp(2.6rem, 6vw, 4.8rem); line-height: 0.95; margin: 16px 0 24px; }
+  .intro > p:last-child { max-width: 760px; color: var(--text-muted); font-size: 1.18rem; line-height: 1.7; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 28px; margin-top: 56px; }
+  .empty-state { margin-top: 56px; color: var(--text-muted); line-height: 1.7; }
+  .empty-state a { color: var(--accent); }
+  @media (max-width: 700px) { .intro { margin-top: 90px; } }
+</style>
