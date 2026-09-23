@@ -138,6 +138,7 @@
       <div class="cp-heading">
         <div>
           <div class="section-title">Surface pressure</div>
+
           <div class="cp-subtitle">
             Ideal incompressible C<sub>p</sub> from the mapped velocity field
           </div>
@@ -146,6 +147,7 @@
         <div class="cp-legend">
           <span class="upper-dot"></span>
           Upper
+
           <span class="lower-dot"></span>
           Lower
         </div>
@@ -192,8 +194,13 @@
         </div>
 
         <p>
-          The ideal lift coefficient is then calculated using
-          Kutta–Joukowski:
+          The mapped airfoil is normalised to a physical chord of 1 m. The
+          airfoil is rotated through α in the laboratory frame while the
+          freestream remains horizontal.
+        </p>
+
+        <p>
+          The ideal lift coefficient is calculated using Kutta–Joukowski:
         </p>
 
         <div class="equation">
@@ -250,114 +257,141 @@
     cp: number;
   };
 
-  const explorers = document.querySelectorAll<HTMLElement>(
-    "[data-joukowski-explorer]"
-  );
+  const explorers =
+    document.querySelectorAll<HTMLElement>(
+      "[data-joukowski-explorer]"
+    );
 
   for (const root of explorers) {
+
     // ==================================================
     // DOM
     // ==================================================
 
-    const canvas = root.querySelector<HTMLCanvasElement>(
-      "[data-flow-canvas]"
-    );
+    const canvas =
+      root.querySelector<HTMLCanvasElement>(
+        "[data-flow-canvas]"
+      );
 
-    const cpCanvas = root.querySelector<HTMLCanvasElement>(
-      "[data-cp-canvas]"
-    );
+    const cpCanvas =
+      root.querySelector<HTMLCanvasElement>(
+        "[data-cp-canvas]"
+      );
 
-    const speedSlider = root.querySelector<HTMLInputElement>(
-      "[data-speed]"
-    );
+    const speedSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-speed]"
+      );
 
-    const alphaSlider = root.querySelector<HTMLInputElement>(
-      "[data-alpha]"
-    );
+    const alphaSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-alpha]"
+      );
 
-    const thicknessSlider = root.querySelector<HTMLInputElement>(
-      "[data-thickness]"
-    );
+    const thicknessSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-thickness]"
+      );
 
-    const camberSlider = root.querySelector<HTMLInputElement>(
-      "[data-camber]"
-    );
+    const camberSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-camber]"
+      );
 
-    const speedOutput = root.querySelector<HTMLOutputElement>(
-      "[data-speed-output]"
-    );
+    const speedOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-speed-output]"
+      );
 
-    const alphaOutput = root.querySelector<HTMLOutputElement>(
-      "[data-alpha-output]"
-    );
+    const alphaOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-alpha-output]"
+      );
 
-    const thicknessOutput = root.querySelector<HTMLOutputElement>(
-      "[data-thickness-output]"
-    );
+    const thicknessOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-thickness-output]"
+      );
 
-    const camberOutput = root.querySelector<HTMLOutputElement>(
-      "[data-camber-output]"
-    );
+    const camberOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-camber-output]"
+      );
 
-    const gammaOutput = root.querySelector<HTMLElement>(
-      "[data-gamma-output]"
-    );
+    const gammaOutput =
+      root.querySelector<HTMLElement>(
+        "[data-gamma-output]"
+      );
 
-    const clOutput = root.querySelector<HTMLElement>(
-      "[data-cl-output]"
-    );
+    const clOutput =
+      root.querySelector<HTMLElement>(
+        "[data-cl-output]"
+      );
 
-    const chordOutput = root.querySelector<HTMLElement>(
-      "[data-chord-output]"
-    );
+    const chordOutput =
+      root.querySelector<HTMLElement>(
+        "[data-chord-output]"
+      );
 
-    const particlesToggle = root.querySelector<HTMLInputElement>(
-      "[data-particles-toggle]"
-    );
+    const particlesToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-particles-toggle]"
+      );
 
-    const trailsToggle = root.querySelector<HTMLInputElement>(
-      "[data-trails-toggle]"
-    );
+    const trailsToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-trails-toggle]"
+      );
 
-    const streamlinesToggle = root.querySelector<HTMLInputElement>(
-      "[data-streamlines-toggle]"
-    );
+    const streamlinesToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-streamlines-toggle]"
+      );
 
-    const vectorsToggle = root.querySelector<HTMLInputElement>(
-      "[data-vectors-toggle]"
-    );
+    const vectorsToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-vectors-toggle]"
+      );
 
-    const pauseButton = root.querySelector<HTMLButtonElement>(
-      "[data-pause]"
-    );
+    const pauseButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-pause]"
+      );
 
-    const resetButton = root.querySelector<HTMLButtonElement>(
-      "[data-reset]"
-    );
+    const resetButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-reset]"
+      );
 
-    const probePanel = root.querySelector<HTMLElement>(
-      "[data-probe-panel]"
-    );
+    const probePanel =
+      root.querySelector<HTMLElement>(
+        "[data-probe-panel]"
+      );
 
-    const probeXOutput = root.querySelector<HTMLElement>(
-      "[data-probe-x]"
-    );
+    const probeXOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-x]"
+      );
 
-    const probeYOutput = root.querySelector<HTMLElement>(
-      "[data-probe-y]"
-    );
+    const probeYOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-y]"
+      );
 
-    const probeUOutput = root.querySelector<HTMLElement>(
-      "[data-probe-u]"
-    );
+    const probeUOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-u]"
+      );
 
-    const probeVOutput = root.querySelector<HTMLElement>(
-      "[data-probe-v]"
-    );
+    const probeVOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-v]"
+      );
 
-    const probeSpeedOutput = root.querySelector<HTMLElement>(
-      "[data-probe-speed]"
-    );
+    const probeSpeedOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-speed]"
+      );
 
     if (
       !canvas ||
@@ -389,10 +423,16 @@
       continue;
     }
 
-    const ctx = canvas.getContext("2d");
-    const cpCtx = cpCanvas.getContext("2d");
+    const ctx =
+      canvas.getContext("2d");
 
-    if (!ctx || !cpCtx) {
+    const cpCtx =
+      cpCanvas.getContext("2d");
+
+    if (
+      !ctx ||
+      !cpCtx
+    ) {
       continue;
     }
 
@@ -400,8 +440,15 @@
     // OFFSCREEN TRAIL CANVAS
     // ==================================================
 
-    const trailCanvas = document.createElement("canvas");
-    const trailCtx = trailCanvas.getContext("2d");
+    const trailCanvas =
+      document.createElement(
+        "canvas"
+      );
+
+    const trailCtx =
+      trailCanvas.getContext(
+        "2d"
+      );
 
     if (!trailCtx) {
       continue;
@@ -411,109 +458,266 @@
     // DISPLAY DOMAIN
     // ==================================================
 
-    const xmin = -3.0;
-    const xmax = 3.0;
+    /*
+      The physical airfoil now has exactly a 1 m chord.
 
-    const ymin = -1.8;
-    const ymax = 1.8;
+      These limits retain approximately the same
+      visual airfoil-to-canvas scale as the original
+      unnormalised Joukowski model.
+    */
 
-    const particleCount = 1300;
+    const xmin = -0.8;
+    const xmax = 0.8;
 
-    const particleX = new Float32Array(particleCount);
-    const particleY = new Float32Array(particleCount);
+    const ymin = -0.48;
+    const ymax = 0.48;
 
-    const previousParticleX = new Float32Array(particleCount);
-    const previousParticleY = new Float32Array(particleCount);
+    const particleCount =
+      1300;
+
+    const particleX =
+      new Float32Array(
+        particleCount
+      );
+
+    const particleY =
+      new Float32Array(
+        particleCount
+      );
+
+    const previousParticleX =
+      new Float32Array(
+        particleCount
+      );
+
+    const previousParticleY =
+      new Float32Array(
+        particleCount
+      );
 
     // ==================================================
     // JOUKOWSKI MODEL STATE
     // ==================================================
 
-    const b = 1.0;
+    const b =
+      1.0;
 
-    let U = 1.5;
-    let alpha = 4 * Math.PI / 180;
+    const targetChord =
+      1.0;
 
-    let epsilon = 0.12;
-    let eta = 0.06;
+    let U =
+      1.5;
+
+    let alpha =
+      4 *
+      Math.PI /
+      180;
+
+    let epsilon =
+      0.12;
+
+    let eta =
+      0.06;
 
     let circleCentre: Complex = {
       re: -epsilon,
       im: eta
     };
 
-    let circleRadius = 1;
-    let trailingEdgeAngle = 0;
-    let circulation = 0;
+    let circleRadius =
+      1;
 
-    let chord = 4;
-    let liftCoefficient = 0;
+    let trailingEdgeAngle =
+      0;
 
-    let geometryPoints: Point[] = [];
+    /*
+      circulation is the raw circulation in the
+      internal Joukowski coordinate system.
 
-    let geometryMinX = -2;
-    let geometryMaxX = 2;
+      physicalCirculation is its value after the
+      airfoil is scaled to a 1 m chord.
+    */
 
-    let upperSurface: SurfacePoint[] = [];
-    let lowerSurface: SurfacePoint[] = [];
+    let circulation =
+      0;
+
+    let physicalCirculation =
+      0;
+
+    let chord =
+      targetChord;
+
+    let liftCoefficient =
+      0;
+
+    /*
+      Raw mapped-airfoil dimensions are used to
+      convert between the internal Joukowski system
+      and the normalised 1 m physical airfoil.
+    */
+
+    let rawChord =
+      4;
+
+    let rawMidX =
+      0;
+
+    let rawMidY =
+      0;
+
+    let lengthScale =
+      targetChord /
+      rawChord;
+
+    let geometryPoints:
+      Point[] =
+      [];
+
+    let geometryMinX =
+      -0.5;
+
+    let geometryMaxX =
+      0.5;
+
+    let rawGeometryMinX =
+      -2;
+
+    let rawGeometryMaxX =
+      2;
+
+    let upperSurface:
+      SurfacePoint[] =
+      [];
+
+    let lowerSurface:
+      SurfacePoint[] =
+      [];
 
     // ==================================================
     // VISUAL STATE
     // ==================================================
 
-    let showParticles = true;
-    let showTrails = true;
-    let showStreamlines = true;
-    let showVectors = false;
+    let showParticles =
+      true;
 
-    let running = true;
-    let previousTime = performance.now();
+    let showTrails =
+      true;
 
-    let probeActive = false;
-    let probeX = 0;
-    let probeY = 0;
+    let showStreamlines =
+      true;
 
-    let streamlinesDirty = true;
-    let cachedStreamlines: Point[][] = [];
+    let showVectors =
+      false;
+
+    let running =
+      true;
+
+    let previousTime =
+      performance.now();
+
+    let probeActive =
+      false;
+
+    let probeX =
+      0;
+
+    let probeY =
+      0;
+
+    let streamlinesDirty =
+      true;
+
+    let cachedStreamlines:
+      Point[][] =
+      [];
 
     // ==================================================
     // COMPLEX ARITHMETIC
     // ==================================================
 
-    function cAdd(a: Complex, b: Complex): Complex {
+    function cAdd(
+      a: Complex,
+      b: Complex
+    ): Complex {
+
       return {
-        re: a.re + b.re,
-        im: a.im + b.im
+        re:
+          a.re +
+          b.re,
+
+        im:
+          a.im +
+          b.im
       };
     }
 
-    function cSub(a: Complex, b: Complex): Complex {
+    function cSub(
+      a: Complex,
+      b: Complex
+    ): Complex {
+
       return {
-        re: a.re - b.re,
-        im: a.im - b.im
+        re:
+          a.re -
+          b.re,
+
+        im:
+          a.im -
+          b.im
       };
     }
 
-    function cMul(a: Complex, b: Complex): Complex {
+    function cMul(
+      a: Complex,
+      b: Complex
+    ): Complex {
+
       return {
-        re: a.re * b.re - a.im * b.im,
-        im: a.re * b.im + a.im * b.re
+        re:
+          a.re *
+          b.re -
+          a.im *
+          b.im,
+
+        im:
+          a.re *
+          b.im +
+          a.im *
+          b.re
       };
     }
 
-    function cScale(a: Complex, scale: number): Complex {
+    function cScale(
+      a: Complex,
+      scale: number
+    ): Complex {
+
       return {
-        re: a.re * scale,
-        im: a.im * scale
+        re:
+          a.re *
+          scale,
+
+        im:
+          a.im *
+          scale
       };
     }
 
-    function cDiv(a: Complex, b: Complex): Complex {
+    function cDiv(
+      a: Complex,
+      b: Complex
+    ): Complex {
+
       const denominator =
-        b.re * b.re +
-        b.im * b.im;
+        b.re *
+        b.re +
+        b.im *
+        b.im;
 
-      if (denominator < 1e-16) {
+      if (
+        denominator <
+        1e-16
+      ) {
         return {
           re: 0,
           im: 0
@@ -522,23 +726,41 @@
 
       return {
         re:
-          (a.re * b.re + a.im * b.im) /
+          (
+            a.re *
+            b.re +
+            a.im *
+            b.im
+          ) /
           denominator,
 
         im:
-          (a.im * b.re - a.re * b.im) /
+          (
+            a.im *
+            b.re -
+            a.re *
+            b.im
+          ) /
           denominator
       };
     }
 
-    function cAbs2(a: Complex): number {
+    function cAbs2(
+      a: Complex
+    ): number {
+
       return (
-        a.re * a.re +
-        a.im * a.im
+        a.re *
+        a.re +
+        a.im *
+        a.im
       );
     }
 
-    function cSqrt(z: Complex): Complex {
+    function cSqrt(
+      z: Complex
+    ): Complex {
+
       const magnitude =
         Math.hypot(
           z.re,
@@ -549,7 +771,11 @@
         Math.sqrt(
           Math.max(
             0,
-            (magnitude + z.re) / 2
+            (
+              magnitude +
+              z.re
+            ) /
+            2
           )
         );
 
@@ -557,17 +783,176 @@
         Math.sqrt(
           Math.max(
             0,
-            (magnitude - z.re) / 2
+            (
+              magnitude -
+              z.re
+            ) /
+            2
           )
         );
 
-      if (z.im < 0) {
-        imaginaryPart *= -1;
+      if (
+        z.im <
+        0
+      ) {
+        imaginaryPart *=
+          -1;
       }
 
       return {
-        re: realPart,
-        im: imaginaryPart
+        re:
+          realPart,
+
+        im:
+          imaginaryPart
+      };
+    }
+
+    // ==================================================
+    // LAB / BODY COORDINATE TRANSFORMATIONS
+    // ==================================================
+
+    /*
+      The potential-flow solution is evaluated in the
+      body-fixed coordinate system.
+
+      Positive α rotates the airfoil clockwise in the
+      laboratory frame, so its leading edge rises.
+
+      The freestream therefore remains:
+
+      U∞ = (U, 0)
+
+      in laboratory coordinates.
+    */
+
+    function bodyToLabPoint(
+      point: Point
+    ): Point {
+
+      const cosAlpha =
+        Math.cos(
+          alpha
+        );
+
+      const sinAlpha =
+        Math.sin(
+          alpha
+        );
+
+      return {
+        x:
+          cosAlpha *
+          point.x +
+          sinAlpha *
+          point.y,
+
+        y:
+          -sinAlpha *
+          point.x +
+          cosAlpha *
+          point.y
+      };
+    }
+
+    function labToBodyPoint(
+      point: Point
+    ): Point {
+
+      const cosAlpha =
+        Math.cos(
+          alpha
+        );
+
+      const sinAlpha =
+        Math.sin(
+          alpha
+        );
+
+      return {
+        x:
+          cosAlpha *
+          point.x -
+          sinAlpha *
+          point.y,
+
+        y:
+          sinAlpha *
+          point.x +
+          cosAlpha *
+          point.y
+      };
+    }
+
+    function bodyToLabVelocity(
+      u: number,
+      v: number
+    ) {
+
+      const cosAlpha =
+        Math.cos(
+          alpha
+        );
+
+      const sinAlpha =
+        Math.sin(
+          alpha
+        );
+
+      return {
+        u:
+          cosAlpha *
+          u +
+          sinAlpha *
+          v,
+
+        v:
+          -sinAlpha *
+          u +
+          cosAlpha *
+          v
+      };
+    }
+
+    // ==================================================
+    // RAW JOUKOWSKI / NORMALISED BODY COORDINATES
+    // ==================================================
+
+    function rawMappedToBody(
+      z: Complex
+    ): Point {
+
+      return {
+        x:
+          (
+            z.re -
+            rawMidX
+          ) *
+          lengthScale,
+
+        y:
+          (
+            z.im -
+            rawMidY
+          ) *
+          lengthScale
+      };
+    }
+
+    function bodyToRawMapped(
+      point: Point
+    ): Complex {
+
+      return {
+        re:
+          point.x /
+          lengthScale +
+          rawMidX,
+
+        im:
+          point.y /
+          lengthScale +
+          rawMidY
       };
     }
 
@@ -575,12 +960,19 @@
     // JOUKOWSKI TRANSFORMATION
     // ==================================================
 
-    function joukowski(zeta: Complex): Complex {
+    function joukowski(
+      zeta: Complex
+    ): Complex {
+
       const inverse =
         cDiv(
           {
-            re: b * b,
-            im: 0
+            re:
+              b *
+              b,
+
+            im:
+              0
           },
           zeta
         );
@@ -591,7 +983,10 @@
       );
     }
 
-    function joukowskiDerivative(zeta: Complex): Complex {
+    function joukowskiDerivative(
+      zeta: Complex
+    ): Complex {
+
       const zetaSquared =
         cMul(
           zeta,
@@ -601,29 +996,36 @@
       const fraction =
         cDiv(
           {
-            re: b * b,
-            im: 0
+            re:
+              b *
+              b,
+
+            im:
+              0
           },
           zetaSquared
         );
 
       return {
-        re: 1 - fraction.re,
-        im: -fraction.im
+        re:
+          1 -
+          fraction.re,
+
+        im:
+          -fraction.im
       };
     }
 
-    function inverseJoukowski(z: Complex): Complex {
+    function inverseJoukowski(
+      z: Complex
+    ): Complex {
+
       /*
-        ζ satisfies
-
         ζ² - zζ + b² = 0
-
-        therefore:
 
         ζ = 1/2 [z ± sqrt(z² - 4b²)]
 
-        The exterior solution is chosen as the root
+        The exterior root is selected as the one
         furthest from the generating-circle centre.
       */
 
@@ -637,8 +1039,13 @@
         cSub(
           zSquared,
           {
-            re: 4 * b * b,
-            im: 0
+            re:
+              4 *
+              b *
+              b,
+
+            im:
+              0
           }
         );
 
@@ -682,7 +1089,8 @@
         );
 
       return (
-        distance1 >= distance2
+        distance1 >=
+        distance2
           ? root1
           : root2
       );
@@ -692,20 +1100,22 @@
     // CYLINDER-PLANE FLOW
     // ==================================================
 
-    function circleVelocityComplex(zeta: Complex): Complex {
+    function circleVelocityComplex(
+      zeta: Complex
+    ): Complex {
+
       /*
         Complex velocity convention:
 
         q = u - iv
 
-        Uniform flow:
-        U exp(-i α)
+        The body-frame freestream arrives at
+        relative incidence α:
 
-        Cylinder doublet:
-        - U R² exp(+i α)/(ζ-c)²
+        U exp(-iα)
 
-        Circulation:
-        - i Γ/[2π(ζ-c)]
+        After the final body-to-lab rotation this
+        becomes exactly horizontal.
       */
 
       const relative =
@@ -720,14 +1130,32 @@
           relative
         );
 
-      const expMinusAlpha: Complex = {
-        re: Math.cos(alpha),
-        im: -Math.sin(alpha)
+      const expMinusAlpha:
+        Complex =
+      {
+        re:
+          Math.cos(
+            alpha
+          ),
+
+        im:
+          -Math.sin(
+            alpha
+          )
       };
 
-      const expPlusAlpha: Complex = {
-        re: Math.cos(alpha),
-        im: Math.sin(alpha)
+      const expPlusAlpha:
+        Complex =
+      {
+        re:
+          Math.cos(
+            alpha
+          ),
+
+        im:
+          Math.sin(
+            alpha
+          )
       };
 
       const uniform =
@@ -756,11 +1184,18 @@
           relative
         );
 
-      const vortexCoefficient: Complex = {
-        re: 0,
+      const vortexCoefficient:
+        Complex =
+      {
+        re:
+          0,
+
         im:
           -circulation /
-          (2 * Math.PI)
+          (
+            2 *
+            Math.PI
+          )
       };
 
       const vortexTerm =
@@ -779,12 +1214,13 @@
     }
 
     // ==================================================
-    // PHYSICAL-PLANE VELOCITY
+    // BODY-FRAME MAPPED VELOCITY
     // ==================================================
 
-    function physicalVelocityFromZeta(
+    function bodyVelocityFromZeta(
       zeta: Complex
     ) {
+
       const mappingDerivative =
         joukowskiDerivative(
           zeta
@@ -793,7 +1229,8 @@
       if (
         cAbs2(
           mappingDerivative
-        ) < 1e-12
+        ) <
+        1e-12
       ) {
         return null;
       }
@@ -810,19 +1247,29 @@
         );
 
       /*
+        Complex velocity:
+
         dW/dz = u - iv
       */
 
       return {
-        u: mappedVelocity.re,
-        v: -mappedVelocity.im
+        u:
+          mappedVelocity.re,
+
+        v:
+          -mappedVelocity.im
       };
     }
+
+    // ==================================================
+    // LAB-FRAME VELOCITY
+    // ==================================================
 
     function velocityAt(
       x: number,
       y: number
     ) {
+
       if (
         pointInsideAirfoil(
           x,
@@ -832,27 +1279,68 @@
         return null;
       }
 
-      const zeta =
-        inverseJoukowski({
-          re: x,
-          im: y
+      /*
+        1. Laboratory coordinate
+        2. Rotate into airfoil-fixed frame
+        3. Undo 1 m chord normalisation
+        4. Invert Joukowski mapping
+      */
+
+      const bodyPoint =
+        labToBodyPoint({
+          x,
+          y
         });
+
+      const rawMappedPoint =
+        bodyToRawMapped(
+          bodyPoint
+        );
+
+      const zeta =
+        inverseJoukowski(
+          rawMappedPoint
+        );
 
       const radiusFromCentre =
         Math.hypot(
-          zeta.re - circleCentre.re,
-          zeta.im - circleCentre.im
+          zeta.re -
+          circleCentre.re,
+
+          zeta.im -
+          circleCentre.im
         );
 
       if (
         radiusFromCentre <
-        circleRadius * 0.998
+        circleRadius *
+        0.998
       ) {
         return null;
       }
 
-      return physicalVelocityFromZeta(
-        zeta
+      const bodyVelocity =
+        bodyVelocityFromZeta(
+          zeta
+        );
+
+      if (!bodyVelocity) {
+        return null;
+      }
+
+      /*
+        Rotate the body-frame velocity into the
+        laboratory frame.
+
+        Far from the airfoil this gives:
+
+        u = U∞
+        v = 0
+      */
+
+      return bodyToLabVelocity(
+        bodyVelocity.u,
+        bodyVelocity.v
       );
     }
 
@@ -861,30 +1349,38 @@
     // ==================================================
 
     function rebuildGeometry() {
+
       circleCentre = {
-        re: -epsilon,
-        im: eta
+        re:
+          -epsilon,
+
+        im:
+          eta
       };
 
       /*
-        The circle must pass through ζ = b so that
-        the mapped body has a trailing-edge cusp.
+        Circle passes through ζ = b,
+        generating the trailing-edge cusp.
       */
 
       circleRadius =
         Math.hypot(
-          b - circleCentre.re,
+          b -
+          circleCentre.re,
+
           -circleCentre.im
         );
 
       trailingEdgeAngle =
         Math.atan2(
           -circleCentre.im,
-          b - circleCentre.re
+          b -
+          circleCentre.re
         );
 
       /*
-        Kutta condition.
+        Kutta condition in the internal
+        Joukowski coordinate system.
       */
 
       circulation =
@@ -897,37 +1393,63 @@
           alpha
         );
 
-      geometryPoints = [];
+      const rawGeometry:
+        Complex[] =
+        [];
 
-      geometryMinX = Infinity;
-      geometryMaxX = -Infinity;
+      rawGeometryMinX =
+        Infinity;
 
-      const sampleCount = 480;
+      rawGeometryMaxX =
+        -Infinity;
+
+      let rawGeometryMinY =
+        Infinity;
+
+      let rawGeometryMaxY =
+        -Infinity;
+
+      const sampleCount =
+        480;
+
+      /*
+        First generate the raw Joukowski geometry.
+      */
 
       for (
         let i = 0;
         i < sampleCount;
         i++
       ) {
+
         const theta =
           trailingEdgeAngle +
           (
             i /
-            (sampleCount - 1)
+            (
+              sampleCount -
+              1
+            )
           ) *
           2 *
           Math.PI;
 
-        const zeta: Complex = {
+        const zeta:
+          Complex =
+        {
           re:
             circleCentre.re +
             circleRadius *
-            Math.cos(theta),
+            Math.cos(
+              theta
+            ),
 
           im:
             circleCentre.im +
             circleRadius *
-            Math.sin(theta)
+            Math.sin(
+              theta
+            )
         };
 
         const z =
@@ -935,39 +1457,135 @@
             zeta
           );
 
-        geometryPoints.push({
-          x: z.re,
-          y: z.im
-        });
+        rawGeometry.push(
+          z
+        );
+
+        rawGeometryMinX =
+          Math.min(
+            rawGeometryMinX,
+            z.re
+          );
+
+        rawGeometryMaxX =
+          Math.max(
+            rawGeometryMaxX,
+            z.re
+          );
+
+        rawGeometryMinY =
+          Math.min(
+            rawGeometryMinY,
+            z.im
+          );
+
+        rawGeometryMaxY =
+          Math.max(
+            rawGeometryMaxY,
+            z.im
+          );
+      }
+
+      // ------------------------------------------------
+      // NORMALISE CHORD TO EXACTLY 1 m
+      // ------------------------------------------------
+
+      rawChord =
+        rawGeometryMaxX -
+        rawGeometryMinX;
+
+      rawMidX =
+        0.5 *
+        (
+          rawGeometryMinX +
+          rawGeometryMaxX
+        );
+
+      rawMidY =
+        0.5 *
+        (
+          rawGeometryMinY +
+          rawGeometryMaxY
+        );
+
+      lengthScale =
+        targetChord /
+        rawChord;
+
+      chord =
+        targetChord;
+
+      geometryPoints =
+        [];
+
+      geometryMinX =
+        Infinity;
+
+      geometryMaxX =
+        -Infinity;
+
+      /*
+        Convert raw mapped coordinates into a
+        1 m chord body frame, then rotate the
+        physical airfoil into the laboratory frame.
+      */
+
+      for (
+        const rawPoint
+        of rawGeometry
+      ) {
+
+        const bodyPoint =
+          rawMappedToBody(
+            rawPoint
+          );
+
+        const labPoint =
+          bodyToLabPoint(
+            bodyPoint
+          );
+
+        geometryPoints.push(
+          labPoint
+        );
 
         geometryMinX =
           Math.min(
             geometryMinX,
-            z.re
+            labPoint.x
           );
 
         geometryMaxX =
           Math.max(
             geometryMaxX,
-            z.re
+            labPoint.x
           );
       }
 
-      chord =
-        geometryMaxX -
-        geometryMinX;
+      /*
+        Circulation has dimensions L²/T.
+
+        Scaling the raw geometry length by
+        lengthScale therefore scales Γ by the
+        same length factor for fixed U.
+      */
+
+      physicalCirculation =
+        circulation *
+        lengthScale;
 
       liftCoefficient =
         -2 *
-        circulation /
+        physicalCirculation /
         (
           U *
-          chord
+          targetChord
         );
 
       rebuildSurfacePressure();
 
-      streamlinesDirty = true;
+      streamlinesDirty =
+        true;
 
       clearTrails();
 
@@ -984,14 +1602,22 @@
       x: number,
       y: number
     ) {
-      let inside = false;
+
+      let inside =
+        false;
 
       for (
         let i = 0,
-        j = geometryPoints.length - 1;
-        i < geometryPoints.length;
+        j =
+          geometryPoints.length -
+          1;
+
+        i <
+        geometryPoints.length;
+
         j = i++
       ) {
+
         const pi =
           geometryPoints[i];
 
@@ -1000,14 +1626,26 @@
 
         const intersects =
           (
-            (pi.y > y) !==
-            (pj.y > y)
+            (
+              pi.y >
+              y
+            ) !==
+            (
+              pj.y >
+              y
+            )
           ) &&
           (
             x <
             (
-              (pj.x - pi.x) *
-              (y - pi.y) /
+              (
+                pj.x -
+                pi.x
+              ) *
+              (
+                y -
+                pi.y
+              ) /
               (
                 pj.y -
                 pi.y
@@ -1016,7 +1654,9 @@
             )
           );
 
-        if (intersects) {
+        if (
+          intersects
+        ) {
           inside =
             !inside;
         }
@@ -1032,19 +1672,29 @@
     function sampleSurface(
       direction: number
     ): SurfacePoint[] {
-      const points: SurfacePoint[] = [];
 
-      const count = 180;
-      const edgeOffset = 0.012;
+      const points:
+        SurfacePoint[] =
+        [];
+
+      const count =
+        180;
+
+      const edgeOffset =
+        0.012;
 
       for (
         let i = 0;
         i < count;
         i++
       ) {
+
         const fraction =
           i /
-          (count - 1);
+          (
+            count -
+            1
+          );
 
         const arc =
           edgeOffset +
@@ -1060,16 +1710,22 @@
           direction *
           arc;
 
-        const zeta: Complex = {
+        const zeta:
+          Complex =
+        {
           re:
             circleCentre.re +
             circleRadius *
-            Math.cos(theta),
+            Math.cos(
+              theta
+            ),
 
           im:
             circleCentre.im +
             circleRadius *
-            Math.sin(theta)
+            Math.sin(
+              theta
+            )
         };
 
         const z =
@@ -1078,11 +1734,13 @@
           );
 
         const velocity =
-          physicalVelocityFromZeta(
+          bodyVelocityFromZeta(
             zeta
           );
 
-        if (!velocity) {
+        if (
+          !velocity
+        ) {
           continue;
         }
 
@@ -1104,14 +1762,20 @@
           );
 
         points.push({
+          /*
+            x/c is invariant under our final
+            uniform geometry scaling.
+          */
+
           x:
             (
               z.re -
-              geometryMinX
+              rawGeometryMinX
             ) /
-            chord,
+            rawChord,
 
-          y: z.im,
+          y:
+            z.im,
 
           cp
         });
@@ -1121,6 +1785,7 @@
     }
 
     function rebuildSurfacePressure() {
+
       const branchA =
         sampleSurface(
           1
@@ -1150,14 +1815,18 @@
       if (
         midA &&
         midB &&
-        midA.y >= midB.y
+        midA.y >=
+        midB.y
       ) {
+
         upperSurface =
           branchA;
 
         lowerSurface =
           branchB;
+
       } else {
+
         upperSurface =
           branchB;
 
@@ -1173,9 +1842,16 @@
     function physicalToScreenX(
       x: number
     ) {
+
       return (
-        (x - xmin) /
-        (xmax - xmin) *
+        (
+          x -
+          xmin
+        ) /
+        (
+          xmax -
+          xmin
+        ) *
         canvas.clientWidth
       );
     }
@@ -1183,10 +1859,17 @@
     function physicalToScreenY(
       y: number
     ) {
+
       return (
         canvas.clientHeight -
-        (y - ymin) /
-        (ymax - ymin) *
+        (
+          y -
+          ymin
+        ) /
+        (
+          ymax -
+          ymin
+        ) *
         canvas.clientHeight
       );
     }
@@ -1194,22 +1877,30 @@
     function screenToPhysicalX(
       x: number
     ) {
+
       return (
         xmin +
         x /
         canvas.clientWidth *
-        (xmax - xmin)
+        (
+          xmax -
+          xmin
+        )
       );
     }
 
     function screenToPhysicalY(
       y: number
     ) {
+
       return (
         ymax -
         y /
         canvas.clientHeight *
-        (ymax - ymin)
+        (
+          ymax -
+          ymin
+        )
       );
     }
 
@@ -1221,27 +1912,45 @@
       index: number,
       anywhere = true
     ) {
-      let attempts = 0;
+
+      let attempts =
+        0;
 
       do {
-        if (anywhere) {
+
+        if (
+          anywhere
+        ) {
+
           particleX[index] =
             xmin +
             Math.random() *
-            (xmax - xmin);
+            (
+              xmax -
+              xmin
+            );
 
           particleY[index] =
             ymin +
             Math.random() *
-            (ymax - ymin);
+            (
+              ymax -
+              ymin
+            );
+
         } else {
+
           particleX[index] =
-            xmin + 0.02;
+            xmin +
+            0.005;
 
           particleY[index] =
             ymin +
             Math.random() *
-            (ymax - ymin);
+            (
+              ymax -
+              ymin
+            );
         }
 
         attempts++;
@@ -1251,7 +1960,8 @@
           particleX[index],
           particleY[index]
         ) &&
-        attempts < 30
+        attempts <
+        30
       );
 
       previousParticleX[index] =
@@ -1262,11 +1972,14 @@
     }
 
     function seedAllParticles() {
+
       for (
         let i = 0;
-        i < particleCount;
+        i <
+        particleCount;
         i++
       ) {
+
         seedParticle(
           i,
           true
@@ -1279,16 +1992,21 @@
     function updateParticles(
       dt: number
     ) {
-      const substeps = 2;
+
+      const substeps =
+        2;
+
       const subDt =
         dt /
         substeps;
 
       for (
         let i = 0;
-        i < particleCount;
+        i <
+        particleCount;
         i++
       ) {
+
         previousParticleX[i] =
           particleX[i];
 
@@ -1297,9 +2015,11 @@
 
         for (
           let step = 0;
-          step < substeps;
+          step <
+          substeps;
           step++
         ) {
+
           const x =
             particleX[i];
 
@@ -1312,7 +2032,10 @@
               y
             );
 
-          if (!velocity1) {
+          if (
+            !velocity1
+          ) {
+
             seedParticle(
               i,
               false
@@ -1327,20 +2050,15 @@
               velocity1.v
             );
 
-          /*
-            Extreme mapped velocities occur only
-            extremely close to singular geometric
-            locations. Re-seeding is preferable to
-            letting a particle jump across the domain.
-          */
-
           if (
             speed1 >
             Math.max(
               20,
-              12 * U
+              12 *
+              U
             )
           ) {
+
             seedParticle(
               i,
               false
@@ -1367,7 +2085,10 @@
               midY
             );
 
-          if (!velocity2) {
+          if (
+            !velocity2
+          ) {
+
             seedParticle(
               i,
               false
@@ -1387,10 +2108,14 @@
             subDt;
 
           const outside =
-            particleX[i] < xmin ||
-            particleX[i] > xmax ||
-            particleY[i] < ymin ||
-            particleY[i] > ymax;
+            particleX[i] <
+            xmin ||
+            particleX[i] >
+            xmax ||
+            particleY[i] <
+            ymin ||
+            particleY[i] >
+            ymax;
 
           if (
             outside ||
@@ -1399,6 +2124,7 @@
               particleY[i]
             )
           ) {
+
             seedParticle(
               i,
               false
@@ -1426,10 +2152,12 @@
     function speedBin(
       speed: number
     ) {
+
       const reference =
         Math.max(
           2,
-          2.5 * U
+          2.5 *
+          U
         );
 
       const normalized =
@@ -1440,7 +2168,8 @@
         );
 
       return Math.min(
-        speedColours.length - 1,
+        speedColours.length -
+        1,
         Math.floor(
           normalized *
           speedColours.length
@@ -1449,6 +2178,7 @@
     }
 
     function clearTrails() {
+
       trailCtx.save();
 
       trailCtx.setTransform(
@@ -1471,6 +2201,7 @@
     }
 
     function fadeTrails() {
+
       trailCtx.save();
 
       trailCtx.setTransform(
@@ -1502,15 +2233,20 @@
     }
 
     function drawNewTrailSegments() {
-      if (!showTrails) {
+
+      if (
+        !showTrails
+      ) {
         return;
       }
 
       for (
         let bin = 0;
-        bin < speedColours.length;
+        bin <
+        speedColours.length;
         bin++
       ) {
+
         trailCtx.beginPath();
 
         let hasSegments =
@@ -1518,9 +2254,11 @@
 
         for (
           let i = 0;
-          i < particleCount;
+          i <
+          particleCount;
           i++
         ) {
+
           const x0 =
             previousParticleX[i];
 
@@ -1535,22 +2273,32 @@
 
           if (
             Math.abs(
-              x1 - x0
-            ) > 0.7 ||
+              x1 -
+              x0
+            ) >
+            0.18 ||
             Math.abs(
-              y1 - y0
-            ) > 0.7
+              y1 -
+              y0
+            ) >
+            0.18
           ) {
             continue;
           }
 
           const mx =
             0.5 *
-            (x0 + x1);
+            (
+              x0 +
+              x1
+            );
 
           const my =
             0.5 *
-            (y0 + y1);
+            (
+              y0 +
+              y1
+            );
 
           const velocity =
             velocityAt(
@@ -1558,7 +2306,9 @@
               my
             );
 
-          if (!velocity) {
+          if (
+            !velocity
+          ) {
             continue;
           }
 
@@ -1571,7 +2321,8 @@
           if (
             speedBin(
               speed
-            ) !== bin
+            ) !==
+            bin
           ) {
             continue;
           }
@@ -1598,7 +2349,10 @@
             true;
         }
 
-        if (hasSegments) {
+        if (
+          hasSegments
+        ) {
+
           trailCtx.strokeStyle =
             speedColours[bin];
 
@@ -1618,13 +2372,16 @@
       x: number,
       y: number
     ) {
+
       const velocity =
         velocityAt(
           x,
           y
         );
 
-      if (!velocity) {
+      if (
+        !velocity
+      ) {
         return null;
       }
 
@@ -1656,22 +2413,30 @@
       seedX: number,
       seedY: number
     ) {
-      const points: Point[] = [];
 
-      let x = seedX;
-      let y = seedY;
+      const points:
+        Point[] =
+        [];
+
+      let x =
+        seedX;
+
+      let y =
+        seedY;
 
       const stepSize =
-        0.025;
+        0.0065;
 
       const maxSteps =
         700;
 
       for (
         let i = 0;
-        i < maxSteps;
+        i <
+        maxSteps;
         i++
       ) {
+
         if (
           x < xmin ||
           x > xmax ||
@@ -1701,7 +2466,9 @@
             y
           );
 
-        if (!d1) {
+        if (
+          !d1
+        ) {
           break;
         }
 
@@ -1723,7 +2490,9 @@
             midY
           );
 
-        if (!d2) {
+        if (
+          !d2
+        ) {
           break;
         }
 
@@ -1740,15 +2509,20 @@
     }
 
     function rebuildStreamlines() {
-      cachedStreamlines = [];
 
-      const count = 25;
+      cachedStreamlines =
+        [];
+
+      const count =
+        25;
 
       for (
         let i = 0;
-        i < count;
+        i <
+        count;
         i++
       ) {
+
         const y =
           ymin +
           (
@@ -1756,11 +2530,15 @@
             0.5
           ) /
           count *
-          (ymax - ymin);
+          (
+            ymax -
+            ymin
+          );
 
         const streamline =
           traceStreamline(
-            xmin + 0.02,
+            xmin +
+            0.005,
             y
           );
 
@@ -1768,6 +2546,7 @@
           streamline.length >
           2
         ) {
+
           cachedStreamlines.push(
             streamline
           );
@@ -1779,11 +2558,17 @@
     }
 
     function drawStreamlines() {
-      if (!showStreamlines) {
+
+      if (
+        !showStreamlines
+      ) {
         return;
       }
 
-      if (streamlinesDirty) {
+      if (
+        streamlinesDirty
+      ) {
+
         rebuildStreamlines();
       }
 
@@ -1799,6 +2584,7 @@
         const streamline
         of cachedStreamlines
       ) {
+
         if (
           streamline.length <
           2
@@ -1819,9 +2605,11 @@
 
         for (
           let i = 1;
-          i < streamline.length;
+          i <
+          streamline.length;
           i++
         ) {
+
           ctx.lineTo(
             physicalToScreenX(
               streamline[i].x
@@ -1849,11 +2637,14 @@
       dy: number,
       opacity: number
     ) {
+
       const endX =
-        x + dx;
+        x +
+        dx;
 
       const endY =
-        y + dy;
+        y +
+        dy;
 
       const angle =
         Math.atan2(
@@ -1899,13 +2690,16 @@
         head *
         Math.cos(
           angle -
-          Math.PI / 6
+          Math.PI /
+          6
         ),
+
         endY -
         head *
         Math.sin(
           angle -
-          Math.PI / 6
+          Math.PI /
+          6
         )
       );
 
@@ -1914,13 +2708,16 @@
         head *
         Math.cos(
           angle +
-          Math.PI / 6
+          Math.PI /
+          6
         ),
+
         endY -
         head *
         Math.sin(
           angle +
-          Math.PI / 6
+          Math.PI /
+          6
         )
       );
 
@@ -1930,7 +2727,10 @@
     }
 
     function drawVectorField() {
-      if (!showVectors) {
+
+      if (
+        !showVectors
+      ) {
         return;
       }
 
@@ -1954,14 +2754,18 @@
 
       for (
         let iy = 0;
-        iy < ny;
+        iy <
+        ny;
         iy++
       ) {
+
         for (
           let ix = 0;
-          ix < nx;
+          ix <
+          nx;
           ix++
         ) {
+
           const x =
             xmin +
             (
@@ -1969,7 +2773,10 @@
               0.5
             ) /
             nx *
-            (xmax - xmin);
+            (
+              xmax -
+              xmin
+            );
 
           const y =
             ymin +
@@ -1978,7 +2785,10 @@
               0.5
             ) /
             ny *
-            (ymax - ymin);
+            (
+              ymax -
+              ymin
+            );
 
           const velocity =
             velocityAt(
@@ -1986,7 +2796,9 @@
               y
             );
 
-          if (!velocity) {
+          if (
+            !velocity
+          ) {
             continue;
           }
 
@@ -2008,7 +2820,8 @@
               magnitude /
               Math.max(
                 2,
-                2.4 * U
+                2.4 *
+                U
               ),
               1
             );
@@ -2022,6 +2835,7 @@
             physicalToScreenX(
               x
             ),
+
             physicalToScreenY(
               y
             ),
@@ -2047,6 +2861,7 @@
     // ==================================================
 
     function drawBackground() {
+
       const width =
         canvas.clientWidth;
 
@@ -2095,6 +2910,7 @@
         x <= width;
         x += spacing
       ) {
+
         ctx.beginPath();
 
         ctx.moveTo(
@@ -2115,6 +2931,7 @@
         y <= height;
         y += spacing
       ) {
+
         ctx.beginPath();
 
         ctx.moveTo(
@@ -2136,6 +2953,7 @@
     // ==================================================
 
     function drawAirfoil() {
+
       if (
         geometryPoints.length <
         3
@@ -2156,9 +2974,11 @@
 
       for (
         let i = 1;
-        i < geometryPoints.length;
+        i <
+        geometryPoints.length;
         i++
       ) {
+
         ctx.lineTo(
           physicalToScreenX(
             geometryPoints[i].x
@@ -2175,11 +2995,11 @@
         ctx.createLinearGradient(
           0,
           physicalToScreenY(
-            0.5
+            0.2
           ),
           0,
           physicalToScreenY(
-            -0.5
+            -0.2
           )
         );
 
@@ -2208,26 +3028,45 @@
 
       /*
         Trailing-edge marker.
+
+        Convert from:
+        raw mapped plane
+        → normalised body frame
+        → rotated laboratory frame.
       */
 
-      const trailingEdge =
+      const rawTrailingEdge =
         joukowski({
-          re: b,
-          im: 0
+          re:
+            b,
+
+          im:
+            0
         });
+
+      const bodyTrailingEdge =
+        rawMappedToBody(
+          rawTrailingEdge
+        );
+
+      const labTrailingEdge =
+        bodyToLabPoint(
+          bodyTrailingEdge
+        );
 
       ctx.beginPath();
 
       ctx.arc(
         physicalToScreenX(
-          trailingEdge.re
+          labTrailingEdge.x
         ),
         physicalToScreenY(
-          trailingEdge.im
+          labTrailingEdge.y
         ),
         2.6,
         0,
-        2 * Math.PI
+        2 *
+        Math.PI
       );
 
       ctx.fillStyle =
@@ -2241,7 +3080,10 @@
     // ==================================================
 
     function drawTrailCanvas() {
-      if (!showTrails) {
+
+      if (
+        !showTrails
+      ) {
         return;
       }
 
@@ -2266,7 +3108,10 @@
     }
 
     function drawParticles() {
-      if (!showParticles) {
+
+      if (
+        !showParticles
+      ) {
         return;
       }
 
@@ -2275,9 +3120,11 @@
 
       for (
         let i = 0;
-        i < particleCount;
+        i <
+        particleCount;
         i += 2
       ) {
+
         if (
           pointInsideAirfoil(
             particleX[i],
@@ -2291,9 +3138,11 @@
           physicalToScreenX(
             particleX[i]
           ),
+
           physicalToScreenY(
             particleY[i]
           ),
+
           1.5,
           1.5
         );
@@ -2301,32 +3150,31 @@
     }
 
     // ==================================================
-    // FREESTREAM INDICATOR
+    // HORIZONTAL FREESTREAM INDICATOR
     // ==================================================
 
     function drawFreestreamArrow() {
-      const x = 28;
-      const y = 35;
+
+      const x =
+        28;
+
+      const y =
+        35;
 
       const length =
         58;
 
-      const angle =
-        -alpha;
-
-      const dx =
-        length *
-        Math.cos(angle);
-
-      const dy =
-        length *
-        Math.sin(angle);
+      /*
+        The laboratory-frame freestream is fixed
+        horizontally regardless of α.
+      */
 
       const endX =
-        x + dx;
+        x +
+        length;
 
       const endY =
-        y + dy;
+        y;
 
       ctx.strokeStyle =
         "rgba(255,255,255,0.62)";
@@ -2351,12 +3199,6 @@
 
       ctx.stroke();
 
-      const headAngle =
-        Math.atan2(
-          dy,
-          dx
-        );
-
       ctx.beginPath();
 
       ctx.moveTo(
@@ -2366,32 +3208,16 @@
 
       ctx.lineTo(
         endX -
-        7 *
-        Math.cos(
-          headAngle -
-          Math.PI / 6
-        ),
+        7,
         endY -
-        7 *
-        Math.sin(
-          headAngle -
-          Math.PI / 6
-        )
+        4
       );
 
       ctx.lineTo(
         endX -
-        7 *
-        Math.cos(
-          headAngle +
-          Math.PI / 6
-        ),
-        endY -
-        7 *
-        Math.sin(
-          headAngle +
-          Math.PI / 6
-        )
+        7,
+        endY +
+        4
       );
 
       ctx.closePath();
@@ -2404,7 +3230,8 @@
       ctx.fillText(
         "U∞",
         x,
-        y - 10
+        y -
+        10
       );
     }
 
@@ -2413,7 +3240,11 @@
     // ==================================================
 
     function updateProbe() {
-      if (!probeActive) {
+
+      if (
+        !probeActive
+      ) {
+
         probePanel.hidden =
           true;
 
@@ -2435,7 +3266,10 @@
           probeY
         );
 
-      if (!velocity) {
+      if (
+        !velocity
+      ) {
+
         probeUOutput.textContent =
           "—";
 
@@ -2462,7 +3296,10 @@
     }
 
     function drawProbeMarker() {
-      if (!probeActive) {
+
+      if (
+        !probeActive
+      ) {
         return;
       }
 
@@ -2491,7 +3328,8 @@
         y,
         4,
         0,
-        2 * Math.PI
+        2 *
+        Math.PI
       );
 
       ctx.stroke();
@@ -2499,23 +3337,27 @@
       ctx.beginPath();
 
       ctx.moveTo(
-        x - 7,
+        x -
+        7,
         y
       );
 
       ctx.lineTo(
-        x + 7,
+        x +
+        7,
         y
       );
 
       ctx.moveTo(
         x,
-        y - 7
+        y -
+        7
       );
 
       ctx.lineTo(
         x,
-        y + 7
+        y +
+        7
       );
 
       ctx.stroke();
@@ -2528,6 +3370,7 @@
     // ==================================================
 
     function drawCpPlot() {
+
       const width =
         cpCanvas.clientWidth;
 
@@ -2546,25 +3389,24 @@
 
       const allCp = [
         ...upperSurface.map(
-          point => point.cp
+          point =>
+            point.cp
         ),
+
         ...lowerSurface.map(
-          point => point.cp
+          point =>
+            point.cp
         )
       ].filter(
         Number.isFinite
       );
 
       if (
-        allCp.length === 0
+        allCp.length ===
+        0
       ) {
         return;
       }
-
-      /*
-        Prevent one numerical point from destroying
-        the useful plot scale.
-      */
 
       let cpMin =
         Math.max(
@@ -2589,10 +3431,22 @@
           -0.5
         );
 
-      const left = 48;
-      const right = 18;
-      const top = 20;
-      const bottom = 34;
+      const left =
+        54;
+
+      const right =
+        18;
+
+      const top =
+        20;
+
+      /*
+        Increased bottom margin so the tick labels
+        and x/c label occupy separate vertical rows.
+      */
+
+      const bottom =
+        48;
 
       const plotWidth =
         width -
@@ -2607,6 +3461,7 @@
       function plotX(
         xOverC: number
       ) {
+
         return (
           left +
           xOverC *
@@ -2616,12 +3471,13 @@
 
       /*
         Conventional aerodynamic Cp plot:
-        more negative Cp appears higher.
+        increasingly negative Cp appears upward.
       */
 
       function plotY(
         cp: number
       ) {
+
         return (
           top +
           (
@@ -2636,6 +3492,10 @@
         );
       }
 
+      // ------------------------------------------------
+      // GRID
+      // ------------------------------------------------
+
       cpCtx.strokeStyle =
         "rgba(255,255,255,0.08)";
 
@@ -2647,6 +3507,7 @@
         i <= 4;
         i++
       ) {
+
         const x =
           left +
           i /
@@ -2674,6 +3535,7 @@
         i <= 4;
         i++
       ) {
+
         const y =
           top +
           i /
@@ -2696,10 +3558,17 @@
         cpCtx.stroke();
       }
 
+      // ------------------------------------------------
+      // Cp = 0 REFERENCE
+      // ------------------------------------------------
+
       if (
-        cpMin <= 0 &&
-        cpMax >= 0
+        cpMin <=
+        0 &&
+        cpMax >=
+        0
       ) {
+
         cpCtx.strokeStyle =
           "rgba(255,255,255,0.22)";
 
@@ -2707,22 +3576,33 @@
 
         cpCtx.moveTo(
           left,
-          plotY(0)
+          plotY(
+            0
+          )
         );
 
         cpCtx.lineTo(
           left +
           plotWidth,
-          plotY(0)
+          plotY(
+            0
+          )
         );
 
         cpCtx.stroke();
       }
 
+      // ------------------------------------------------
+      // SURFACE CURVES
+      // ------------------------------------------------
+
       function drawSurfaceCurve(
-        surface: SurfacePoint[],
-        colour: string
+        surface:
+          SurfacePoint[],
+        colour:
+          string
       ) {
+
         if (
           surface.length <
           2
@@ -2739,6 +3619,7 @@
           const point
           of surface
         ) {
+
           if (
             !Number.isFinite(
               point.cp
@@ -2766,7 +3647,10 @@
               clampedCp
             );
 
-          if (!started) {
+          if (
+            !started
+          ) {
+
             cpCtx.moveTo(
               x,
               y
@@ -2774,7 +3658,9 @@
 
             started =
               true;
+
           } else {
+
             cpCtx.lineTo(
               x,
               y
@@ -2801,6 +3687,10 @@
         "#f1b86a"
       );
 
+      // ------------------------------------------------
+      // X TICK LABELS
+      // ------------------------------------------------
+
       cpCtx.fillStyle =
         "rgba(255,255,255,0.48)";
 
@@ -2810,55 +3700,108 @@
       cpCtx.textAlign =
         "center";
 
+      cpCtx.textBaseline =
+        "alphabetic";
+
       for (
         let i = 0;
         i <= 4;
         i++
       ) {
+
         const value =
           i /
           4;
 
         cpCtx.fillText(
-          value.toFixed(2),
-          plotX(value),
-          height - 10
+          value.toFixed(
+            2
+          ),
+          plotX(
+            value
+          ),
+          top +
+          plotHeight +
+          17
         );
       }
+
+      // ------------------------------------------------
+      // Y NUMERICAL LABELS
+      // ------------------------------------------------
 
       cpCtx.textAlign =
         "right";
 
       cpCtx.fillText(
-        cpMin.toFixed(1),
-        left - 7,
-        top + 4
+        cpMin.toFixed(
+          1
+        ),
+        left -
+        8,
+        top +
+        4
       );
 
       cpCtx.fillText(
-        cpMax.toFixed(1),
-        left - 7,
-        top + plotHeight
+        cpMax.toFixed(
+          1
+        ),
+        left -
+        8,
+        top +
+        plotHeight
       );
 
-      cpCtx.textAlign =
-        "left";
+      // ------------------------------------------------
+      // CENTRED VERTICAL Cp LABEL
+      // ------------------------------------------------
 
-      cpCtx.fillText(
-        "Cp",
-        10,
-        15
+      cpCtx.save();
+
+      cpCtx.translate(
+        15,
+        top +
+        plotHeight /
+        2
+      );
+
+      cpCtx.rotate(
+        -Math.PI /
+        2
       );
 
       cpCtx.textAlign =
         "center";
+
+      cpCtx.textBaseline =
+        "middle";
+
+      cpCtx.fillText(
+        "Cp",
+        0,
+        0
+      );
+
+      cpCtx.restore();
+
+      // ------------------------------------------------
+      // X/C LABEL BELOW THE TICK LABELS
+      // ------------------------------------------------
+
+      cpCtx.textAlign =
+        "center";
+
+      cpCtx.textBaseline =
+        "alphabetic";
 
       cpCtx.fillText(
         "x/c",
         left +
         plotWidth /
         2,
-        height - 10
+        height -
+        7
       );
     }
 
@@ -2867,6 +3810,7 @@
     // ==================================================
 
     function updateOutputs() {
+
       speedOutput.value =
         `${U.toFixed(1)} m/s`;
 
@@ -2878,19 +3822,25 @@
         ).toFixed(1)}°`;
 
       thicknessOutput.value =
-        epsilon.toFixed(3);
+        epsilon.toFixed(
+          3
+        );
 
       camberOutput.value =
-        eta.toFixed(3);
+        eta.toFixed(
+          3
+        );
 
       gammaOutput.textContent =
-        `${circulation.toFixed(3)} m²/s`;
+        `${physicalCirculation.toFixed(3)} m²/s`;
 
       clOutput.textContent =
-        liftCoefficient.toFixed(3);
+        liftCoefficient.toFixed(
+          3
+        );
 
       chordOutput.textContent =
-        `${chord.toFixed(3)} m`;
+        `${targetChord.toFixed(3)} m`;
     }
 
     // ==================================================
@@ -2898,6 +3848,7 @@
     // ==================================================
 
     function draw() {
+
       drawBackground();
 
       drawStreamlines();
@@ -2907,11 +3858,6 @@
       drawTrailCanvas();
 
       drawParticles();
-
-      /*
-        Draw the body over particles/trails so no
-        numerical artefacts are visible through it.
-      */
 
       drawAirfoil();
 
@@ -2927,6 +3873,7 @@
     function animate(
       now: number
     ) {
+
       const rawDt =
         (
           now -
@@ -2943,16 +3890,24 @@
           0.03
         );
 
-      if (running) {
+      if (
+        running
+      ) {
+
         updateParticles(
           dt
         );
 
-        if (showTrails) {
+        if (
+          showTrails
+        ) {
+
           fadeTrails();
 
           drawNewTrailSegments();
+
         } else {
+
           clearTrails();
         }
       }
@@ -2971,6 +3926,7 @@
     // ==================================================
 
     function readControls() {
+
       U =
         Number(
           speedSlider.value
@@ -3007,6 +3963,7 @@
     }
 
     function modelChanged() {
+
       readControls();
 
       rebuildGeometry();
@@ -3037,6 +3994,7 @@
     particlesToggle.addEventListener(
       "change",
       () => {
+
         showParticles =
           particlesToggle.checked;
       }
@@ -3045,10 +4003,13 @@
     trailsToggle.addEventListener(
       "change",
       () => {
+
         showTrails =
           trailsToggle.checked;
 
-        if (!showTrails) {
+        if (
+          !showTrails
+        ) {
           clearTrails();
         }
       }
@@ -3057,6 +4018,7 @@
     streamlinesToggle.addEventListener(
       "change",
       () => {
+
         showStreamlines =
           streamlinesToggle.checked;
       }
@@ -3065,6 +4027,7 @@
     vectorsToggle.addEventListener(
       "change",
       () => {
+
         showVectors =
           vectorsToggle.checked;
       }
@@ -3077,6 +4040,7 @@
     pauseButton.addEventListener(
       "click",
       () => {
+
         running =
           !running;
 
@@ -3090,6 +4054,7 @@
     resetButton.addEventListener(
       "click",
       () => {
+
         speedSlider.value =
           "1.5";
 
@@ -3138,6 +4103,7 @@
     function updateProbeFromPointer(
       event: PointerEvent
     ) {
+
       const rect =
         canvas.getBoundingClientRect();
 
@@ -3175,6 +4141,7 @@
     canvas.addEventListener(
       "pointerenter",
       event => {
+
         probeActive =
           true;
 
@@ -3187,6 +4154,7 @@
     canvas.addEventListener(
       "pointermove",
       event => {
+
         probeActive =
           true;
 
@@ -3199,6 +4167,7 @@
     canvas.addEventListener(
       "pointerleave",
       () => {
+
         probeActive =
           false;
       }
@@ -3209,9 +4178,13 @@
     // ==================================================
 
     function resizeCanvasElement(
-      targetCanvas: HTMLCanvasElement,
-      targetContext: CanvasRenderingContext2D
+      targetCanvas:
+        HTMLCanvasElement,
+
+      targetContext:
+        CanvasRenderingContext2D
     ) {
+
       const rect =
         targetCanvas.getBoundingClientRect();
 
@@ -3241,8 +4214,10 @@
         );
 
       if (
-        targetCanvas.width === width &&
-        targetCanvas.height === height
+        targetCanvas.width ===
+        width &&
+        targetCanvas.height ===
+        height
       ) {
         return false;
       }
@@ -3266,6 +4241,7 @@
     }
 
     function resizeAll() {
+
       const mainChanged =
         resizeCanvasElement(
           canvas,
@@ -3312,6 +4288,7 @@
         trailCanvas.height !==
         trailHeight
       ) {
+
         trailCanvas.width =
           trailWidth;
 
@@ -3330,12 +4307,18 @@
         clearTrails();
       }
 
-      if (mainChanged) {
+      if (
+        mainChanged
+      ) {
+
         streamlinesDirty =
           true;
       }
 
-      if (cpChanged) {
+      if (
+        cpChanged
+      ) {
+
         drawCpPlot();
       }
     }
@@ -3344,6 +4327,7 @@
       "ResizeObserver"
       in window
     ) {
+
       const observer =
         new ResizeObserver(
           resizeAll
@@ -3356,7 +4340,9 @@
       observer.observe(
         cpCanvas
       );
+
     } else {
+
       window.addEventListener(
         "resize",
         resizeAll
