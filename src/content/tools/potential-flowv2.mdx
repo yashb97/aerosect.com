@@ -1,0 +1,119 @@
+---
+title: "Potential Flow Explorer v2"
+description: "Build a flow from sources, sinks and vortices. Move the pieces and watch simple fields combine into surprising patterns."
+category: "Aerodynamics"
+image: "../../assets/tools/potential-flow.svg"
+order: 3
+draft: true
+---
+
+import PotentialFlowExplorerv2 from "../../components/PotentialFlowExplorerv2.astro";
+import ToolGuide from "../../components/ToolGuide.astro";
+
+<PotentialFlowExplorev2 />
+
+<ToolGuide>
+
+## Getting started
+
+Build two-dimensional flow fields by **adding elementary solutions**. A source pushes fluid radially outwards, a sink draws it inwards and a vortex adds circulation. A uniform freestream carries the combined pattern from left to right. The canvas covers x = −6 to 6 m and y = −3.5 to 3.5 m, with positive y upwards.
+
+1. Start with the default source of +8 m²/s at (−1.5, 0) and sink of −8 m²/s at (1.5, 0), in a 1.5 m/s freestream. Together they create a Rankine-oval-like pattern.
+2. Select an object on the canvas or in the **Objects** list, then change its **Strength**. A source with negative strength becomes a sink; a vortex with negative circulation reverses rotation.
+3. Use **+ Source**, **+ Sink** or **+ Vortex** to add elements, and drag their markers to reposition them. **Delete** removes the selected element; **Clear objects** leaves the freestream in place.
+4. Hover over the canvas to probe velocity. Toggle particles, trails, streamlines and velocity vectors to inspect the field in different ways.
+
+Try setting the freestream to zero to isolate the source–sink interaction, or add a vortex to break the symmetry. Trails start switched off; enable **Trails** to see recent trajectories. **Pause** stops particle motion while you edit. **Reset** restores the starting pair and default controls with trails off and resumes playback.
+
+## The mathematics
+
+Outside their singularities, the classical elementary fields are incompressible and irrotational. Their velocity potentials satisfy Laplace's equation. Because this equation is linear, the potentials—and their velocity fields—can be added. The pressure does not follow the same linear superposition rule.
+
+$$
+\begin{gathered}
+\mathbf{V}=\nabla\phi,\qquad \nabla^2\phi=0,\\[6pt]
+\mathbf{V}_{\mathrm{total}}
+=U_\infty\mathbf{e}_x
++\sum_{i\in\mathcal{S}}\mathbf{V}_i^{(s)}
++\sum_{i\in\mathcal{W}}\mathbf{V}_i^{(v)}.
+\end{gathered}
+$$
+
+Here $\mathbf{e}_x$ is the unit vector in the freestream direction, $\mathcal{S}$ indexes the sources and sinks, and $\mathcal{W}$ indexes the vortices.
+
+For an element centred at $(x_i,y_i)$, define $X_i=x-x_i$, $Y_i=y-y_i$ and $r_i^2=X_i^2+Y_i^2$. A source or sink of strength $Q_i$ contributes:
+
+$$
+\begin{aligned}
+u_i &= \frac{Q_iX_i}{2\pi r_i^2},\\[6pt]
+v_i &= \frac{Q_iY_i}{2\pi r_i^2},\\[6pt]
+u_r &= \frac{Q_i}{2\pi r_i}.
+\end{aligned}
+$$
+
+In this two-dimensional model, $Q$ has units of $\mathrm{m^2\,s^{-1}}$: volume flow per unit depth. Positive $Q$ is a source and negative $Q$ a sink. The radial flux across a circle surrounding an isolated element is $2\pi r u_r=Q$.
+
+A point vortex of circulation $\Gamma_i$ contributes:
+
+$$
+\begin{aligned}
+u_i &= -\frac{\Gamma_iY_i}{2\pi r_i^2},\\[6pt]
+v_i &= \frac{\Gamma_iX_i}{2\pi r_i^2},\\[6pt]
+u_\theta &= \frac{\Gamma_i}{2\pi r_i}.
+\end{aligned}
+$$
+
+Circulation also has units of $\mathrm{m^2\,s^{-1}}$. Positive $\Gamma$ produces counterclockwise motion; negative $\Gamma$ produces clockwise motion. An ideal point vortex is irrotational away from its centre but has nonzero circulation around a loop enclosing it; its velocity potential is locally defined and changes by $\Gamma$ around a complete circuit.
+
+The explorer sums all the $u$ contributions and adds $U_\infty$, then sums all the $v$ contributions. The probe reports these components and the speed $\lVert\mathbf{V}\rVert=\sqrt{u^2+v^2}$.
+
+<p className="reference">For the analytical building blocks and their superposition, see <a href="https://web.mit.edu/fluids-modules/www/potential_flows/LecturesHTML/lec1011/lecture1011.html">MIT's Potential Flows lectures</a>.</p>
+
+## How it is computed
+
+The source and vortex formulas diverge at their centres. The implementation replaces every $r_i^2$ denominator with a bounded value:
+
+$$
+D_i=\max\!\left(r_i^2,\varepsilon^2\right),
+\qquad \varepsilon=0.07\,\mathrm{m}.
+$$
+
+The regularised contributions are then
+
+$$
+\begin{aligned}
+\mathbf{V}_i^{(s)} &= \frac{Q_i}{2\pi D_i}
+\begin{pmatrix}X_i\\Y_i\end{pmatrix},\\[8pt]
+\mathbf{V}_i^{(v)} &= \frac{\Gamma_i}{2\pi D_i}
+\begin{pmatrix}-Y_i\\X_i\end{pmatrix}.
+\end{aligned}
+$$
+
+Outside the 0.07 m core these are the exact classical velocity formulas. Inside, velocity varies linearly with distance from the centre. This numerical regularisation is not viscous diffusion: the source core has distributed divergence and the vortex core has distributed vorticity. The ideal potential-flow assumptions apply outside those cores.
+
+The 1,800 passive particles follow $\frac{\mathrm{d}\mathbf{x}}{\mathrm{d}t}=\mathbf{V}(\mathbf{x})$. Each animation interval is capped at 0.03 s and divided into two midpoint Runge–Kutta substeps. With substep duration $h$, the update is:
+
+$$
+\begin{aligned}
+\mathbf{x}_{\mathrm{mid}} &= \mathbf{x}_n+\frac{h}{2}\,\mathbf{V}(\mathbf{x}_n),\\[6pt]
+\mathbf{x}_{n+1} &= \mathbf{x}_n+h\,\mathbf{V}(\mathbf{x}_{\mathrm{mid}}).
+\end{aligned}
+$$
+
+Particles are reseeded when they leave the view or start a substep within $1.4\varepsilon=0.098\,\mathrm{m}$ of any element. Seeding uses the domain, inflow boundary and positive sources to keep the field populated; particle counts are not a measurement of fluid density or flux.
+
+Streamlines are traced using the midpoint method on $\frac{\mathrm{d}\mathbf{x}}{\mathrm{d}s}=\pm\frac{\mathbf{V}}{\lVert\mathbf{V}\rVert}$, with a spatial step of 0.045 m and at most 520 steps. The code uses 21 inlet seeds plus 12 seeds around each source or sink at radius 0.16 m. It traces forwards from sources and backwards from sinks; backwards tracing is a drawing technique, not reversed physical flow. The paths are cached until the field changes.
+
+## Reading the flow
+
+Streamlines indicate the current direction field. Trails show recent particle motion and coincide with streamline curves when the settings remain fixed, up to integration error. Near stagnation points, $\lVert\mathbf{V}\rVert$ approaches zero; the streamline tracer stops following a direction when its magnitude falls below $10^{-8}\,\mathrm{m\,s^{-1}}$.
+
+Trail colours use seven relative speed bands and rescale with the freestream. Arrow lengths and opacity are capped for readability, so neither is an absolute velocity scale. Use the probe for values. A finite collection of seeds may miss closed or isolated streamline regions, particularly around vortices.
+
+## What the model assumes
+
+This is a prescribed, inviscid flow field with stationary elements between edits. The elements do not move under each other's induced velocities. No solid boundary is enforced, and the model does not calculate pressure, lift, drag, boundary layers, separation or turbulence. An oval-shaped dividing streamline can suggest a body outline, but no physical body has been inserted into the simulation.
+
+The displayed particles are visual tracers. Finite timesteps, reseeding and core regularisation affect paths close to strong elements; this is not a mesh-based CFD solution. Horizontal and vertical coordinates are scaled independently to fit the canvas, so screen aspect ratio can distort geometric proportions.
+
+</ToolGuide>

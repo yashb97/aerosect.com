@@ -1,0 +1,6135 @@
+<section class="potential-flow-explorer" data-potential-flow-explorer>
+
+  <!-- ==================================================
+       VISUALISATION
+       ================================================== -->
+
+  <div class="canvas-wrap">
+
+    <canvas
+      aria-label="Interactive potential flow laboratory"
+    ></canvas>
+
+    <div class="canvas-label">
+      Drag elements · Hover to probe
+    </div>
+
+    <div
+      class="probe-panel"
+      data-probe-panel
+      hidden
+    >
+      <div class="probe-title">
+        Local flow
+      </div>
+
+      <div class="probe-grid">
+
+        <span>x</span>
+        <strong data-probe-x>—</strong>
+
+        <span>y</span>
+        <strong data-probe-y>—</strong>
+
+        <span>u</span>
+        <strong data-probe-u>—</strong>
+
+        <span>v</span>
+        <strong data-probe-v>—</strong>
+
+        <span>|V|</span>
+        <strong data-probe-speed>—</strong>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       CONTROLS
+       ================================================== -->
+
+  <div class="controls">
+
+
+    <!-- PRESETS -->
+
+    <div class="preset-section">
+
+      <div class="section-heading-row">
+
+        <div class="section-title">
+          Canonical flows
+        </div>
+
+        <div class="preset-status">
+          <span>Current:</span>
+          <strong data-preset-status>Custom</strong>
+        </div>
+
+      </div>
+
+
+      <div class="preset-grid">
+
+        <button
+          class="preset-button"
+          data-preset="rankine-half"
+          type="button"
+        >
+          Rankine half-body
+        </button>
+
+        <button
+          class="preset-button"
+          data-preset="rankine-oval"
+          type="button"
+        >
+          Rankine oval
+        </button>
+
+        <button
+          class="preset-button"
+          data-preset="cylinder"
+          type="button"
+        >
+          Cylinder
+        </button>
+
+        <button
+          class="preset-button"
+          data-preset="lifting-cylinder"
+          type="button"
+        >
+          Lifting cylinder
+        </button>
+
+      </div>
+
+
+      <div
+        class="body-info"
+        data-body-info
+        hidden
+      >
+        <span>
+          Detected solid-body streamline
+        </span>
+
+        <strong data-body-radius>
+          —
+        </strong>
+      </div>
+
+    </div>
+
+
+    <!-- ADD FLOW ELEMENTS -->
+
+    <div class="tool-section">
+
+      <div class="section-title">
+        Flow elements
+      </div>
+
+      <div class="toolbar">
+
+        <button
+          data-add-source
+          type="button"
+        >
+          + Source
+        </button>
+
+        <button
+          data-add-sink
+          type="button"
+        >
+          + Sink
+        </button>
+
+        <button
+          data-add-vortex
+          type="button"
+        >
+          + Vortex
+        </button>
+
+        <button
+          data-add-doublet
+          type="button"
+        >
+          + Doublet
+        </button>
+
+        <button
+          data-clear
+          type="button"
+          class="secondary-button"
+        >
+          Clear objects
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- FREESTREAM -->
+
+    <label class="control-row">
+
+      <span>
+        Freestream U∞
+      </span>
+
+      <output data-freestream-output>
+        1.5 m/s
+      </output>
+
+      <input
+        data-freestream
+        type="range"
+        min="0"
+        max="5"
+        step="0.1"
+        value="1.5"
+      />
+
+    </label>
+
+
+    <!-- OBJECT LIST -->
+
+    <div class="object-section">
+
+      <div class="section-title">
+        Objects
+      </div>
+
+      <div
+        class="object-list"
+        data-object-list
+      ></div>
+
+    </div>
+
+
+    <!-- SELECTED OBJECT -->
+
+    <div class="selected-panel">
+
+      <div class="selected-header">
+
+        <div>
+          <span class="selected-caption">
+            Selected
+          </span>
+
+          <strong data-selected-name>
+            None
+          </strong>
+        </div>
+
+        <button
+          data-delete
+          type="button"
+          class="danger-button"
+          disabled
+        >
+          Delete
+        </button>
+
+      </div>
+
+
+      <label class="control-row selected-control">
+
+        <span data-strength-label>
+          Strength
+        </span>
+
+        <output data-strength-output>
+          —
+        </output>
+
+        <input
+          data-strength
+          type="range"
+          min="-20"
+          max="20"
+          step="0.5"
+          value="0"
+          disabled
+        />
+
+      </label>
+
+
+      <div class="selected-position">
+
+        <div>
+          <span>x</span>
+          <strong data-selected-x>—</strong>
+        </div>
+
+        <div>
+          <span>y</span>
+          <strong data-selected-y>—</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- VISUALS -->
+
+    <div class="visual-controls">
+
+      <div class="section-title">
+        Visual layers
+      </div>
+
+      <div class="toggle-grid">
+
+        <label class="toggle">
+          <input
+            data-particles-toggle
+            type="checkbox"
+            checked
+          />
+          <span>Particles</span>
+        </label>
+
+        <label class="toggle">
+          <input
+            data-trails-toggle
+            type="checkbox"
+            checked
+          />
+          <span>Trails</span>
+        </label>
+
+        <label class="toggle">
+          <input
+            data-streamlines-toggle
+            type="checkbox"
+            checked
+          />
+          <span>Streamlines</span>
+        </label>
+
+        <label class="toggle">
+          <input
+            data-vectors-toggle
+            type="checkbox"
+          />
+          <span>Velocity vectors</span>
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <!-- MODEL -->
+
+    <details class="model-details">
+
+      <summary>
+        Model assumptions and equations
+      </summary>
+
+      <div class="model-content">
+
+        <p>
+          The velocity field is formed by linear
+          superposition of classical two-dimensional
+          potential-flow solutions.
+        </p>
+
+        <div class="equation">
+          V = V∞ + Σ Vsource + Σ Vvortex + Σ Vdoublet
+        </div>
+
+        <div class="equation">
+          Source / sink: ur = Q/(2πr)
+        </div>
+
+        <div class="equation">
+          Vortex: uθ = Γ/(2πr)
+        </div>
+
+        <div class="equation">
+          x-aligned doublet:
+          φ = μx/(2πr²)
+        </div>
+
+        <p>
+          A positive x-aligned doublet combined with
+          uniform flow generates the classical
+          potential-flow solution around a circular
+          cylinder when
+        </p>
+
+        <div class="equation">
+          μ = 2π U∞ a²
+        </div>
+
+        <p>
+          where a is the cylinder radius.
+        </p>
+
+        <ul>
+          <li>Two-dimensional</li>
+          <li>Incompressible</li>
+          <li>Inviscid</li>
+          <li>Irrotational except at vortex singularities</li>
+          <li>Linear superposition</li>
+          <li>Doublets are aligned with the x-axis</li>
+          <li>No boundary layers or viscous drag</li>
+        </ul>
+
+        <p class="model-note">
+          Singularities are numerically bounded only
+          inside a small core to maintain stable
+          particle integration.
+        </p>
+
+      </div>
+
+    </details>
+
+
+    <!-- BOTTOM -->
+
+    <div class="bottom-row">
+
+      <div class="model-info">
+        <strong>Model:</strong>
+        2-D potential-flow superposition
+      </div>
+
+      <div class="buttons">
+
+        <button
+          data-pause
+          type="button"
+        >
+          Pause
+        </button>
+
+        <button
+          data-reset
+          type="button"
+        >
+          Reset
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+
+  type ElementType =
+    "source" |
+    "vortex" |
+    "doublet";
+
+
+  type PresetKey =
+    "rankine-half" |
+    "rankine-oval" |
+    "cylinder" |
+    "lifting-cylinder" |
+    "custom";
+
+
+  type FlowElement = {
+
+    id: number;
+
+    type: ElementType;
+
+    x: number;
+
+    y: number;
+
+    strength: number;
+
+  };
+
+
+  type Point = {
+
+    x: number;
+
+    y: number;
+
+  };
+
+
+  type CylinderBody = {
+
+    x: number;
+
+    y: number;
+
+    radius: number;
+
+  };
+
+
+  const explorers =
+    document.querySelectorAll<HTMLElement>(
+      "[data-potential-flow-explorer]"
+    );
+
+
+  for (const root of explorers) {
+
+
+    // ==================================================
+    // DOM
+    // ==================================================
+
+    const canvas =
+      root.querySelector<HTMLCanvasElement>(
+        "canvas"
+      );
+
+
+    const freestreamSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-freestream]"
+      );
+
+
+    const freestreamOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-freestream-output]"
+      );
+
+
+    const addSourceButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-add-source]"
+      );
+
+
+    const addSinkButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-add-sink]"
+      );
+
+
+    const addVortexButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-add-vortex]"
+      );
+
+
+    const addDoubletButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-add-doublet]"
+      );
+
+
+    const clearButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-clear]"
+      );
+
+
+    const deleteButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-delete]"
+      );
+
+
+    const strengthSlider =
+      root.querySelector<HTMLInputElement>(
+        "[data-strength]"
+      );
+
+
+    const strengthOutput =
+      root.querySelector<HTMLOutputElement>(
+        "[data-strength-output]"
+      );
+
+
+    const strengthLabel =
+      root.querySelector<HTMLElement>(
+        "[data-strength-label]"
+      );
+
+
+    const selectedName =
+      root.querySelector<HTMLElement>(
+        "[data-selected-name]"
+      );
+
+
+    const selectedXOutput =
+      root.querySelector<HTMLElement>(
+        "[data-selected-x]"
+      );
+
+
+    const selectedYOutput =
+      root.querySelector<HTMLElement>(
+        "[data-selected-y]"
+      );
+
+
+    const objectList =
+      root.querySelector<HTMLElement>(
+        "[data-object-list]"
+      );
+
+
+    const particlesToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-particles-toggle]"
+      );
+
+
+    const trailsToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-trails-toggle]"
+      );
+
+
+    const streamlinesToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-streamlines-toggle]"
+      );
+
+
+    const vectorsToggle =
+      root.querySelector<HTMLInputElement>(
+        "[data-vectors-toggle]"
+      );
+
+
+    const pauseButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-pause]"
+      );
+
+
+    const resetButton =
+      root.querySelector<HTMLButtonElement>(
+        "[data-reset]"
+      );
+
+
+    const probePanel =
+      root.querySelector<HTMLElement>(
+        "[data-probe-panel]"
+      );
+
+
+    const probeXOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-x]"
+      );
+
+
+    const probeYOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-y]"
+      );
+
+
+    const probeUOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-u]"
+      );
+
+
+    const probeVOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-v]"
+      );
+
+
+    const probeSpeedOutput =
+      root.querySelector<HTMLElement>(
+        "[data-probe-speed]"
+      );
+
+
+    const presetStatus =
+      root.querySelector<HTMLElement>(
+        "[data-preset-status]"
+      );
+
+
+    const presetButtons =
+      root.querySelectorAll<HTMLButtonElement>(
+        "[data-preset]"
+      );
+
+
+    const bodyInfo =
+      root.querySelector<HTMLElement>(
+        "[data-body-info]"
+      );
+
+
+    const bodyRadiusOutput =
+      root.querySelector<HTMLElement>(
+        "[data-body-radius]"
+      );
+
+
+    if (
+      !canvas ||
+      !freestreamSlider ||
+      !freestreamOutput ||
+      !addSourceButton ||
+      !addSinkButton ||
+      !addVortexButton ||
+      !addDoubletButton ||
+      !clearButton ||
+      !deleteButton ||
+      !strengthSlider ||
+      !strengthOutput ||
+      !strengthLabel ||
+      !selectedName ||
+      !selectedXOutput ||
+      !selectedYOutput ||
+      !objectList ||
+      !particlesToggle ||
+      !trailsToggle ||
+      !streamlinesToggle ||
+      !vectorsToggle ||
+      !pauseButton ||
+      !resetButton ||
+      !probePanel ||
+      !probeXOutput ||
+      !probeYOutput ||
+      !probeUOutput ||
+      !probeVOutput ||
+      !probeSpeedOutput ||
+      !presetStatus ||
+      !bodyInfo ||
+      !bodyRadiusOutput
+    ) {
+      continue;
+    }
+
+
+    const ctx =
+      canvas.getContext(
+        "2d"
+      );
+
+
+    if (!ctx) {
+      continue;
+    }
+
+
+    // ==================================================
+    // TRAIL CANVAS
+    // ==================================================
+
+    const trailCanvas =
+      document.createElement(
+        "canvas"
+      );
+
+
+    const trailCtx =
+      trailCanvas.getContext(
+        "2d"
+      );
+
+
+    if (!trailCtx) {
+      continue;
+    }
+
+
+    // ==================================================
+    // DOMAIN
+    // ==================================================
+
+    const xmin = -6;
+    const xmax = 6;
+
+    const ymin = -3.5;
+    const ymax = 3.5;
+
+
+    const particleCount =
+      1800;
+
+
+    const particleX =
+      new Float32Array(
+        particleCount
+      );
+
+
+    const particleY =
+      new Float32Array(
+        particleCount
+      );
+
+
+    const previousParticleX =
+      new Float32Array(
+        particleCount
+      );
+
+
+    const previousParticleY =
+      new Float32Array(
+        particleCount
+      );
+
+
+    // ==================================================
+    // OBJECT STATE
+    // ==================================================
+
+    let nextElementId =
+      1;
+
+
+    let elements:
+      FlowElement[] =
+      [];
+
+
+    let selectedElementId:
+      number | null =
+      null;
+
+
+    let currentPreset:
+      PresetKey =
+      "custom";
+
+
+    function makeElement(
+      type: ElementType,
+      x: number,
+      y: number,
+      strength: number
+    ): FlowElement {
+
+      return {
+
+        id:
+          nextElementId++,
+
+        type,
+
+        x,
+
+        y,
+
+        strength
+
+      };
+    }
+
+
+    // ==================================================
+    // VISUAL STATE
+    // ==================================================
+
+    let freestream =
+      1.5;
+
+
+    let showParticles =
+      true;
+
+
+    let showTrails =
+      true;
+
+
+    let showStreamlines =
+      true;
+
+
+    let showVectors =
+      false;
+
+
+    let running =
+      true;
+
+
+    let previousTime =
+      performance.now();
+
+
+    let draggingElementId:
+      number | null =
+      null;
+
+
+    let probeActive =
+      false;
+
+
+    let probeX = 0;
+
+    let probeY = 0;
+
+
+    let streamlinesDirty =
+      true;
+
+
+    let cachedStreamlines:
+      Point[][] =
+      [];
+
+
+    // ==================================================
+    // COORDINATE TRANSFORMS
+    // ==================================================
+
+    function physicalToScreenX(
+      x: number
+    ) {
+
+      return (
+        (
+          x - xmin
+        ) /
+        (
+          xmax - xmin
+        ) *
+        canvas.clientWidth
+      );
+    }
+
+
+    function physicalToScreenY(
+      y: number
+    ) {
+
+      return (
+        canvas.clientHeight -
+        (
+          y - ymin
+        ) /
+        (
+          ymax - ymin
+        ) *
+        canvas.clientHeight
+      );
+    }
+
+
+    function screenToPhysicalX(
+      x: number
+    ) {
+
+      return (
+        xmin +
+        x /
+        canvas.clientWidth *
+        (
+          xmax - xmin
+        )
+      );
+    }
+
+
+    function screenToPhysicalY(
+      y: number
+    ) {
+
+      return (
+        ymax -
+        y /
+        canvas.clientHeight *
+        (
+          ymax - ymin
+        )
+      );
+    }
+
+
+    // ==================================================
+    // NUMERICAL CORE
+    // ==================================================
+
+    function coreRadiusFor(
+      element: FlowElement
+    ) {
+
+      /*
+        Doublet velocity diverges more strongly
+        than source/vortex velocity.
+      */
+
+      return (
+        element.type ===
+        "doublet"
+          ? 0.12
+          : 0.07
+      );
+    }
+
+
+    // ==================================================
+    // POTENTIAL-FLOW PHYSICS
+    // ==================================================
+
+    function velocityAt(
+      x: number,
+      y: number
+    ) {
+
+      let u =
+        freestream;
+
+
+      let v =
+        0;
+
+
+      for (
+        const element
+        of elements
+      ) {
+
+        const dx =
+          x -
+          element.x;
+
+
+        const dy =
+          y -
+          element.y;
+
+
+        const r2 =
+          dx * dx +
+          dy * dy;
+
+
+        const core =
+          coreRadiusFor(
+            element
+          );
+
+
+        const safeR2 =
+          Math.max(
+            r2,
+            core *
+            core
+          );
+
+
+        if (
+          element.type ===
+          "source"
+        ) {
+
+          /*
+            Source / sink
+
+            u = Q/(2πr²) dx
+            v = Q/(2πr²) dy
+          */
+
+          const coefficient =
+            element.strength /
+            (
+              2 *
+              Math.PI *
+              safeR2
+            );
+
+
+          u +=
+            coefficient *
+            dx;
+
+
+          v +=
+            coefficient *
+            dy;
+
+
+        } else if (
+          element.type ===
+          "vortex"
+        ) {
+
+          /*
+            Point vortex
+
+            u = -Γ/(2πr²) dy
+            v =  Γ/(2πr²) dx
+          */
+
+          const coefficient =
+            element.strength /
+            (
+              2 *
+              Math.PI *
+              safeR2
+            );
+
+
+          u -=
+            coefficient *
+            dy;
+
+
+          v +=
+            coefficient *
+            dx;
+
+
+        } else {
+
+          /*
+            x-aligned 2-D doublet
+
+            φ = μx/(2πr²)
+
+            u =
+              μ/(2π)
+              (y² - x²)/r⁴
+
+            v =
+             -μ/π
+              xy/r⁴
+          */
+
+          const safeR4 =
+            safeR2 *
+            safeR2;
+
+
+          const coefficient =
+            element.strength /
+            (
+              2 *
+              Math.PI *
+              safeR4
+            );
+
+
+          u +=
+            coefficient *
+            (
+              dy * dy -
+              dx * dx
+            );
+
+
+          v +=
+            coefficient *
+            (
+              -2 *
+              dx *
+              dy
+            );
+        }
+      }
+
+
+      return {
+        u,
+        v
+      };
+    }
+
+
+    function speedAt(
+      x: number,
+      y: number
+    ) {
+
+      const velocity =
+        velocityAt(
+          x,
+          y
+        );
+
+
+      return Math.hypot(
+        velocity.u,
+        velocity.v
+      );
+    }
+
+
+    // ==================================================
+    // CYLINDER DETECTION
+    // ==================================================
+
+    function detectCylinderBody(): CylinderBody | null {
+
+      if (
+        freestream <=
+        1e-8
+      ) {
+
+        return null;
+      }
+
+
+      const sources =
+        elements.filter(
+          element =>
+            element.type ===
+            "source"
+        );
+
+
+      if (
+        sources.length >
+        0
+      ) {
+
+        return null;
+      }
+
+
+      const doublets =
+        elements.filter(
+          element =>
+            element.type ===
+            "doublet"
+        );
+
+
+      if (
+        doublets.length !==
+        1
+      ) {
+
+        return null;
+      }
+
+
+      const doublet =
+        doublets[0];
+
+
+      /*
+        Positive μ with positive U∞ gives the
+        classical cylinder solution.
+      */
+
+      if (
+        doublet.strength <=
+        0
+      ) {
+
+        return null;
+      }
+
+
+      /*
+        Any vortices must be effectively concentric
+        with the doublet for the circular surface to
+        remain a streamline.
+      */
+
+      const vortices =
+        elements.filter(
+          element =>
+            element.type ===
+            "vortex"
+        );
+
+
+      for (
+        const vortex
+        of vortices
+      ) {
+
+        const distance =
+          Math.hypot(
+            vortex.x -
+            doublet.x,
+            vortex.y -
+            doublet.y
+          );
+
+
+        if (
+          distance >
+          0.03
+        ) {
+
+          return null;
+        }
+      }
+
+
+      const radius =
+        Math.sqrt(
+          doublet.strength /
+          (
+            2 *
+            Math.PI *
+            freestream
+          )
+        );
+
+
+      if (
+        !Number.isFinite(
+          radius
+        ) ||
+        radius <=
+        0
+      ) {
+
+        return null;
+      }
+
+
+      return {
+
+        x:
+          doublet.x,
+
+        y:
+          doublet.y,
+
+        radius
+
+      };
+    }
+
+
+    function insideSolidBody(
+      x: number,
+      y: number
+    ) {
+
+      const body =
+        detectCylinderBody();
+
+
+      if (!body) {
+        return false;
+      }
+
+
+      return (
+        Math.hypot(
+          x -
+          body.x,
+          y -
+          body.y
+        ) <
+        body.radius *
+        0.995
+      );
+    }
+
+
+    // ==================================================
+    // SINGULARITY PROXIMITY
+    // ==================================================
+
+    function tooCloseToElement(
+      x: number,
+      y: number
+    ) {
+
+      for (
+        const element
+        of elements
+      ) {
+
+        const core =
+          coreRadiusFor(
+            element
+          ) *
+          1.4;
+
+
+        const dx =
+          x -
+          element.x;
+
+
+        const dy =
+          y -
+          element.y;
+
+
+        if (
+          dx * dx +
+          dy * dy <
+          core *
+          core
+        ) {
+
+          return true;
+        }
+      }
+
+
+      return false;
+    }
+
+
+    // ==================================================
+    // PARTICLES
+    // ==================================================
+
+    function positiveSources() {
+
+      return elements.filter(
+        element =>
+          element.type ===
+            "source" &&
+          element.strength >
+            0
+      );
+    }
+
+
+    function seedNearSource(
+      i: number
+    ) {
+
+      const sources =
+        positiveSources();
+
+
+      if (
+        sources.length ===
+        0
+      ) {
+
+        return false;
+      }
+
+
+      const source =
+        sources[
+          Math.floor(
+            Math.random() *
+            sources.length
+          )
+        ];
+
+
+      const angle =
+        Math.random() *
+        Math.PI *
+        2;
+
+
+      const radius =
+        0.14 +
+        Math.random() *
+        0.10;
+
+
+      particleX[i] =
+        source.x +
+        Math.cos(
+          angle
+        ) *
+        radius;
+
+
+      particleY[i] =
+        source.y +
+        Math.sin(
+          angle
+        ) *
+        radius;
+
+
+      return true;
+    }
+
+
+    function seedParticle(
+      i: number,
+      anywhere = true
+    ) {
+
+      let attempts =
+        0;
+
+
+      do {
+
+        if (
+          anywhere
+        ) {
+
+          particleX[i] =
+            xmin +
+            Math.random() *
+            (
+              xmax -
+              xmin
+            );
+
+
+          particleY[i] =
+            ymin +
+            Math.random() *
+            (
+              ymax -
+              ymin
+            );
+
+        } else {
+
+          const choice =
+            Math.random();
+
+
+          if (
+            choice <
+            0.70
+          ) {
+
+            particleX[i] =
+              xmin;
+
+
+            particleY[i] =
+              ymin +
+              Math.random() *
+              (
+                ymax -
+                ymin
+              );
+
+
+          } else if (
+            choice <
+            0.88
+          ) {
+
+            particleX[i] =
+              xmin +
+              Math.random() *
+              (
+                xmax -
+                xmin
+              );
+
+
+            particleY[i] =
+              ymin +
+              Math.random() *
+              (
+                ymax -
+                ymin
+              );
+
+
+          } else {
+
+            const success =
+              seedNearSource(
+                i
+              );
+
+
+            if (
+              !success
+            ) {
+
+              particleX[i] =
+                xmin;
+
+
+              particleY[i] =
+                ymin +
+                Math.random() *
+                (
+                  ymax -
+                  ymin
+                );
+            }
+          }
+        }
+
+
+        attempts++;
+
+      } while (
+        insideSolidBody(
+          particleX[i],
+          particleY[i]
+        ) &&
+        attempts <
+        20
+      );
+
+
+      previousParticleX[i] =
+        particleX[i];
+
+
+      previousParticleY[i] =
+        particleY[i];
+    }
+
+
+    function seedAllParticles() {
+
+      for (
+        let i = 0;
+        i <
+        particleCount;
+        i++
+      ) {
+
+        seedParticle(
+          i,
+          true
+        );
+      }
+
+
+      clearTrails();
+    }
+
+
+    // ==================================================
+    // RK2 PARTICLE ADVECTION
+    // ==================================================
+
+    function updateParticles(
+      dt: number
+    ) {
+
+      const substeps =
+        2;
+
+
+      const subDt =
+        dt /
+        substeps;
+
+
+      for (
+        let i = 0;
+        i <
+        particleCount;
+        i++
+      ) {
+
+        previousParticleX[i] =
+          particleX[i];
+
+
+        previousParticleY[i] =
+          particleY[i];
+
+
+        for (
+          let step = 0;
+          step <
+          substeps;
+          step++
+        ) {
+
+          const x =
+            particleX[i];
+
+
+          const y =
+            particleY[i];
+
+
+          if (
+            insideSolidBody(
+              x,
+              y
+            ) ||
+            tooCloseToElement(
+              x,
+              y
+            )
+          ) {
+
+            seedParticle(
+              i,
+              false
+            );
+
+            break;
+          }
+
+
+          const velocity1 =
+            velocityAt(
+              x,
+              y
+            );
+
+
+          const midX =
+            x +
+            0.5 *
+            velocity1.u *
+            subDt;
+
+
+          const midY =
+            y +
+            0.5 *
+            velocity1.v *
+            subDt;
+
+
+          const velocity2 =
+            velocityAt(
+              midX,
+              midY
+            );
+
+
+          particleX[i] =
+            x +
+            velocity2.u *
+            subDt;
+
+
+          particleY[i] =
+            y +
+            velocity2.v *
+            subDt;
+
+
+          const outside =
+            particleX[i] <
+              xmin ||
+            particleX[i] >
+              xmax ||
+            particleY[i] <
+              ymin ||
+            particleY[i] >
+              ymax;
+
+
+          if (
+            outside ||
+            insideSolidBody(
+              particleX[i],
+              particleY[i]
+            )
+          ) {
+
+            seedParticle(
+              i,
+              false
+            );
+
+            break;
+          }
+        }
+      }
+    }
+
+
+    // ==================================================
+    // TRAILS
+    // ==================================================
+
+    const speedColours = [
+
+      "rgba(72,121,170,0.28)",
+
+      "rgba(70,147,202,0.34)",
+
+      "rgba(72,172,222,0.40)",
+
+      "rgba(83,195,236,0.48)",
+
+      "rgba(110,213,247,0.58)",
+
+      "rgba(155,227,252,0.70)",
+
+      "rgba(213,244,255,0.82)"
+
+    ];
+
+
+    function speedBin(
+      speed: number
+    ) {
+
+      const reference =
+        Math.max(
+          2,
+          freestream *
+          2.6
+        );
+
+
+      const normalized =
+        Math.min(
+          speed /
+          reference,
+          1
+        );
+
+
+      return Math.min(
+        speedColours.length -
+        1,
+        Math.floor(
+          normalized *
+          speedColours.length
+        )
+      );
+    }
+
+
+    function clearTrails() {
+
+      trailCtx.save();
+
+
+      trailCtx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+
+      trailCtx.clearRect(
+        0,
+        0,
+        trailCanvas.width,
+        trailCanvas.height
+      );
+
+
+      trailCtx.restore();
+    }
+
+
+    function fadeTrails() {
+
+      trailCtx.save();
+
+
+      trailCtx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+
+      trailCtx.globalCompositeOperation =
+        "destination-out";
+
+
+      trailCtx.fillStyle =
+        "rgba(0,0,0,0.055)";
+
+
+      trailCtx.fillRect(
+        0,
+        0,
+        trailCanvas.width,
+        trailCanvas.height
+      );
+
+
+      trailCtx.restore();
+
+
+      trailCtx.globalCompositeOperation =
+        "source-over";
+    }
+
+
+    function drawNewTrailSegments() {
+
+      if (!showTrails) {
+        return;
+      }
+
+
+      for (
+        let bin = 0;
+        bin <
+        speedColours.length;
+        bin++
+      ) {
+
+        trailCtx.beginPath();
+
+
+        let hasSegments =
+          false;
+
+
+        for (
+          let i = 0;
+          i <
+          particleCount;
+          i++
+        ) {
+
+          const x0 =
+            previousParticleX[i];
+
+
+          const y0 =
+            previousParticleY[i];
+
+
+          const x1 =
+            particleX[i];
+
+
+          const y1 =
+            particleY[i];
+
+
+          if (
+            Math.abs(
+              x1 - x0
+            ) > 0.8 ||
+            Math.abs(
+              y1 - y0
+            ) > 0.8
+          ) {
+
+            continue;
+          }
+
+
+          const mx =
+            0.5 *
+            (
+              x0 +
+              x1
+            );
+
+
+          const my =
+            0.5 *
+            (
+              y0 +
+              y1
+            );
+
+
+          if (
+            speedBin(
+              speedAt(
+                mx,
+                my
+              )
+            ) !==
+            bin
+          ) {
+
+            continue;
+          }
+
+
+          trailCtx.moveTo(
+            physicalToScreenX(
+              x0
+            ),
+            physicalToScreenY(
+              y0
+            )
+          );
+
+
+          trailCtx.lineTo(
+            physicalToScreenX(
+              x1
+            ),
+            physicalToScreenY(
+              y1
+            )
+          );
+
+
+          hasSegments =
+            true;
+        }
+
+
+        if (
+          hasSegments
+        ) {
+
+          trailCtx.strokeStyle =
+            speedColours[bin];
+
+
+          trailCtx.lineWidth =
+            1;
+
+
+          trailCtx.stroke();
+        }
+      }
+    }
+
+
+    // ==================================================
+    // STREAMLINES
+    // ==================================================
+
+    function directionAt(
+      x: number,
+      y: number,
+      sign = 1
+    ) {
+
+      const velocity =
+        velocityAt(
+          x,
+          y
+        );
+
+
+      const magnitude =
+        Math.hypot(
+          velocity.u,
+          velocity.v
+        );
+
+
+      if (
+        magnitude <
+        1e-8
+      ) {
+
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+
+
+      return {
+
+        x:
+          sign *
+          velocity.u /
+          magnitude,
+
+        y:
+          sign *
+          velocity.v /
+          magnitude
+
+      };
+    }
+
+
+    function traceStreamline(
+      seedX: number,
+      seedY: number,
+      directionSign = 1
+    ) {
+
+      const points:
+        Point[] =
+        [];
+
+
+      let x =
+        seedX;
+
+
+      let y =
+        seedY;
+
+
+      const spatialStep =
+        0.04;
+
+
+      const maxSteps =
+        560;
+
+
+      for (
+        let step = 0;
+        step <
+        maxSteps;
+        step++
+      ) {
+
+        if (
+          x < xmin ||
+          x > xmax ||
+          y < ymin ||
+          y > ymax
+        ) {
+          break;
+        }
+
+
+        if (
+          insideSolidBody(
+            x,
+            y
+          ) ||
+          tooCloseToElement(
+            x,
+            y
+          )
+        ) {
+          break;
+        }
+
+
+        points.push({
+          x,
+          y
+        });
+
+
+        const d1 =
+          directionAt(
+            x,
+            y,
+            directionSign
+          );
+
+
+        if (
+          d1.x === 0 &&
+          d1.y === 0
+        ) {
+          break;
+        }
+
+
+        const midX =
+          x +
+          0.5 *
+          spatialStep *
+          d1.x;
+
+
+        const midY =
+          y +
+          0.5 *
+          spatialStep *
+          d1.y;
+
+
+        const d2 =
+          directionAt(
+            midX,
+            midY,
+            directionSign
+          );
+
+
+        x +=
+          spatialStep *
+          d2.x;
+
+
+        y +=
+          spatialStep *
+          d2.y;
+      }
+
+
+      return points;
+    }
+
+
+    function rebuildStreamlines() {
+
+      cachedStreamlines =
+        [];
+
+
+      const verticalSeedCount =
+        23;
+
+
+      for (
+        let i = 0;
+        i <
+        verticalSeedCount;
+        i++
+      ) {
+
+        const y =
+          ymin +
+          (
+            i +
+            0.5
+          ) /
+          verticalSeedCount *
+          (
+            ymax -
+            ymin
+          );
+
+
+        const streamline =
+          traceStreamline(
+            xmin +
+            0.02,
+            y,
+            1
+          );
+
+
+        if (
+          streamline.length >
+          2
+        ) {
+
+          cachedStreamlines.push(
+            streamline
+          );
+        }
+      }
+
+
+      /*
+        Radial seeds around sources and sinks.
+      */
+
+      for (
+        const element
+        of elements
+      ) {
+
+        if (
+          element.type !==
+          "source"
+        ) {
+          continue;
+        }
+
+
+        const seedRadius =
+          0.16;
+
+
+        const seedCount =
+          14;
+
+
+        const sign =
+          element.strength >=
+          0
+            ? 1
+            : -1;
+
+
+        for (
+          let i = 0;
+          i <
+          seedCount;
+          i++
+        ) {
+
+          const angle =
+            i /
+            seedCount *
+            Math.PI *
+            2;
+
+
+          const streamline =
+            traceStreamline(
+              element.x +
+              Math.cos(
+                angle
+              ) *
+              seedRadius,
+
+              element.y +
+              Math.sin(
+                angle
+              ) *
+              seedRadius,
+
+              sign
+            );
+
+
+          if (
+            streamline.length >
+            2
+          ) {
+
+            cachedStreamlines.push(
+              streamline
+            );
+          }
+        }
+      }
+
+
+      streamlinesDirty =
+        false;
+    }
+
+
+    function drawStreamlines() {
+
+      if (!showStreamlines) {
+        return;
+      }
+
+
+      if (
+        streamlinesDirty
+      ) {
+
+        rebuildStreamlines();
+      }
+
+
+      ctx.save();
+
+
+      ctx.strokeStyle =
+        "rgba(195,225,242,0.20)";
+
+
+      ctx.lineWidth =
+        0.85;
+
+
+      for (
+        const streamline
+        of cachedStreamlines
+      ) {
+
+        if (
+          streamline.length <
+          2
+        ) {
+          continue;
+        }
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+          physicalToScreenX(
+            streamline[0].x
+          ),
+          physicalToScreenY(
+            streamline[0].y
+          )
+        );
+
+
+        for (
+          let i = 1;
+          i <
+          streamline.length;
+          i++
+        ) {
+
+          ctx.lineTo(
+            physicalToScreenX(
+              streamline[i].x
+            ),
+            physicalToScreenY(
+              streamline[i].y
+            )
+          );
+        }
+
+
+        ctx.stroke();
+      }
+
+
+      ctx.restore();
+    }
+
+
+    // ==================================================
+    // VECTOR FIELD
+    // ==================================================
+
+    function drawArrow(
+      x: number,
+      y: number,
+      dx: number,
+      dy: number,
+      opacity: number
+    ) {
+
+      const endX =
+        x +
+        dx;
+
+
+      const endY =
+        y +
+        dy;
+
+
+      const angle =
+        Math.atan2(
+          dy,
+          dx
+        );
+
+
+      const head =
+        4.5;
+
+
+      ctx.strokeStyle =
+        `rgba(210,235,248,${opacity})`;
+
+
+      ctx.fillStyle =
+        `rgba(210,235,248,${opacity})`;
+
+
+      ctx.lineWidth =
+        0.8;
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        x,
+        y
+      );
+
+
+      ctx.lineTo(
+        endX,
+        endY
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        endX,
+        endY
+      );
+
+
+      ctx.lineTo(
+        endX -
+        head *
+        Math.cos(
+          angle -
+          Math.PI /
+          6
+        ),
+
+        endY -
+        head *
+        Math.sin(
+          angle -
+          Math.PI /
+          6
+        )
+      );
+
+
+      ctx.lineTo(
+        endX -
+        head *
+        Math.cos(
+          angle +
+          Math.PI /
+          6
+        ),
+
+        endY -
+        head *
+        Math.sin(
+          angle +
+          Math.PI /
+          6
+        )
+      );
+
+
+      ctx.closePath();
+
+
+      ctx.fill();
+    }
+
+
+    function drawVectorField() {
+
+      if (!showVectors) {
+        return;
+      }
+
+
+      const nx =
+        Math.max(
+          10,
+          Math.floor(
+            canvas.clientWidth /
+            72
+          )
+        );
+
+
+      const ny =
+        Math.max(
+          6,
+          Math.floor(
+            canvas.clientHeight /
+            72
+          )
+        );
+
+
+      const referenceSpeed =
+        Math.max(
+          2,
+          freestream *
+          2
+        );
+
+
+      for (
+        let iy = 0;
+        iy < ny;
+        iy++
+      ) {
+
+        for (
+          let ix = 0;
+          ix < nx;
+          ix++
+        ) {
+
+          const x =
+            xmin +
+            (
+              ix +
+              0.5
+            ) /
+            nx *
+            (
+              xmax -
+              xmin
+            );
+
+
+          const y =
+            ymin +
+            (
+              iy +
+              0.5
+            ) /
+            ny *
+            (
+              ymax -
+              ymin
+            );
+
+
+          if (
+            insideSolidBody(
+              x,
+              y
+            ) ||
+            tooCloseToElement(
+              x,
+              y
+            )
+          ) {
+            continue;
+          }
+
+
+          const velocity =
+            velocityAt(
+              x,
+              y
+            );
+
+
+          const magnitude =
+            Math.hypot(
+              velocity.u,
+              velocity.v
+            );
+
+
+          if (
+            magnitude <
+            1e-8
+          ) {
+            continue;
+          }
+
+
+          const relative =
+            Math.min(
+              magnitude /
+              referenceSpeed,
+              1
+            );
+
+
+          const length =
+            8 +
+            15 *
+            relative;
+
+
+          drawArrow(
+            physicalToScreenX(
+              x
+            ),
+            physicalToScreenY(
+              y
+            ),
+
+            velocity.u /
+            magnitude *
+            length,
+
+            -velocity.v /
+            magnitude *
+            length,
+
+            0.14 +
+            0.32 *
+            relative
+          );
+        }
+      }
+    }
+
+
+    // ==================================================
+    // BACKGROUND
+    // ==================================================
+
+    function drawBackground() {
+
+      const width =
+        canvas.clientWidth;
+
+
+      const height =
+        canvas.clientHeight;
+
+
+      const gradient =
+        ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          height
+        );
+
+
+      gradient.addColorStop(
+        0,
+        "#091018"
+      );
+
+
+      gradient.addColorStop(
+        1,
+        "#06090d"
+      );
+
+
+      ctx.fillStyle =
+        gradient;
+
+
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.035)";
+
+
+      ctx.lineWidth =
+        1;
+
+
+      const spacing =
+        50;
+
+
+      for (
+        let x = 0;
+        x <= width;
+        x += spacing
+      ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          x,
+          0
+        );
+
+        ctx.lineTo(
+          x,
+          height
+        );
+
+        ctx.stroke();
+      }
+
+
+      for (
+        let y = 0;
+        y <= height;
+        y += spacing
+      ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          0,
+          y
+        );
+
+        ctx.lineTo(
+          width,
+          y
+        );
+
+        ctx.stroke();
+      }
+    }
+
+
+    // ==================================================
+    // TRAIL COMPOSITE
+    // ==================================================
+
+    function drawTrailCanvas() {
+
+      if (!showTrails) {
+        return;
+      }
+
+
+      ctx.save();
+
+
+      ctx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+
+      ctx.drawImage(
+        trailCanvas,
+        0,
+        0
+      );
+
+
+      ctx.restore();
+    }
+
+
+    // ==================================================
+    // PARTICLES
+    // ==================================================
+
+    function drawParticles() {
+
+      if (!showParticles) {
+        return;
+      }
+
+
+      ctx.fillStyle =
+        "rgba(220,243,255,0.67)";
+
+
+      for (
+        let i = 0;
+        i <
+        particleCount;
+        i += 2
+      ) {
+
+        if (
+          insideSolidBody(
+            particleX[i],
+            particleY[i]
+          )
+        ) {
+          continue;
+        }
+
+
+        ctx.fillRect(
+          physicalToScreenX(
+            particleX[i]
+          ),
+          physicalToScreenY(
+            particleY[i]
+          ),
+          1.5,
+          1.5
+        );
+      }
+    }
+
+
+    // ==================================================
+    // CYLINDER BODY
+    // ==================================================
+
+    function drawCylinderBody() {
+
+      const body =
+        detectCylinderBody();
+
+
+      if (!body) {
+        return;
+      }
+
+
+      const px =
+        physicalToScreenX(
+          body.x
+        );
+
+
+      const py =
+        physicalToScreenY(
+          body.y
+        );
+
+
+      const radiusX =
+        body.radius *
+        canvas.clientWidth /
+        (
+          xmax -
+          xmin
+        );
+
+
+      const radiusY =
+        body.radius *
+        canvas.clientHeight /
+        (
+          ymax -
+          ymin
+        );
+
+
+      const bodyGradient =
+        ctx.createRadialGradient(
+          px -
+          radiusX *
+          0.25,
+
+          py -
+          radiusY *
+          0.25,
+
+          0,
+
+          px,
+          py,
+
+          Math.max(
+            radiusX,
+            radiusY
+          )
+        );
+
+
+      bodyGradient.addColorStop(
+        0,
+        "#18232d"
+      );
+
+
+      bodyGradient.addColorStop(
+        1,
+        "#0b1117"
+      );
+
+
+      ctx.beginPath();
+
+
+      ctx.ellipse(
+        px,
+        py,
+        radiusX,
+        radiusY,
+        0,
+        0,
+        Math.PI *
+        2
+      );
+
+
+      ctx.fillStyle =
+        bodyGradient;
+
+
+      ctx.fill();
+
+
+      ctx.strokeStyle =
+        "rgba(210,230,242,0.42)";
+
+
+      ctx.lineWidth =
+        1.4;
+
+
+      ctx.stroke();
+
+
+      /*
+        Radius indicator.
+      */
+
+      ctx.save();
+
+
+      ctx.setLineDash(
+        [4, 4]
+      );
+
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.22)";
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        px,
+        py
+      );
+
+
+      ctx.lineTo(
+        px +
+        radiusX,
+        py
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.restore();
+
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.42)";
+
+
+      ctx.font =
+        "11px system-ui, sans-serif";
+
+
+      ctx.fillText(
+        `a = ${body.radius.toFixed(
+          2
+        )} m`,
+        px +
+        radiusX *
+        0.28,
+        py - 7
+      );
+    }
+
+
+    // ==================================================
+    // MARKERS
+    // ==================================================
+
+    function elementDisplayName(
+      element: FlowElement
+    ) {
+
+      if (
+        element.type ===
+        "vortex"
+      ) {
+
+        return "Vortex";
+      }
+
+
+      if (
+        element.type ===
+        "doublet"
+      ) {
+
+        return "Doublet";
+      }
+
+
+      if (
+        element.strength >
+        0
+      ) {
+
+        return "Source";
+      }
+
+
+      if (
+        element.strength <
+        0
+      ) {
+
+        return "Sink";
+      }
+
+
+      return "Source / sink";
+    }
+
+
+    function markerColour(
+      element: FlowElement
+    ) {
+
+      if (
+        element.type ===
+        "vortex"
+      ) {
+
+        return "#c896ff";
+      }
+
+
+      if (
+        element.type ===
+        "doublet"
+      ) {
+
+        return "#f2c66d";
+      }
+
+
+      return (
+        element.strength >=
+        0
+          ? "#65d8b2"
+          : "#ff8298"
+      );
+    }
+
+
+    function drawElementMarker(
+      element: FlowElement
+    ) {
+
+      const x =
+        physicalToScreenX(
+          element.x
+        );
+
+
+      const y =
+        physicalToScreenY(
+          element.y
+        );
+
+
+      const selected =
+        element.id ===
+        selectedElementId;
+
+
+      const colour =
+        markerColour(
+          element
+        );
+
+
+      // Halo
+
+      const halo =
+        ctx.createRadialGradient(
+          x,
+          y,
+          0,
+          x,
+          y,
+          selected
+            ? 28
+            : 22
+        );
+
+
+      halo.addColorStop(
+        0,
+        selected
+          ? "rgba(255,255,255,0.15)"
+          : "rgba(255,255,255,0.06)"
+      );
+
+
+      halo.addColorStop(
+        1,
+        "rgba(255,255,255,0)"
+      );
+
+
+      ctx.fillStyle =
+        halo;
+
+
+      ctx.beginPath();
+
+
+      ctx.arc(
+        x,
+        y,
+        selected
+          ? 28
+          : 22,
+        0,
+        Math.PI *
+        2
+      );
+
+
+      ctx.fill();
+
+
+      if (
+        element.type ===
+        "doublet"
+      ) {
+
+        /*
+          Diamond marker makes the doublet visually
+          distinct from source/vortex singularities.
+        */
+
+        ctx.save();
+
+
+        ctx.translate(
+          x,
+          y
+        );
+
+
+        ctx.rotate(
+          Math.PI /
+          4
+        );
+
+
+        ctx.strokeStyle =
+          colour;
+
+
+        ctx.lineWidth =
+          selected
+            ? 2.4
+            : 1.7;
+
+
+        ctx.strokeRect(
+          -9,
+          -9,
+          18,
+          18
+        );
+
+
+        ctx.restore();
+
+
+        ctx.strokeStyle =
+          colour;
+
+
+        ctx.lineWidth =
+          1.5;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+          x - 6,
+          y
+        );
+
+
+        ctx.lineTo(
+          x + 6,
+          y
+        );
+
+
+        ctx.stroke();
+
+
+      } else {
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+          x,
+          y,
+          selected
+            ? 14
+            : 12,
+          0,
+          Math.PI *
+          2
+        );
+
+
+        ctx.strokeStyle =
+          colour;
+
+
+        ctx.lineWidth =
+          selected
+            ? 2.4
+            : 1.7;
+
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+          colour;
+
+
+        ctx.font =
+          "600 16px system-ui, sans-serif";
+
+
+        ctx.textAlign =
+          "center";
+
+
+        ctx.textBaseline =
+          "middle";
+
+
+        const symbol =
+          element.type ===
+          "vortex"
+
+            ? (
+                element.strength >=
+                0
+                  ? "↺"
+                  : "↻"
+              )
+
+            : (
+                element.strength >=
+                0
+                  ? "+"
+                  : "−"
+              );
+
+
+        ctx.fillText(
+          symbol,
+          x,
+          y +
+          0.5
+        );
+
+
+        ctx.textAlign =
+          "start";
+
+
+        ctx.textBaseline =
+          "alphabetic";
+      }
+    }
+
+
+    function drawElements() {
+
+      for (
+        const element
+        of elements
+      ) {
+
+        drawElementMarker(
+          element
+        );
+      }
+    }
+
+
+    // ==================================================
+    // FREESTREAM
+    // ==================================================
+
+    function drawFreestreamArrow() {
+
+      if (
+        freestream <=
+        0.01
+      ) {
+        return;
+      }
+
+
+      const x = 25;
+      const y = 32;
+
+
+      const length =
+        34 +
+        freestream *
+        9;
+
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.58)";
+
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.68)";
+
+
+      ctx.lineWidth =
+        1.6;
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        x,
+        y
+      );
+
+
+      ctx.lineTo(
+        x +
+        length,
+        y
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        x +
+        length,
+        y
+      );
+
+
+      ctx.lineTo(
+        x +
+        length -
+        7,
+        y -
+        4
+      );
+
+
+      ctx.lineTo(
+        x +
+        length -
+        7,
+        y +
+        4
+      );
+
+
+      ctx.closePath();
+
+
+      ctx.fill();
+
+
+      ctx.font =
+        "12px system-ui, sans-serif";
+
+
+      ctx.fillText(
+        "U∞",
+        x,
+        y -
+        9
+      );
+    }
+
+
+    // ==================================================
+    // PROBE
+    // ==================================================
+
+    function updateProbe() {
+
+      if (
+        !probeActive ||
+        draggingElementId !==
+        null
+      ) {
+
+        probePanel.hidden =
+          true;
+
+        return;
+      }
+
+
+      probePanel.hidden =
+        false;
+
+
+      probeXOutput.textContent =
+        `${probeX.toFixed(
+          2
+        )} m`;
+
+
+      probeYOutput.textContent =
+        `${probeY.toFixed(
+          2
+        )} m`;
+
+
+      if (
+        insideSolidBody(
+          probeX,
+          probeY
+        )
+      ) {
+
+        probeUOutput.textContent =
+          "—";
+
+
+        probeVOutput.textContent =
+          "—";
+
+
+        probeSpeedOutput.textContent =
+          "solid body";
+
+
+        return;
+      }
+
+
+      const velocity =
+        velocityAt(
+          probeX,
+          probeY
+        );
+
+
+      probeUOutput.textContent =
+        `${velocity.u.toFixed(
+          2
+        )} m/s`;
+
+
+      probeVOutput.textContent =
+        `${velocity.v.toFixed(
+          2
+        )} m/s`;
+
+
+      probeSpeedOutput.textContent =
+        `${Math.hypot(
+          velocity.u,
+          velocity.v
+        ).toFixed(
+          2
+        )} m/s`;
+    }
+
+
+    function drawProbeMarker() {
+
+      if (
+        !probeActive ||
+        draggingElementId !==
+        null
+      ) {
+        return;
+      }
+
+
+      const x =
+        physicalToScreenX(
+          probeX
+        );
+
+
+      const y =
+        physicalToScreenY(
+          probeY
+        );
+
+
+      ctx.save();
+
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.48)";
+
+
+      ctx.beginPath();
+
+
+      ctx.arc(
+        x,
+        y,
+        4,
+        0,
+        Math.PI *
+        2
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        x -
+        7,
+        y
+      );
+
+
+      ctx.lineTo(
+        x +
+        7,
+        y
+      );
+
+
+      ctx.moveTo(
+        x,
+        y -
+        7
+      );
+
+
+      ctx.lineTo(
+        x,
+        y +
+        7
+      );
+
+
+      ctx.stroke();
+
+
+      ctx.restore();
+    }
+
+
+    // ==================================================
+    // FULL FRAME
+    // ==================================================
+
+    function draw() {
+
+      drawBackground();
+
+      drawStreamlines();
+
+      drawVectorField();
+
+      drawTrailCanvas();
+
+      drawParticles();
+
+      /*
+        Draw the physical cylinder after particles
+        and trails so the solid body cleanly masks
+        anything that numerically wandered inside it.
+      */
+
+      drawCylinderBody();
+
+      drawElements();
+
+      drawFreestreamArrow();
+
+      drawProbeMarker();
+    }
+
+
+    // ==================================================
+    // ANIMATION
+    // ==================================================
+
+    function animate(
+      now: number
+    ) {
+
+      const rawDt =
+        (
+          now -
+          previousTime
+        ) /
+        1000;
+
+
+      previousTime =
+        now;
+
+
+      const dt =
+        Math.min(
+          rawDt,
+          0.03
+        );
+
+
+      if (
+        running
+      ) {
+
+        updateParticles(
+          dt
+        );
+
+
+        if (
+          showTrails
+        ) {
+
+          fadeTrails();
+
+          drawNewTrailSegments();
+
+        } else {
+
+          clearTrails();
+        }
+      }
+
+
+      updateProbe();
+
+      draw();
+
+
+      requestAnimationFrame(
+        animate
+      );
+    }
+
+
+    // ==================================================
+    // RESIZE
+    // ==================================================
+
+    function resizeCanvas() {
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+
+      const dpr =
+        Math.min(
+          window.devicePixelRatio ||
+          1,
+          2
+        );
+
+
+      const width =
+        Math.max(
+          1,
+          Math.round(
+            rect.width *
+            dpr
+          )
+        );
+
+
+      const height =
+        Math.max(
+          1,
+          Math.round(
+            rect.height *
+            dpr
+          )
+        );
+
+
+      if (
+        canvas.width ===
+          width &&
+        canvas.height ===
+          height
+      ) {
+        return;
+      }
+
+
+      canvas.width =
+        width;
+
+
+      canvas.height =
+        height;
+
+
+      trailCanvas.width =
+        width;
+
+
+      trailCanvas.height =
+        height;
+
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+
+      trailCtx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+
+      clearTrails();
+
+      streamlinesDirty =
+        true;
+    }
+
+
+    // ==================================================
+    // SELECTED ELEMENT
+    // ==================================================
+
+    function selectedElement() {
+
+      if (
+        selectedElementId ===
+        null
+      ) {
+        return null;
+      }
+
+
+      return (
+        elements.find(
+          element =>
+            element.id ===
+            selectedElementId
+        ) ??
+        null
+      );
+    }
+
+
+    function strengthUnits(
+      element: FlowElement
+    ) {
+
+      return (
+        element.type ===
+        "doublet"
+          ? "m³/s"
+          : "m²/s"
+      );
+    }
+
+
+    function configureStrengthSlider(
+      element: FlowElement
+    ) {
+
+      if (
+        element.type ===
+        "doublet"
+      ) {
+
+        strengthSlider.min =
+          "-30";
+
+
+        strengthSlider.max =
+          "30";
+
+
+        strengthSlider.step =
+          "0.5";
+
+      } else {
+
+        strengthSlider.min =
+          "-20";
+
+
+        strengthSlider.max =
+          "20";
+
+
+        strengthSlider.step =
+          "0.5";
+      }
+    }
+
+
+    function updateSelectedPanel() {
+
+      const element =
+        selectedElement();
+
+
+      if (!element) {
+
+        selectedName.textContent =
+          "None";
+
+
+        strengthOutput.value =
+          "—";
+
+
+        selectedXOutput.textContent =
+          "—";
+
+
+        selectedYOutput.textContent =
+          "—";
+
+
+        strengthSlider.disabled =
+          true;
+
+
+        deleteButton.disabled =
+          true;
+
+
+        return;
+      }
+
+
+      selectedName.textContent =
+        `${elementDisplayName(
+          element
+        )} ${element.id}`;
+
+
+      configureStrengthSlider(
+        element
+      );
+
+
+      strengthSlider.disabled =
+        false;
+
+
+      deleteButton.disabled =
+        false;
+
+
+      strengthSlider.value =
+        String(
+          element.strength
+        );
+
+
+      if (
+        element.type ===
+        "vortex"
+      ) {
+
+        strengthLabel.textContent =
+          "Circulation Γ";
+
+
+      } else if (
+        element.type ===
+        "doublet"
+      ) {
+
+        strengthLabel.textContent =
+          "Doublet strength μ";
+
+
+      } else {
+
+        strengthLabel.textContent =
+          "Source strength Q";
+      }
+
+
+      strengthOutput.value =
+        `${element.strength.toFixed(
+          2
+        )} ${strengthUnits(
+          element
+        )}`;
+
+
+      selectedXOutput.textContent =
+        `${element.x.toFixed(
+          2
+        )} m`;
+
+
+      selectedYOutput.textContent =
+        `${element.y.toFixed(
+          2
+        )} m`;
+    }
+
+
+    // ==================================================
+    // OBJECT LIST
+    // ==================================================
+
+    function renderObjectList() {
+
+      objectList.replaceChildren();
+
+
+      if (
+        elements.length ===
+        0
+      ) {
+
+        const empty =
+          document.createElement(
+            "span"
+          );
+
+
+        empty.className =
+          "empty-objects";
+
+
+        empty.textContent =
+          "No flow elements — add one above.";
+
+
+        objectList.append(
+          empty
+        );
+
+
+        return;
+      }
+
+
+      for (
+        const element
+        of elements
+      ) {
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+
+        button.type =
+          "button";
+
+
+        button.className =
+          "object-chip";
+
+
+        if (
+          element.id ===
+          selectedElementId
+        ) {
+
+          button.classList.add(
+            "selected"
+          );
+        }
+
+
+        const dot =
+          document.createElement(
+            "span"
+          );
+
+
+        dot.className =
+          "object-dot";
+
+
+        dot.style.background =
+          markerColour(
+            element
+          );
+
+
+        const text =
+          document.createElement(
+            "span"
+          );
+
+
+        text.textContent =
+          `${elementDisplayName(
+            element
+          )} ${element.id}`;
+
+
+        button.append(
+          dot,
+          text
+        );
+
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            selectedElementId =
+              element.id;
+
+
+            updateSelectedPanel();
+
+            renderObjectList();
+          }
+        );
+
+
+        objectList.append(
+          button
+        );
+      }
+    }
+// ==================================================
+// PRESET UI
+// ==================================================
+
+const presetNames = {
+      "rankine-half": "Rankine half-body",
+      "rankine-oval": "Rankine oval",
+      "cylinder": "Cylinder",
+      "lifting-cylinder": "Lifting cylinder",
+      "custom": "Custom"
+    };
+
+    function updatePresetUI() {
+
+      presetStatus.textContent =
+        presetNames[
+          currentPreset
+        ];
+
+
+      for (
+        const button
+        of presetButtons
+      ) {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.preset ===
+          currentPreset
+        );
+      }
+    }
+
+
+    function markCustom() {
+
+      if (
+        currentPreset ===
+        "custom"
+      ) {
+        return;
+      }
+
+
+      currentPreset =
+        "custom";
+
+
+      updatePresetUI();
+    }
+
+
+    // ==================================================
+    // BODY INFORMATION
+    // ==================================================
+
+    function updateBodyInfo() {
+
+      const body =
+        detectCylinderBody();
+
+
+      if (!body) {
+
+        bodyInfo.hidden =
+          true;
+
+        return;
+      }
+
+
+      bodyInfo.hidden =
+        false;
+
+
+      bodyRadiusOutput.textContent =
+        `a = ${body.radius.toFixed(
+          3
+        )} m`;
+    }
+
+
+    // ==================================================
+    // UI REFRESH
+    // ==================================================
+
+    function refreshObjectUI() {
+
+      updateSelectedPanel();
+
+      renderObjectList();
+
+      updateBodyInfo();
+
+      updatePresetUI();
+    }
+
+
+    function fieldChanged(
+      clearParticleTrails =
+        true
+    ) {
+
+      streamlinesDirty =
+        true;
+
+
+      if (
+        clearParticleTrails
+      ) {
+
+        clearTrails();
+      }
+
+
+      updateBodyInfo();
+    }
+
+
+    // ==================================================
+    // PRESETS
+    // ==================================================
+
+    function applyPreset(
+      key: PresetKey
+    ) {
+
+      nextElementId =
+        1;
+
+
+      elements =
+        [];
+
+
+      const U =
+        1.5;
+
+
+      freestream =
+        U;
+
+
+      freestreamSlider.value =
+        String(
+          U
+        );
+
+
+      freestreamOutput.value =
+        `${U.toFixed(
+          1
+        )} m/s`;
+
+
+      if (
+        key ===
+        "rankine-half"
+      ) {
+
+        elements = [
+
+          makeElement(
+            "source",
+            0,
+            0,
+            8
+          )
+
+        ];
+
+
+      } else if (
+        key ===
+        "rankine-oval"
+      ) {
+
+        elements = [
+
+          makeElement(
+            "source",
+            -1.5,
+            0,
+            8
+          ),
+
+          makeElement(
+            "source",
+            1.5,
+            0,
+            -8
+          )
+
+        ];
+
+
+      } else if (
+        key ===
+        "cylinder"
+      ) {
+
+        const radius =
+          1;
+
+
+        const mu =
+          2 *
+          Math.PI *
+          U *
+          radius *
+          radius;
+
+
+        elements = [
+
+          makeElement(
+            "doublet",
+            0,
+            0,
+            mu
+          )
+
+        ];
+
+
+      } else if (
+        key ===
+        "lifting-cylinder"
+      ) {
+
+        const radius =
+          1;
+
+
+        const mu =
+          2 *
+          Math.PI *
+          U *
+          radius *
+          radius;
+
+
+        elements = [
+
+          makeElement(
+            "doublet",
+            0,
+            0,
+            mu
+          ),
+
+          makeElement(
+            "vortex",
+            0,
+            0,
+            5
+          )
+
+        ];
+
+      }
+
+
+      currentPreset =
+        key;
+
+
+      selectedElementId =
+        elements.length >
+        0
+          ? elements[0].id
+          : null;
+
+
+      streamlinesDirty =
+        true;
+
+
+      seedAllParticles();
+
+      refreshObjectUI();
+    }
+
+
+    for (
+      const button
+      of presetButtons
+    ) {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const key = button.dataset.preset;
+
+    if (
+      key === "rankine-half" ||
+      key === "rankine-oval" ||
+      key === "cylinder" ||
+      key === "lifting-cylinder"
+    ) {
+      applyPreset(key);
+    }
+        }
+      );
+    }
+
+
+    // ==================================================
+    // ADD ELEMENT
+    // ==================================================
+
+    function addElement(
+      element: FlowElement
+    ) {
+
+      if (
+        elements.length >=
+        12
+      ) {
+        return;
+      }
+
+
+      elements.push(
+        element
+      );
+
+
+      selectedElementId =
+        element.id;
+
+
+      markCustom();
+
+      fieldChanged();
+
+      refreshObjectUI();
+    }
+
+
+    addSourceButton.addEventListener(
+      "click",
+      () => {
+
+        addElement(
+          makeElement(
+            "source",
+            0,
+            0.5,
+            6
+          )
+        );
+      }
+    );
+
+
+    addSinkButton.addEventListener(
+      "click",
+      () => {
+
+        addElement(
+          makeElement(
+            "source",
+            0,
+            -0.5,
+            -6
+          )
+        );
+      }
+    );
+
+
+    addVortexButton.addEventListener(
+      "click",
+      () => {
+
+        addElement(
+          makeElement(
+            "vortex",
+            0,
+            0,
+            7
+          )
+        );
+      }
+    );
+
+
+    addDoubletButton.addEventListener(
+      "click",
+      () => {
+
+        addElement(
+          makeElement(
+            "doublet",
+            0,
+            0,
+            10
+          )
+        );
+      }
+    );
+
+
+    // ==================================================
+    // DELETE / CLEAR
+    // ==================================================
+
+    deleteButton.addEventListener(
+      "click",
+      () => {
+
+        if (
+          selectedElementId ===
+          null
+        ) {
+          return;
+        }
+
+
+        elements =
+          elements.filter(
+            element =>
+              element.id !==
+              selectedElementId
+          );
+
+
+        selectedElementId =
+          elements.length >
+          0
+            ? elements[
+                elements.length -
+                1
+              ].id
+            : null;
+
+
+        markCustom();
+
+        fieldChanged();
+
+        seedAllParticles();
+
+        refreshObjectUI();
+      }
+    );
+
+
+    clearButton.addEventListener(
+      "click",
+      () => {
+
+        elements =
+          [];
+
+
+        selectedElementId =
+          null;
+
+
+        markCustom();
+
+        fieldChanged();
+
+        seedAllParticles();
+
+        refreshObjectUI();
+      }
+    );
+
+
+    // ==================================================
+    // CONTROLS
+    // ==================================================
+
+    freestreamSlider.addEventListener(
+      "input",
+      () => {
+
+        freestream =
+          Number(
+            freestreamSlider.value
+          );
+
+
+        freestreamOutput.value =
+          `${freestream.toFixed(
+            1
+          )} m/s`;
+
+
+        markCustom();
+
+        fieldChanged();
+
+        seedAllParticles();
+      }
+    );
+
+
+    strengthSlider.addEventListener(
+      "input",
+      () => {
+
+        const element =
+          selectedElement();
+
+
+        if (!element) {
+          return;
+        }
+
+
+        element.strength =
+          Number(
+            strengthSlider.value
+          );
+
+
+        markCustom();
+
+        fieldChanged();
+
+        refreshObjectUI();
+      }
+    );
+
+
+    particlesToggle.addEventListener(
+      "change",
+      () => {
+
+        showParticles =
+          particlesToggle.checked;
+      }
+    );
+
+
+    trailsToggle.addEventListener(
+      "change",
+      () => {
+
+        showTrails =
+          trailsToggle.checked;
+
+
+        if (!showTrails) {
+          clearTrails();
+        }
+      }
+    );
+
+
+    streamlinesToggle.addEventListener(
+      "change",
+      () => {
+
+        showStreamlines =
+          streamlinesToggle.checked;
+      }
+    );
+
+
+    vectorsToggle.addEventListener(
+      "change",
+      () => {
+
+        showVectors =
+          vectorsToggle.checked;
+      }
+    );
+
+
+    // ==================================================
+    // PAUSE / RESET
+    // ==================================================
+
+    pauseButton.addEventListener(
+      "click",
+      () => {
+
+        running =
+          !running;
+
+
+        pauseButton.textContent =
+          running
+            ? "Pause"
+            : "Play";
+      }
+    );
+
+
+    resetButton.addEventListener(
+      "click",
+      () => {
+
+        particlesToggle.checked =
+          true;
+
+
+        trailsToggle.checked =
+          true;
+
+
+        streamlinesToggle.checked =
+          true;
+
+
+        vectorsToggle.checked =
+          false;
+
+
+        showParticles =
+          true;
+
+
+        showTrails =
+          true;
+
+
+        showStreamlines =
+          true;
+
+
+        showVectors =
+          false;
+
+
+        running =
+          true;
+
+
+        pauseButton.textContent =
+          "Pause";
+
+
+        probeActive =
+          false;
+
+
+        applyPreset(
+          "rankine-oval"
+        );
+      }
+    );
+
+
+    // ==================================================
+    // HIT TEST
+    // ==================================================
+
+    function elementAtScreenPosition(
+      px: number,
+      py: number
+    ) {
+
+      let best:
+        FlowElement | null =
+        null;
+
+
+      let bestDistance =
+        Infinity;
+
+
+      /*
+        Reverse iteration makes later-drawn objects win
+        when two markers overlap.
+      */
+
+      for (
+        let i =
+          elements.length -
+          1;
+        i >= 0;
+        i--
+      ) {
+
+        const element =
+          elements[i];
+
+
+        const ex =
+          physicalToScreenX(
+            element.x
+          );
+
+
+        const ey =
+          physicalToScreenY(
+            element.y
+          );
+
+
+        const distance =
+          Math.hypot(
+            px -
+            ex,
+            py -
+            ey
+          );
+
+
+        if (
+          distance <
+            24 &&
+          distance <
+            bestDistance
+        ) {
+
+          best =
+            element;
+
+
+          bestDistance =
+            distance;
+        }
+      }
+
+
+      return best;
+    }
+
+
+    // ==================================================
+    // POINTER
+    // ==================================================
+
+    function pointerScreenPosition(
+      event: PointerEvent
+    ) {
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+
+      return {
+
+        x:
+          Math.max(
+            0,
+            Math.min(
+              rect.width,
+              event.clientX -
+              rect.left
+            )
+          ),
+
+        y:
+          Math.max(
+            0,
+            Math.min(
+              rect.height,
+              event.clientY -
+              rect.top
+            )
+          )
+
+      };
+    }
+
+
+    function updateProbeFromPointer(
+      event: PointerEvent
+    ) {
+
+      const pointer =
+        pointerScreenPosition(
+          event
+        );
+
+
+      probeX =
+        screenToPhysicalX(
+          pointer.x
+        );
+
+
+      probeY =
+        screenToPhysicalY(
+          pointer.y
+        );
+    }
+
+
+    canvas.addEventListener(
+      "pointerenter",
+      event => {
+
+        probeActive =
+          true;
+
+
+        updateProbeFromPointer(
+          event
+        );
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointermove",
+      event => {
+
+        updateProbeFromPointer(
+          event
+        );
+
+
+        probeActive =
+          true;
+
+
+        if (
+          draggingElementId ===
+          null
+        ) {
+          return;
+        }
+
+
+        const element =
+          elements.find(
+            candidate =>
+              candidate.id ===
+              draggingElementId
+          );
+
+
+        if (!element) {
+          return;
+        }
+
+
+        element.x =
+          Math.max(
+            xmin,
+            Math.min(
+              xmax,
+              probeX
+            )
+          );
+
+
+        element.y =
+          Math.max(
+            ymin,
+            Math.min(
+              ymax,
+              probeY
+            )
+          );
+
+
+        markCustom();
+
+        fieldChanged();
+
+        updateSelectedPanel();
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointerleave",
+      () => {
+
+        if (
+          draggingElementId ===
+          null
+        ) {
+
+          probeActive =
+            false;
+        }
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointerdown",
+      event => {
+
+        const pointer =
+          pointerScreenPosition(
+            event
+          );
+
+
+        const element =
+          elementAtScreenPosition(
+            pointer.x,
+            pointer.y
+          );
+
+
+        if (!element) {
+
+          probeActive =
+            true;
+
+
+          updateProbeFromPointer(
+            event
+          );
+
+
+          return;
+        }
+
+
+        selectedElementId =
+          element.id;
+
+
+        draggingElementId =
+          element.id;
+
+
+        probeActive =
+          false;
+
+
+        canvas.setPointerCapture(
+          event.pointerId
+        );
+
+
+        refreshObjectUI();
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointerup",
+      event => {
+
+        draggingElementId =
+          null;
+
+
+        probeActive =
+          true;
+
+
+        updateProbeFromPointer(
+          event
+        );
+
+
+        if (
+          canvas.hasPointerCapture(
+            event.pointerId
+          )
+        ) {
+
+          canvas.releasePointerCapture(
+            event.pointerId
+          );
+        }
+      }
+    );
+
+
+    canvas.addEventListener(
+      "pointercancel",
+      () => {
+
+        draggingElementId =
+          null;
+
+
+        probeActive =
+          false;
+      }
+    );
+
+
+    // ==================================================
+    // RESIZE
+    // ==================================================
+
+    if (
+      "ResizeObserver"
+      in window
+    ) {
+
+      const observer =
+        new ResizeObserver(
+          resizeCanvas
+        );
+
+
+      observer.observe(
+        canvas
+      );
+
+    } else {
+
+      window.addEventListener(
+        "resize",
+        resizeCanvas
+      );
+    }
+
+
+    // ==================================================
+    // START
+    // ==================================================
+
+    resizeCanvas();
+
+    applyPreset(
+      "rankine-oval"
+    );
+
+
+    requestAnimationFrame(
+      animate
+    );
+
+  }
+
+</script>
+
+
+<style>
+
+  .potential-flow-explorer {
+
+    max-width: 950px;
+
+    margin: 2rem auto;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      rgba(255,255,255,0.12);
+
+    border-radius: 20px;
+
+    background: #080c11;
+
+    color: #f5f7fa;
+
+    box-shadow:
+      0 18px 50px
+      rgba(0,0,0,0.18);
+
+  }
+
+
+  /* CANVAS */
+
+  .canvas-wrap {
+
+    position: relative;
+
+    background: #080c11;
+
+  }
+
+
+  canvas {
+
+    display: block;
+
+    width: 100%;
+
+    height: 500px;
+
+    cursor: crosshair;
+
+    touch-action: none;
+
+  }
+
+
+  .canvas-label {
+
+    position: absolute;
+
+    right: 16px;
+
+    top: 14px;
+
+    padding:
+      0.42rem
+      0.68rem;
+
+    border:
+      1px solid
+      rgba(255,255,255,0.09);
+
+    border-radius: 8px;
+
+    background:
+      rgba(3,7,11,0.55);
+
+    backdrop-filter:
+      blur(8px);
+
+    color:
+      rgba(255,255,255,0.50);
+
+    font-size: 0.72rem;
+
+    pointer-events: none;
+
+  }
+
+
+  /* PROBE */
+
+  .probe-panel {
+
+    position: absolute;
+
+    right: 16px;
+
+    bottom: 14px;
+
+    width: 150px;
+
+    padding:
+      0.7rem
+      0.75rem;
+
+    border:
+      1px solid
+      rgba(255,255,255,0.09);
+
+    border-radius: 10px;
+
+    background:
+      rgba(3,7,11,0.70);
+
+    backdrop-filter:
+      blur(10px);
+
+    pointer-events: none;
+
+  }
+
+
+  .probe-title {
+
+    margin-bottom: 0.45rem;
+
+    color:
+      rgba(255,255,255,0.72);
+
+    font-size: 0.68rem;
+
+    font-weight: 600;
+
+    letter-spacing: 0.04em;
+
+    text-transform: uppercase;
+
+  }
+
+
+  .probe-grid {
+
+    display: grid;
+
+    grid-template-columns:
+      auto 1fr;
+
+    gap:
+      0.18rem 0.6rem;
+
+    font-size: 0.69rem;
+
+  }
+
+
+  .probe-grid span {
+
+    color:
+      rgba(255,255,255,0.40);
+
+  }
+
+
+  .probe-grid strong {
+
+    text-align: right;
+
+    color:
+      rgba(255,255,255,0.78);
+
+    font-weight: 500;
+
+    font-variant-numeric:
+      tabular-nums;
+
+  }
+
+
+  /* CONTROL AREA */
+
+  .controls {
+
+    display: grid;
+
+    gap: 1rem;
+
+    padding: 1.45rem;
+
+    border-top:
+      1px solid
+      rgba(255,255,255,0.09);
+
+    background:
+      linear-gradient(
+        180deg,
+        #0d131a,
+        #090d12
+      );
+
+  }
+
+
+  .section-title {
+
+    margin-bottom: 0.65rem;
+
+    color: #798692;
+
+    font-size: 0.72rem;
+
+    font-weight: 600;
+
+    letter-spacing: 0.06em;
+
+    text-transform: uppercase;
+
+  }
+
+
+  .section-heading-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: baseline;
+
+    gap: 1rem;
+
+  }
+
+
+  /* PRESETS */
+
+  .preset-section {
+
+    padding-bottom: 0.95rem;
+
+    border-bottom:
+      1px solid
+      rgba(255,255,255,0.055);
+
+  }
+
+
+  .preset-status {
+
+    display: flex;
+
+    gap: 0.4rem;
+
+    color: #66737f;
+
+    font-size: 0.72rem;
+
+  }
+
+
+  .preset-status strong {
+
+    color: #a5b0ba;
+
+    font-weight: 500;
+
+  }
+
+
+  .preset-grid {
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 0.6rem;
+
+  }
+
+
+  .preset-button.active {
+
+    border-color:
+      rgba(101,199,255,0.48);
+
+    background:
+      rgba(101,199,255,0.10);
+
+    color: #d9f3ff;
+
+  }
+
+
+  .body-info {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 1rem;
+
+    margin-top: 0.7rem;
+
+    padding:
+      0.6rem
+      0.75rem;
+
+    border:
+      1px solid
+      rgba(242,198,109,0.17);
+
+    border-radius: 9px;
+
+    background:
+      rgba(242,198,109,0.045);
+
+    color: #8c949b;
+
+    font-size: 0.76rem;
+
+  }
+
+
+  .body-info strong {
+
+    color: #d9c79e;
+
+    font-weight: 500;
+
+    font-variant-numeric:
+      tabular-nums;
+
+  }
+
+
+  /* TOOLBAR */
+
+  .toolbar {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 0.6rem;
+
+  }
+
+
+  button {
+
+    min-height: 38px;
+
+    padding:
+      0.62rem
+      0.95rem;
+
+    border:
+      1px solid
+      rgba(255,255,255,0.15);
+
+    border-radius: 9px;
+
+    background:
+      rgba(255,255,255,0.055);
+
+    color:
+      rgba(255,255,255,0.86);
+
+    cursor: pointer;
+
+    transition:
+      background 120ms ease,
+      border-color 120ms ease,
+      transform 120ms ease;
+
+  }
+
+
+  button:hover:not(:disabled) {
+
+    border-color:
+      rgba(255,255,255,0.25);
+
+    background:
+      rgba(255,255,255,0.10);
+
+  }
+
+
+  button:active:not(:disabled) {
+
+    transform:
+      translateY(1px);
+
+  }
+
+
+  button:disabled {
+
+    opacity: 0.35;
+
+    cursor: default;
+
+  }
+
+
+  .secondary-button {
+
+    margin-left: auto;
+
+    color: #8d99a5;
+
+  }
+
+
+  .danger-button {
+
+    color: #ff9aaa;
+
+  }
+
+
+  /* SLIDERS */
+
+  .control-row {
+
+    display: grid;
+
+    grid-template-columns:
+      180px
+      135px
+      1fr;
+
+    align-items: center;
+
+    gap: 1rem;
+
+  }
+
+
+  output {
+
+    color: #9ca9b5;
+
+    font-size: 0.85rem;
+
+    font-variant-numeric:
+      tabular-nums;
+
+  }
+
+
+  input[type="range"] {
+
+    width: 100%;
+
+    accent-color: #65c7ff;
+
+    cursor: pointer;
+
+  }
+
+
+  input[type="range"]:disabled {
+
+    opacity: 0.35;
+
+    cursor: default;
+
+  }
+
+
+  /* OBJECTS */
+
+  .object-section {
+
+    padding:
+      0.8rem
+      0;
+
+    border-top:
+      1px solid
+      rgba(255,255,255,0.055);
+
+    border-bottom:
+      1px solid
+      rgba(255,255,255,0.055);
+
+  }
+
+
+  .object-list {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 0.5rem;
+
+    min-height: 34px;
+
+  }
+
+
+  :global(.object-chip) {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 0.48rem;
+
+    min-height: 32px;
+
+    padding:
+      0.38rem
+      0.65rem;
+
+    font-size: 0.75rem;
+
+  }
+
+
+  :global(.object-chip.selected) {
+
+    border-color:
+      rgba(101,199,255,0.48);
+
+    background:
+      rgba(101,199,255,0.09);
+
+  }
+
+
+  :global(.object-dot) {
+
+    display: inline-block;
+
+    width: 8px;
+
+    height: 8px;
+
+    border-radius: 50%;
+
+  }
+
+
+  :global(.empty-objects) {
+
+    color: #67737f;
+
+    font-size: 0.78rem;
+
+  }
+
+
+  /* SELECTED */
+
+  .selected-panel {
+
+    display: grid;
+
+    gap: 0.9rem;
+
+    padding: 1rem;
+
+    border:
+      1px solid
+      rgba(255,255,255,0.07);
+
+    border-radius: 12px;
+
+    background:
+      rgba(255,255,255,0.025);
+
+  }
+
+
+  .selected-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 1rem;
+
+  }
+
+
+  .selected-caption {
+
+    display: block;
+
+    margin-bottom: 0.15rem;
+
+    color: #687582;
+
+    font-size: 0.67rem;
+
+    letter-spacing: 0.06em;
+
+    text-transform: uppercase;
+
+  }
+
+
+  .selected-header strong {
+
+    color: #d7e0e9;
+
+    font-size: 0.88rem;
+
+    font-weight: 500;
+
+  }
+
+
+  .selected-position {
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 0.6rem;
+
+  }
+
+
+  .selected-position > div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    padding:
+      0.55rem
+      0.7rem;
+
+    border-radius: 8px;
+
+    background:
+      rgba(255,255,255,0.025);
+
+    font-size: 0.75rem;
+
+  }
+
+
+  .selected-position span {
+
+    color: #697581;
+
+  }
+
+
+  .selected-position strong {
+
+    color: #bec8d2;
+
+    font-weight: 500;
+
+    font-variant-numeric:
+      tabular-nums;
+
+  }
+
+
+  /* VISUALS */
+
+  .visual-controls {
+
+    padding: 0.7rem 0;
+
+  }
+
+
+  .toggle-grid {
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 0.7rem;
+
+  }
+
+
+  .toggle {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.55rem;
+
+    color: #a1abb5;
+
+    font-size: 0.8rem;
+
+    cursor: pointer;
+
+  }
+
+
+  .toggle input {
+
+    width: 15px;
+
+    height: 15px;
+
+    accent-color: #65c7ff;
+
+  }
+
+
+  /* MODEL DETAILS */
+
+  .model-details {
+
+    border:
+      1px solid
+      rgba(255,255,255,0.065);
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    background:
+      rgba(255,255,255,0.018);
+
+  }
+
+
+  .model-details summary {
+
+    padding:
+      0.72rem
+      0.9rem;
+
+    cursor: pointer;
+
+    color: #9ca7b2;
+
+    font-size: 0.8rem;
+
+  }
+
+
+  .model-content {
+
+    padding:
+      0
+      0.9rem
+      0.9rem;
+
+    color: #8d99a4;
+
+    font-size: 0.78rem;
+
+    line-height: 1.6;
+
+  }
+
+
+  .model-content ul {
+
+    padding-left: 1.2rem;
+
+  }
+
+
+  .equation {
+
+    margin:
+      0.45rem
+      0;
+
+    padding:
+      0.55rem
+      0.7rem;
+
+    border-radius: 7px;
+
+    background:
+      rgba(255,255,255,0.035);
+
+    color: #c7d1db;
+
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+
+    font-size: 0.75rem;
+
+    overflow-wrap: anywhere;
+
+  }
+
+
+  .model-note {
+
+    color: #74808c;
+
+  }
+
+
+  /* BOTTOM */
+
+  .bottom-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 1rem;
+
+  }
+
+
+  .model-info {
+
+    color: #7f8b96;
+
+    font-size: 0.79rem;
+
+  }
+
+
+  .buttons {
+
+    display: flex;
+
+    gap: 0.6rem;
+
+  }
+
+
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+
+    outline:
+      2px solid
+      rgba(101,199,255,0.8);
+
+    outline-offset: 3px;
+
+  }
+
+
+  /* RESPONSIVE */
+
+  @media (
+    max-width: 760px
+  ) {
+
+    canvas {
+
+      height: 400px;
+
+    }
+
+
+    .preset-grid {
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(
+            0,
+            1fr
+          )
+        );
+
+    }
+
+
+    .control-row {
+
+      grid-template-columns:
+        1fr auto;
+
+    }
+
+
+    .control-row
+    input[type="range"] {
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    .toggle-grid {
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(
+            0,
+            1fr
+          )
+        );
+
+    }
+
+
+    .secondary-button {
+
+      margin-left: 0;
+
+    }
+
+
+    .bottom-row {
+
+      flex-direction: column;
+
+      align-items: flex-start;
+
+    }
+
+  }
+
+
+  @media (
+    max-width: 480px
+  ) {
+
+    canvas {
+
+      height: 340px;
+
+    }
+
+
+    .canvas-label {
+
+      display: none;
+
+    }
+
+
+    .controls {
+
+      padding: 1.05rem;
+
+    }
+
+
+    .preset-grid {
+
+      grid-template-columns:
+        1fr;
+
+    }
+
+
+    .toggle-grid {
+
+      grid-template-columns:
+        1fr;
+
+    }
+
+
+    .selected-position {
+
+      grid-template-columns:
+        1fr;
+
+    }
+
+
+    .section-heading-row {
+
+      flex-direction: column;
+
+      gap: 0;
+
+    }
+
+  }
+
+</style>

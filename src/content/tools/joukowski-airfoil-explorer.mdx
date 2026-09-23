@@ -1,0 +1,65 @@
+---
+title: "Joukowski Airfoil Explorer"
+description: "Find the rhythm of a travelling wave. Adjust amplitude, frequency and speed to see how its shape and wavelength respond."
+category: "Waves"
+image: "../../assets/tools/wave.svg"
+order: 1
+draft: true
+---
+
+import JoukowskiAirfoilExplorer from "../../components/JoukowskiAirfoilExplorer.astro";
+import ToolGuide from "../../components/ToolGuide.astro";
+
+<JoukowskiAirfoilExplorer />
+
+<ToolGuide>
+
+## Getting started
+
+A wave carries a repeating pattern through space. This explorer draws a single sinusoidal wave travelling to the right across a **10 m domain**. Use it to connect what you see—crest height, crest spacing and motion—to the parameters in a wave equation.
+
+1. Increase **Amplitude** to make the oscillation taller without changing its wavelength or speed. The amplitude is shown in relative display units; the vertical axis is not calibrated in metres.
+2. Increase **Frequency** while keeping speed fixed. More cycles pass each second, so the crests become closer together.
+3. Increase **Wave speed** at fixed frequency. The pattern travels faster and the crests spread apart.
+4. Select **Pause** to inspect a snapshot. The sliders still work while paused. **Reset** restores the three slider defaults; it does not restart the wave's phase or change whether playback is paused.
+
+Try doubling frequency from 1 Hz to 2 Hz at 4 m/s: the displayed wavelength falls from 4 m to 2 m.
+
+## The mathematics
+
+The plotted displacement is evaluated directly from the travelling-wave expression:
+
+$$
+\begin{aligned}
+y(x,t) &= A\sin(kx-\omega t),\\[4pt]
+\omega &= 2\pi f,
+& k &= \frac{\omega}{c}=\frac{2\pi}{\lambda},\\[4pt]
+\lambda &= \frac{c}{f},
+& T &= \frac{1}{f}.
+\end{aligned}
+$$
+
+Here $A$ is amplitude, $x$ is position in metres, $t$ is animation time in seconds, $f$ is frequency in hertz and $c$ is wave speed in metres per second. The angular frequency $\omega$ is measured in radians per second and the wavenumber $k$ in radians per metre. $\lambda$ is wavelength and $T$ is period.
+
+Following a crest means keeping its phase, $kx-\omega t$, constant. Differentiating that condition gives $\frac{\mathrm{d}x}{\mathrm{d}t}=\frac{\omega}{k}=c$, so the minus sign makes the pattern move in the positive $x$ direction. At fixed settings, the function also satisfies the one-dimensional wave equation:
+
+$$
+\frac{\partial^2 y}{\partial t^2}
+= c^2\frac{\partial^2 y}{\partial x^2}.
+$$
+
+<p className="reference">For the standard wave relationships, see <a href="https://openstax.org/books/university-physics-volume-1/pages/16-2-mathematics-of-waves">OpenStax, Mathematics of Waves</a>.</p>
+
+## How it is computed
+
+The explorer samples the analytical sine function every two horizontal CSS pixels and joins those samples with a line. A horizontal pixel coordinate $p$ is mapped to $x=10p/W$, where $W$ is the canvas width. The vertical drawing coordinate is $\frac{H}{2}-\frac{y}{1.5}(0.22H)$, where $H$ is the canvas height. This scaling keeps amplitude changes visible without assigning a physical vertical scale.
+
+Each animation frame advances time by the elapsed frame interval, capped at **0.05 s**. Pausing holds this time constant. The wavelength readout is recalculated as $c/f$ whenever a slider changes; no spatial or temporal differential equation is numerically solved.
+
+## What the model assumes
+
+This is a single, ideal harmonic wave at each set of controls. It has no damping, reflection, interference or medium-specific dispersion relation. Amplitude does not affect speed. Changing frequency or speed immediately substitutes the new parameter into the expression at the current animation time, so the phase can jump; this is not a simulation of a physical transition between two driving conditions.
+
+The drawn curve represents displacement versus position, not the trajectory of a material particle moving along the wave. On a narrow screen, the shortest wavelengths have fewer plotted samples and are less visually resolved.
+
+</ToolGuide>

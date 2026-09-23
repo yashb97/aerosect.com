@@ -1,0 +1,3987 @@
+<section class="joukowski-explorer" data-joukowski-explorer>
+  <div class="canvas-wrap">
+    <canvas
+      class="flow-canvas"
+      data-flow-canvas
+      aria-label="Interactive Joukowski airfoil flow visualisation"
+    ></canvas>
+
+    <div class="canvas-label">
+      Hover to probe the flow
+    </div>
+
+    <div class="probe-panel" data-probe-panel hidden>
+      <div class="probe-title">Local flow</div>
+
+      <div class="probe-grid">
+        <span>x</span>
+        <strong data-probe-x>—</strong>
+
+        <span>y</span>
+        <strong data-probe-y>—</strong>
+
+        <span>u</span>
+        <strong data-probe-u>—</strong>
+
+        <span>v</span>
+        <strong data-probe-v>—</strong>
+
+        <span>|V|</span>
+        <strong data-probe-speed>—</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="section-title">Airfoil & flow</div>
+
+    <label class="control-row">
+      <span>Freestream U∞</span>
+      <output data-speed-output>1.5 m/s</output>
+
+      <input
+        data-speed
+        type="range"
+        min="0.2"
+        max="5"
+        step="0.1"
+        value="1.5"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Angle of attack α</span>
+      <output data-alpha-output>4.0°</output>
+
+      <input
+        data-alpha
+        type="range"
+        min="-12"
+        max="16"
+        step="0.5"
+        value="4"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Thickness control ε</span>
+      <output data-thickness-output>0.120</output>
+
+      <input
+        data-thickness
+        type="range"
+        min="0.02"
+        max="0.25"
+        step="0.005"
+        value="0.12"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Camber control η</span>
+      <output data-camber-output>0.060</output>
+
+      <input
+        data-camber
+        type="range"
+        min="-0.18"
+        max="0.18"
+        step="0.005"
+        value="0.06"
+      />
+    </label>
+
+    <div class="derived-values">
+      <div>
+        <span>Kutta circulation Γ</span>
+        <strong data-gamma-output>—</strong>
+      </div>
+
+      <div>
+        <span>Ideal lift coefficient C<sub>L</sub></span>
+        <strong data-cl-output>—</strong>
+      </div>
+
+      <div>
+        <span>Chord c</span>
+        <strong data-chord-output>—</strong>
+      </div>
+    </div>
+
+    <div class="visual-section">
+      <div class="section-title">Visual layers</div>
+
+      <div class="toggle-grid">
+        <label class="toggle">
+          <input data-particles-toggle type="checkbox" checked />
+          <span>Particles</span>
+        </label>
+
+        <label class="toggle">
+          <input data-trails-toggle type="checkbox" checked />
+          <span>Trails</span>
+        </label>
+
+        <label class="toggle">
+          <input data-streamlines-toggle type="checkbox" checked />
+          <span>Streamlines</span>
+        </label>
+
+        <label class="toggle">
+          <input data-vectors-toggle type="checkbox" />
+          <span>Velocity vectors</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="cp-section">
+      <div class="cp-heading">
+        <div>
+          <div class="section-title">Surface pressure</div>
+          <div class="cp-subtitle">
+            Ideal incompressible C<sub>p</sub> from the mapped velocity field
+          </div>
+        </div>
+
+        <div class="cp-legend">
+          <span class="upper-dot"></span>
+          Upper
+          <span class="lower-dot"></span>
+          Lower
+        </div>
+      </div>
+
+      <canvas
+        class="cp-canvas"
+        data-cp-canvas
+        aria-label="Surface pressure coefficient distribution"
+      ></canvas>
+    </div>
+
+    <details class="model-details">
+      <summary>Model assumptions and equations</summary>
+
+      <div class="model-content">
+        <p>
+          The model begins with inviscid flow around a circular cylinder in the
+          complex ζ-plane and maps that flow into the physical z-plane using the
+          Joukowski transformation.
+        </p>
+
+        <div class="equation">
+          z = ζ + b²/ζ
+        </div>
+
+        <p>
+          The generating circle is offset from the origin. Its radius is chosen
+          so that it passes through ζ = b, creating the sharp trailing-edge
+          cusp.
+        </p>
+
+        <div class="equation">
+          R = |b − ζc|
+        </div>
+
+        <p>
+          Circulation is selected automatically using the Kutta condition so
+          that the mapped velocity remains finite at the trailing edge.
+        </p>
+
+        <div class="equation">
+          Γ = 4πRU∞ sin(θTE − α)
+        </div>
+
+        <p>
+          The ideal lift coefficient is then calculated using
+          Kutta–Joukowski:
+        </p>
+
+        <div class="equation">
+          CL = −2Γ/(U∞c)
+        </div>
+
+        <ul>
+          <li>Two-dimensional</li>
+          <li>Steady</li>
+          <li>Incompressible</li>
+          <li>Inviscid</li>
+          <li>Conformal potential-flow mapping</li>
+          <li>Kutta condition enforced analytically</li>
+          <li>No boundary layer or separation</li>
+          <li>No viscous drag</li>
+        </ul>
+
+        <p class="model-note">
+          ε and η control the generating-circle position; they are geometric
+          controls rather than direct percentage-thickness and percentage-camber
+          inputs.
+        </p>
+      </div>
+    </details>
+
+    <div class="bottom-row">
+      <div class="model-info">
+        <strong>Model:</strong>
+        Joukowski airfoil + Kutta-conditioned potential flow
+      </div>
+
+      <div class="buttons">
+        <button data-pause type="button">Pause</button>
+        <button data-reset type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  type Complex = {
+    re: number;
+    im: number;
+  };
+
+  type Point = {
+    x: number;
+    y: number;
+  };
+
+  type SurfacePoint = {
+    x: number;
+    y: number;
+    cp: number;
+  };
+
+  const explorers = document.querySelectorAll<HTMLElement>(
+    "[data-joukowski-explorer]"
+  );
+
+  for (const root of explorers) {
+    // ==================================================
+    // DOM
+    // ==================================================
+
+    const canvas = root.querySelector<HTMLCanvasElement>(
+      "[data-flow-canvas]"
+    );
+
+    const cpCanvas = root.querySelector<HTMLCanvasElement>(
+      "[data-cp-canvas]"
+    );
+
+    const speedSlider = root.querySelector<HTMLInputElement>(
+      "[data-speed]"
+    );
+
+    const alphaSlider = root.querySelector<HTMLInputElement>(
+      "[data-alpha]"
+    );
+
+    const thicknessSlider = root.querySelector<HTMLInputElement>(
+      "[data-thickness]"
+    );
+
+    const camberSlider = root.querySelector<HTMLInputElement>(
+      "[data-camber]"
+    );
+
+    const speedOutput = root.querySelector<HTMLOutputElement>(
+      "[data-speed-output]"
+    );
+
+    const alphaOutput = root.querySelector<HTMLOutputElement>(
+      "[data-alpha-output]"
+    );
+
+    const thicknessOutput = root.querySelector<HTMLOutputElement>(
+      "[data-thickness-output]"
+    );
+
+    const camberOutput = root.querySelector<HTMLOutputElement>(
+      "[data-camber-output]"
+    );
+
+    const gammaOutput = root.querySelector<HTMLElement>(
+      "[data-gamma-output]"
+    );
+
+    const clOutput = root.querySelector<HTMLElement>(
+      "[data-cl-output]"
+    );
+
+    const chordOutput = root.querySelector<HTMLElement>(
+      "[data-chord-output]"
+    );
+
+    const particlesToggle = root.querySelector<HTMLInputElement>(
+      "[data-particles-toggle]"
+    );
+
+    const trailsToggle = root.querySelector<HTMLInputElement>(
+      "[data-trails-toggle]"
+    );
+
+    const streamlinesToggle = root.querySelector<HTMLInputElement>(
+      "[data-streamlines-toggle]"
+    );
+
+    const vectorsToggle = root.querySelector<HTMLInputElement>(
+      "[data-vectors-toggle]"
+    );
+
+    const pauseButton = root.querySelector<HTMLButtonElement>(
+      "[data-pause]"
+    );
+
+    const resetButton = root.querySelector<HTMLButtonElement>(
+      "[data-reset]"
+    );
+
+    const probePanel = root.querySelector<HTMLElement>(
+      "[data-probe-panel]"
+    );
+
+    const probeXOutput = root.querySelector<HTMLElement>(
+      "[data-probe-x]"
+    );
+
+    const probeYOutput = root.querySelector<HTMLElement>(
+      "[data-probe-y]"
+    );
+
+    const probeUOutput = root.querySelector<HTMLElement>(
+      "[data-probe-u]"
+    );
+
+    const probeVOutput = root.querySelector<HTMLElement>(
+      "[data-probe-v]"
+    );
+
+    const probeSpeedOutput = root.querySelector<HTMLElement>(
+      "[data-probe-speed]"
+    );
+
+    if (
+      !canvas ||
+      !cpCanvas ||
+      !speedSlider ||
+      !alphaSlider ||
+      !thicknessSlider ||
+      !camberSlider ||
+      !speedOutput ||
+      !alphaOutput ||
+      !thicknessOutput ||
+      !camberOutput ||
+      !gammaOutput ||
+      !clOutput ||
+      !chordOutput ||
+      !particlesToggle ||
+      !trailsToggle ||
+      !streamlinesToggle ||
+      !vectorsToggle ||
+      !pauseButton ||
+      !resetButton ||
+      !probePanel ||
+      !probeXOutput ||
+      !probeYOutput ||
+      !probeUOutput ||
+      !probeVOutput ||
+      !probeSpeedOutput
+    ) {
+      continue;
+    }
+
+    const ctx = canvas.getContext("2d");
+    const cpCtx = cpCanvas.getContext("2d");
+
+    if (!ctx || !cpCtx) {
+      continue;
+    }
+
+    // ==================================================
+    // OFFSCREEN TRAIL CANVAS
+    // ==================================================
+
+    const trailCanvas = document.createElement("canvas");
+    const trailCtx = trailCanvas.getContext("2d");
+
+    if (!trailCtx) {
+      continue;
+    }
+
+    // ==================================================
+    // DISPLAY DOMAIN
+    // ==================================================
+
+    const xmin = -3.0;
+    const xmax = 3.0;
+
+    const ymin = -1.8;
+    const ymax = 1.8;
+
+    const particleCount = 1300;
+
+    const particleX = new Float32Array(particleCount);
+    const particleY = new Float32Array(particleCount);
+
+    const previousParticleX = new Float32Array(particleCount);
+    const previousParticleY = new Float32Array(particleCount);
+
+    // ==================================================
+    // JOUKOWSKI MODEL STATE
+    // ==================================================
+
+    const b = 1.0;
+
+    let U = 1.5;
+    let alpha = 4 * Math.PI / 180;
+
+    let epsilon = 0.12;
+    let eta = 0.06;
+
+    let circleCentre: Complex = {
+      re: -epsilon,
+      im: eta
+    };
+
+    let circleRadius = 1;
+    let trailingEdgeAngle = 0;
+    let circulation = 0;
+
+    let chord = 4;
+    let liftCoefficient = 0;
+
+    let geometryPoints: Point[] = [];
+
+    let geometryMinX = -2;
+    let geometryMaxX = 2;
+
+    let upperSurface: SurfacePoint[] = [];
+    let lowerSurface: SurfacePoint[] = [];
+
+    // ==================================================
+    // VISUAL STATE
+    // ==================================================
+
+    let showParticles = true;
+    let showTrails = true;
+    let showStreamlines = true;
+    let showVectors = false;
+
+    let running = true;
+    let previousTime = performance.now();
+
+    let probeActive = false;
+    let probeX = 0;
+    let probeY = 0;
+
+    let streamlinesDirty = true;
+    let cachedStreamlines: Point[][] = [];
+
+    // ==================================================
+    // COMPLEX ARITHMETIC
+    // ==================================================
+
+    function cAdd(a: Complex, b: Complex): Complex {
+      return {
+        re: a.re + b.re,
+        im: a.im + b.im
+      };
+    }
+
+    function cSub(a: Complex, b: Complex): Complex {
+      return {
+        re: a.re - b.re,
+        im: a.im - b.im
+      };
+    }
+
+    function cMul(a: Complex, b: Complex): Complex {
+      return {
+        re: a.re * b.re - a.im * b.im,
+        im: a.re * b.im + a.im * b.re
+      };
+    }
+
+    function cScale(a: Complex, scale: number): Complex {
+      return {
+        re: a.re * scale,
+        im: a.im * scale
+      };
+    }
+
+    function cDiv(a: Complex, b: Complex): Complex {
+      const denominator =
+        b.re * b.re +
+        b.im * b.im;
+
+      if (denominator < 1e-16) {
+        return {
+          re: 0,
+          im: 0
+        };
+      }
+
+      return {
+        re:
+          (a.re * b.re + a.im * b.im) /
+          denominator,
+
+        im:
+          (a.im * b.re - a.re * b.im) /
+          denominator
+      };
+    }
+
+    function cAbs2(a: Complex): number {
+      return (
+        a.re * a.re +
+        a.im * a.im
+      );
+    }
+
+    function cSqrt(z: Complex): Complex {
+      const magnitude =
+        Math.hypot(
+          z.re,
+          z.im
+        );
+
+      const realPart =
+        Math.sqrt(
+          Math.max(
+            0,
+            (magnitude + z.re) / 2
+          )
+        );
+
+      let imaginaryPart =
+        Math.sqrt(
+          Math.max(
+            0,
+            (magnitude - z.re) / 2
+          )
+        );
+
+      if (z.im < 0) {
+        imaginaryPart *= -1;
+      }
+
+      return {
+        re: realPart,
+        im: imaginaryPart
+      };
+    }
+
+    // ==================================================
+    // JOUKOWSKI TRANSFORMATION
+    // ==================================================
+
+    function joukowski(zeta: Complex): Complex {
+      const inverse =
+        cDiv(
+          {
+            re: b * b,
+            im: 0
+          },
+          zeta
+        );
+
+      return cAdd(
+        zeta,
+        inverse
+      );
+    }
+
+    function joukowskiDerivative(zeta: Complex): Complex {
+      const zetaSquared =
+        cMul(
+          zeta,
+          zeta
+        );
+
+      const fraction =
+        cDiv(
+          {
+            re: b * b,
+            im: 0
+          },
+          zetaSquared
+        );
+
+      return {
+        re: 1 - fraction.re,
+        im: -fraction.im
+      };
+    }
+
+    function inverseJoukowski(z: Complex): Complex {
+      /*
+        ζ satisfies
+
+        ζ² - zζ + b² = 0
+
+        therefore:
+
+        ζ = 1/2 [z ± sqrt(z² - 4b²)]
+
+        The exterior solution is chosen as the root
+        furthest from the generating-circle centre.
+      */
+
+      const zSquared =
+        cMul(
+          z,
+          z
+        );
+
+      const discriminant =
+        cSub(
+          zSquared,
+          {
+            re: 4 * b * b,
+            im: 0
+          }
+        );
+
+      const root =
+        cSqrt(
+          discriminant
+        );
+
+      const root1 =
+        cScale(
+          cAdd(
+            z,
+            root
+          ),
+          0.5
+        );
+
+      const root2 =
+        cScale(
+          cSub(
+            z,
+            root
+          ),
+          0.5
+        );
+
+      const distance1 =
+        cAbs2(
+          cSub(
+            root1,
+            circleCentre
+          )
+        );
+
+      const distance2 =
+        cAbs2(
+          cSub(
+            root2,
+            circleCentre
+          )
+        );
+
+      return (
+        distance1 >= distance2
+          ? root1
+          : root2
+      );
+    }
+
+    // ==================================================
+    // CYLINDER-PLANE FLOW
+    // ==================================================
+
+    function circleVelocityComplex(zeta: Complex): Complex {
+      /*
+        Complex velocity convention:
+
+        q = u - iv
+
+        Uniform flow:
+        U exp(-i α)
+
+        Cylinder doublet:
+        - U R² exp(+i α)/(ζ-c)²
+
+        Circulation:
+        - i Γ/[2π(ζ-c)]
+      */
+
+      const relative =
+        cSub(
+          zeta,
+          circleCentre
+        );
+
+      const relativeSquared =
+        cMul(
+          relative,
+          relative
+        );
+
+      const expMinusAlpha: Complex = {
+        re: Math.cos(alpha),
+        im: -Math.sin(alpha)
+      };
+
+      const expPlusAlpha: Complex = {
+        re: Math.cos(alpha),
+        im: Math.sin(alpha)
+      };
+
+      const uniform =
+        cScale(
+          expMinusAlpha,
+          U
+        );
+
+      const cylinderTerm =
+        cScale(
+          cDiv(
+            expPlusAlpha,
+            relativeSquared
+          ),
+          U *
+          circleRadius *
+          circleRadius
+        );
+
+      const inverseRelative =
+        cDiv(
+          {
+            re: 1,
+            im: 0
+          },
+          relative
+        );
+
+      const vortexCoefficient: Complex = {
+        re: 0,
+        im:
+          -circulation /
+          (2 * Math.PI)
+      };
+
+      const vortexTerm =
+        cMul(
+          vortexCoefficient,
+          inverseRelative
+        );
+
+      return cAdd(
+        cSub(
+          uniform,
+          cylinderTerm
+        ),
+        vortexTerm
+      );
+    }
+
+    // ==================================================
+    // PHYSICAL-PLANE VELOCITY
+    // ==================================================
+
+    function physicalVelocityFromZeta(
+      zeta: Complex
+    ) {
+      const mappingDerivative =
+        joukowskiDerivative(
+          zeta
+        );
+
+      if (
+        cAbs2(
+          mappingDerivative
+        ) < 1e-12
+      ) {
+        return null;
+      }
+
+      const circleVelocity =
+        circleVelocityComplex(
+          zeta
+        );
+
+      const mappedVelocity =
+        cDiv(
+          circleVelocity,
+          mappingDerivative
+        );
+
+      /*
+        dW/dz = u - iv
+      */
+
+      return {
+        u: mappedVelocity.re,
+        v: -mappedVelocity.im
+      };
+    }
+
+    function velocityAt(
+      x: number,
+      y: number
+    ) {
+      if (
+        pointInsideAirfoil(
+          x,
+          y
+        )
+      ) {
+        return null;
+      }
+
+      const zeta =
+        inverseJoukowski({
+          re: x,
+          im: y
+        });
+
+      const radiusFromCentre =
+        Math.hypot(
+          zeta.re - circleCentre.re,
+          zeta.im - circleCentre.im
+        );
+
+      if (
+        radiusFromCentre <
+        circleRadius * 0.998
+      ) {
+        return null;
+      }
+
+      return physicalVelocityFromZeta(
+        zeta
+      );
+    }
+
+    // ==================================================
+    // AIRFOIL GEOMETRY
+    // ==================================================
+
+    function rebuildGeometry() {
+      circleCentre = {
+        re: -epsilon,
+        im: eta
+      };
+
+      /*
+        The circle must pass through ζ = b so that
+        the mapped body has a trailing-edge cusp.
+      */
+
+      circleRadius =
+        Math.hypot(
+          b - circleCentre.re,
+          -circleCentre.im
+        );
+
+      trailingEdgeAngle =
+        Math.atan2(
+          -circleCentre.im,
+          b - circleCentre.re
+        );
+
+      /*
+        Kutta condition.
+      */
+
+      circulation =
+        4 *
+        Math.PI *
+        circleRadius *
+        U *
+        Math.sin(
+          trailingEdgeAngle -
+          alpha
+        );
+
+      geometryPoints = [];
+
+      geometryMinX = Infinity;
+      geometryMaxX = -Infinity;
+
+      const sampleCount = 480;
+
+      for (
+        let i = 0;
+        i < sampleCount;
+        i++
+      ) {
+        const theta =
+          trailingEdgeAngle +
+          (
+            i /
+            (sampleCount - 1)
+          ) *
+          2 *
+          Math.PI;
+
+        const zeta: Complex = {
+          re:
+            circleCentre.re +
+            circleRadius *
+            Math.cos(theta),
+
+          im:
+            circleCentre.im +
+            circleRadius *
+            Math.sin(theta)
+        };
+
+        const z =
+          joukowski(
+            zeta
+          );
+
+        geometryPoints.push({
+          x: z.re,
+          y: z.im
+        });
+
+        geometryMinX =
+          Math.min(
+            geometryMinX,
+            z.re
+          );
+
+        geometryMaxX =
+          Math.max(
+            geometryMaxX,
+            z.re
+          );
+      }
+
+      chord =
+        geometryMaxX -
+        geometryMinX;
+
+      liftCoefficient =
+        -2 *
+        circulation /
+        (
+          U *
+          chord
+        );
+
+      rebuildSurfacePressure();
+
+      streamlinesDirty = true;
+
+      clearTrails();
+
+      updateOutputs();
+
+      drawCpPlot();
+    }
+
+    // ==================================================
+    // AIRFOIL POINT-IN-POLYGON
+    // ==================================================
+
+    function pointInsideAirfoil(
+      x: number,
+      y: number
+    ) {
+      let inside = false;
+
+      for (
+        let i = 0,
+        j = geometryPoints.length - 1;
+        i < geometryPoints.length;
+        j = i++
+      ) {
+        const pi =
+          geometryPoints[i];
+
+        const pj =
+          geometryPoints[j];
+
+        const intersects =
+          (
+            (pi.y > y) !==
+            (pj.y > y)
+          ) &&
+          (
+            x <
+            (
+              (pj.x - pi.x) *
+              (y - pi.y) /
+              (
+                pj.y -
+                pi.y
+              ) +
+              pi.x
+            )
+          );
+
+        if (intersects) {
+          inside =
+            !inside;
+        }
+      }
+
+      return inside;
+    }
+
+    // ==================================================
+    // SURFACE PRESSURE
+    // ==================================================
+
+    function sampleSurface(
+      direction: number
+    ): SurfacePoint[] {
+      const points: SurfacePoint[] = [];
+
+      const count = 180;
+      const edgeOffset = 0.012;
+
+      for (
+        let i = 0;
+        i < count;
+        i++
+      ) {
+        const fraction =
+          i /
+          (count - 1);
+
+        const arc =
+          edgeOffset +
+          fraction *
+          (
+            Math.PI -
+            2 *
+            edgeOffset
+          );
+
+        const theta =
+          trailingEdgeAngle +
+          direction *
+          arc;
+
+        const zeta: Complex = {
+          re:
+            circleCentre.re +
+            circleRadius *
+            Math.cos(theta),
+
+          im:
+            circleCentre.im +
+            circleRadius *
+            Math.sin(theta)
+        };
+
+        const z =
+          joukowski(
+            zeta
+          );
+
+        const velocity =
+          physicalVelocityFromZeta(
+            zeta
+          );
+
+        if (!velocity) {
+          continue;
+        }
+
+        const speed =
+          Math.hypot(
+            velocity.u,
+            velocity.v
+          );
+
+        const cp =
+          1 -
+          (
+            speed *
+            speed
+          ) /
+          (
+            U *
+            U
+          );
+
+        points.push({
+          x:
+            (
+              z.re -
+              geometryMinX
+            ) /
+            chord,
+
+          y: z.im,
+
+          cp
+        });
+      }
+
+      return points;
+    }
+
+    function rebuildSurfacePressure() {
+      const branchA =
+        sampleSurface(
+          1
+        );
+
+      const branchB =
+        sampleSurface(
+          -1
+        );
+
+      const midA =
+        branchA[
+          Math.floor(
+            branchA.length /
+            2
+          )
+        ];
+
+      const midB =
+        branchB[
+          Math.floor(
+            branchB.length /
+            2
+          )
+        ];
+
+      if (
+        midA &&
+        midB &&
+        midA.y >= midB.y
+      ) {
+        upperSurface =
+          branchA;
+
+        lowerSurface =
+          branchB;
+      } else {
+        upperSurface =
+          branchB;
+
+        lowerSurface =
+          branchA;
+      }
+    }
+
+    // ==================================================
+    // SCREEN COORDINATES
+    // ==================================================
+
+    function physicalToScreenX(
+      x: number
+    ) {
+      return (
+        (x - xmin) /
+        (xmax - xmin) *
+        canvas.clientWidth
+      );
+    }
+
+    function physicalToScreenY(
+      y: number
+    ) {
+      return (
+        canvas.clientHeight -
+        (y - ymin) /
+        (ymax - ymin) *
+        canvas.clientHeight
+      );
+    }
+
+    function screenToPhysicalX(
+      x: number
+    ) {
+      return (
+        xmin +
+        x /
+        canvas.clientWidth *
+        (xmax - xmin)
+      );
+    }
+
+    function screenToPhysicalY(
+      y: number
+    ) {
+      return (
+        ymax -
+        y /
+        canvas.clientHeight *
+        (ymax - ymin)
+      );
+    }
+
+    // ==================================================
+    // PARTICLES
+    // ==================================================
+
+    function seedParticle(
+      index: number,
+      anywhere = true
+    ) {
+      let attempts = 0;
+
+      do {
+        if (anywhere) {
+          particleX[index] =
+            xmin +
+            Math.random() *
+            (xmax - xmin);
+
+          particleY[index] =
+            ymin +
+            Math.random() *
+            (ymax - ymin);
+        } else {
+          particleX[index] =
+            xmin + 0.02;
+
+          particleY[index] =
+            ymin +
+            Math.random() *
+            (ymax - ymin);
+        }
+
+        attempts++;
+
+      } while (
+        pointInsideAirfoil(
+          particleX[index],
+          particleY[index]
+        ) &&
+        attempts < 30
+      );
+
+      previousParticleX[index] =
+        particleX[index];
+
+      previousParticleY[index] =
+        particleY[index];
+    }
+
+    function seedAllParticles() {
+      for (
+        let i = 0;
+        i < particleCount;
+        i++
+      ) {
+        seedParticle(
+          i,
+          true
+        );
+      }
+
+      clearTrails();
+    }
+
+    function updateParticles(
+      dt: number
+    ) {
+      const substeps = 2;
+      const subDt =
+        dt /
+        substeps;
+
+      for (
+        let i = 0;
+        i < particleCount;
+        i++
+      ) {
+        previousParticleX[i] =
+          particleX[i];
+
+        previousParticleY[i] =
+          particleY[i];
+
+        for (
+          let step = 0;
+          step < substeps;
+          step++
+        ) {
+          const x =
+            particleX[i];
+
+          const y =
+            particleY[i];
+
+          const velocity1 =
+            velocityAt(
+              x,
+              y
+            );
+
+          if (!velocity1) {
+            seedParticle(
+              i,
+              false
+            );
+
+            break;
+          }
+
+          const speed1 =
+            Math.hypot(
+              velocity1.u,
+              velocity1.v
+            );
+
+          /*
+            Extreme mapped velocities occur only
+            extremely close to singular geometric
+            locations. Re-seeding is preferable to
+            letting a particle jump across the domain.
+          */
+
+          if (
+            speed1 >
+            Math.max(
+              20,
+              12 * U
+            )
+          ) {
+            seedParticle(
+              i,
+              false
+            );
+
+            break;
+          }
+
+          const midX =
+            x +
+            0.5 *
+            velocity1.u *
+            subDt;
+
+          const midY =
+            y +
+            0.5 *
+            velocity1.v *
+            subDt;
+
+          const velocity2 =
+            velocityAt(
+              midX,
+              midY
+            );
+
+          if (!velocity2) {
+            seedParticle(
+              i,
+              false
+            );
+
+            break;
+          }
+
+          particleX[i] =
+            x +
+            velocity2.u *
+            subDt;
+
+          particleY[i] =
+            y +
+            velocity2.v *
+            subDt;
+
+          const outside =
+            particleX[i] < xmin ||
+            particleX[i] > xmax ||
+            particleY[i] < ymin ||
+            particleY[i] > ymax;
+
+          if (
+            outside ||
+            pointInsideAirfoil(
+              particleX[i],
+              particleY[i]
+            )
+          ) {
+            seedParticle(
+              i,
+              false
+            );
+
+            break;
+          }
+        }
+      }
+    }
+
+    // ==================================================
+    // TRAILS
+    // ==================================================
+
+    const speedColours = [
+      "rgba(72,121,170,0.28)",
+      "rgba(70,151,204,0.34)",
+      "rgba(76,181,226,0.42)",
+      "rgba(94,207,242,0.52)",
+      "rgba(137,226,251,0.66)",
+      "rgba(215,246,255,0.82)"
+    ];
+
+    function speedBin(
+      speed: number
+    ) {
+      const reference =
+        Math.max(
+          2,
+          2.5 * U
+        );
+
+      const normalized =
+        Math.min(
+          speed /
+          reference,
+          1
+        );
+
+      return Math.min(
+        speedColours.length - 1,
+        Math.floor(
+          normalized *
+          speedColours.length
+        )
+      );
+    }
+
+    function clearTrails() {
+      trailCtx.save();
+
+      trailCtx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+      trailCtx.clearRect(
+        0,
+        0,
+        trailCanvas.width,
+        trailCanvas.height
+      );
+
+      trailCtx.restore();
+    }
+
+    function fadeTrails() {
+      trailCtx.save();
+
+      trailCtx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+      trailCtx.globalCompositeOperation =
+        "destination-out";
+
+      trailCtx.fillStyle =
+        "rgba(0,0,0,0.055)";
+
+      trailCtx.fillRect(
+        0,
+        0,
+        trailCanvas.width,
+        trailCanvas.height
+      );
+
+      trailCtx.restore();
+
+      trailCtx.globalCompositeOperation =
+        "source-over";
+    }
+
+    function drawNewTrailSegments() {
+      if (!showTrails) {
+        return;
+      }
+
+      for (
+        let bin = 0;
+        bin < speedColours.length;
+        bin++
+      ) {
+        trailCtx.beginPath();
+
+        let hasSegments =
+          false;
+
+        for (
+          let i = 0;
+          i < particleCount;
+          i++
+        ) {
+          const x0 =
+            previousParticleX[i];
+
+          const y0 =
+            previousParticleY[i];
+
+          const x1 =
+            particleX[i];
+
+          const y1 =
+            particleY[i];
+
+          if (
+            Math.abs(
+              x1 - x0
+            ) > 0.7 ||
+            Math.abs(
+              y1 - y0
+            ) > 0.7
+          ) {
+            continue;
+          }
+
+          const mx =
+            0.5 *
+            (x0 + x1);
+
+          const my =
+            0.5 *
+            (y0 + y1);
+
+          const velocity =
+            velocityAt(
+              mx,
+              my
+            );
+
+          if (!velocity) {
+            continue;
+          }
+
+          const speed =
+            Math.hypot(
+              velocity.u,
+              velocity.v
+            );
+
+          if (
+            speedBin(
+              speed
+            ) !== bin
+          ) {
+            continue;
+          }
+
+          trailCtx.moveTo(
+            physicalToScreenX(
+              x0
+            ),
+            physicalToScreenY(
+              y0
+            )
+          );
+
+          trailCtx.lineTo(
+            physicalToScreenX(
+              x1
+            ),
+            physicalToScreenY(
+              y1
+            )
+          );
+
+          hasSegments =
+            true;
+        }
+
+        if (hasSegments) {
+          trailCtx.strokeStyle =
+            speedColours[bin];
+
+          trailCtx.lineWidth =
+            1;
+
+          trailCtx.stroke();
+        }
+      }
+    }
+
+    // ==================================================
+    // STREAMLINES
+    // ==================================================
+
+    function normalizedDirection(
+      x: number,
+      y: number
+    ) {
+      const velocity =
+        velocityAt(
+          x,
+          y
+        );
+
+      if (!velocity) {
+        return null;
+      }
+
+      const magnitude =
+        Math.hypot(
+          velocity.u,
+          velocity.v
+        );
+
+      if (
+        magnitude <
+        1e-9
+      ) {
+        return null;
+      }
+
+      return {
+        x:
+          velocity.u /
+          magnitude,
+
+        y:
+          velocity.v /
+          magnitude
+      };
+    }
+
+    function traceStreamline(
+      seedX: number,
+      seedY: number
+    ) {
+      const points: Point[] = [];
+
+      let x = seedX;
+      let y = seedY;
+
+      const stepSize =
+        0.025;
+
+      const maxSteps =
+        700;
+
+      for (
+        let i = 0;
+        i < maxSteps;
+        i++
+      ) {
+        if (
+          x < xmin ||
+          x > xmax ||
+          y < ymin ||
+          y > ymax
+        ) {
+          break;
+        }
+
+        if (
+          pointInsideAirfoil(
+            x,
+            y
+          )
+        ) {
+          break;
+        }
+
+        points.push({
+          x,
+          y
+        });
+
+        const d1 =
+          normalizedDirection(
+            x,
+            y
+          );
+
+        if (!d1) {
+          break;
+        }
+
+        const midX =
+          x +
+          0.5 *
+          stepSize *
+          d1.x;
+
+        const midY =
+          y +
+          0.5 *
+          stepSize *
+          d1.y;
+
+        const d2 =
+          normalizedDirection(
+            midX,
+            midY
+          );
+
+        if (!d2) {
+          break;
+        }
+
+        x +=
+          stepSize *
+          d2.x;
+
+        y +=
+          stepSize *
+          d2.y;
+      }
+
+      return points;
+    }
+
+    function rebuildStreamlines() {
+      cachedStreamlines = [];
+
+      const count = 25;
+
+      for (
+        let i = 0;
+        i < count;
+        i++
+      ) {
+        const y =
+          ymin +
+          (
+            i +
+            0.5
+          ) /
+          count *
+          (ymax - ymin);
+
+        const streamline =
+          traceStreamline(
+            xmin + 0.02,
+            y
+          );
+
+        if (
+          streamline.length >
+          2
+        ) {
+          cachedStreamlines.push(
+            streamline
+          );
+        }
+      }
+
+      streamlinesDirty =
+        false;
+    }
+
+    function drawStreamlines() {
+      if (!showStreamlines) {
+        return;
+      }
+
+      if (streamlinesDirty) {
+        rebuildStreamlines();
+      }
+
+      ctx.save();
+
+      ctx.strokeStyle =
+        "rgba(190,222,240,0.21)";
+
+      ctx.lineWidth =
+        0.8;
+
+      for (
+        const streamline
+        of cachedStreamlines
+      ) {
+        if (
+          streamline.length <
+          2
+        ) {
+          continue;
+        }
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          physicalToScreenX(
+            streamline[0].x
+          ),
+          physicalToScreenY(
+            streamline[0].y
+          )
+        );
+
+        for (
+          let i = 1;
+          i < streamline.length;
+          i++
+        ) {
+          ctx.lineTo(
+            physicalToScreenX(
+              streamline[i].x
+            ),
+            physicalToScreenY(
+              streamline[i].y
+            )
+          );
+        }
+
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // ==================================================
+    // VECTOR FIELD
+    // ==================================================
+
+    function drawArrow(
+      x: number,
+      y: number,
+      dx: number,
+      dy: number,
+      opacity: number
+    ) {
+      const endX =
+        x + dx;
+
+      const endY =
+        y + dy;
+
+      const angle =
+        Math.atan2(
+          dy,
+          dx
+        );
+
+      const head =
+        4.5;
+
+      ctx.strokeStyle =
+        `rgba(210,235,248,${opacity})`;
+
+      ctx.fillStyle =
+        `rgba(210,235,248,${opacity})`;
+
+      ctx.lineWidth =
+        0.8;
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        x,
+        y
+      );
+
+      ctx.lineTo(
+        endX,
+        endY
+      );
+
+      ctx.stroke();
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        endX,
+        endY
+      );
+
+      ctx.lineTo(
+        endX -
+        head *
+        Math.cos(
+          angle -
+          Math.PI / 6
+        ),
+        endY -
+        head *
+        Math.sin(
+          angle -
+          Math.PI / 6
+        )
+      );
+
+      ctx.lineTo(
+        endX -
+        head *
+        Math.cos(
+          angle +
+          Math.PI / 6
+        ),
+        endY -
+        head *
+        Math.sin(
+          angle +
+          Math.PI / 6
+        )
+      );
+
+      ctx.closePath();
+
+      ctx.fill();
+    }
+
+    function drawVectorField() {
+      if (!showVectors) {
+        return;
+      }
+
+      const nx =
+        Math.max(
+          10,
+          Math.floor(
+            canvas.clientWidth /
+            70
+          )
+        );
+
+      const ny =
+        Math.max(
+          6,
+          Math.floor(
+            canvas.clientHeight /
+            70
+          )
+        );
+
+      for (
+        let iy = 0;
+        iy < ny;
+        iy++
+      ) {
+        for (
+          let ix = 0;
+          ix < nx;
+          ix++
+        ) {
+          const x =
+            xmin +
+            (
+              ix +
+              0.5
+            ) /
+            nx *
+            (xmax - xmin);
+
+          const y =
+            ymin +
+            (
+              iy +
+              0.5
+            ) /
+            ny *
+            (ymax - ymin);
+
+          const velocity =
+            velocityAt(
+              x,
+              y
+            );
+
+          if (!velocity) {
+            continue;
+          }
+
+          const magnitude =
+            Math.hypot(
+              velocity.u,
+              velocity.v
+            );
+
+          if (
+            magnitude <
+            1e-8
+          ) {
+            continue;
+          }
+
+          const relative =
+            Math.min(
+              magnitude /
+              Math.max(
+                2,
+                2.4 * U
+              ),
+              1
+            );
+
+          const length =
+            7 +
+            15 *
+            relative;
+
+          drawArrow(
+            physicalToScreenX(
+              x
+            ),
+            physicalToScreenY(
+              y
+            ),
+
+            velocity.u /
+            magnitude *
+            length,
+
+            -velocity.v /
+            magnitude *
+            length,
+
+            0.14 +
+            0.3 *
+            relative
+          );
+        }
+      }
+    }
+
+    // ==================================================
+    // BACKGROUND
+    // ==================================================
+
+    function drawBackground() {
+      const width =
+        canvas.clientWidth;
+
+      const height =
+        canvas.clientHeight;
+
+      const gradient =
+        ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          height
+        );
+
+      gradient.addColorStop(
+        0,
+        "#091018"
+      );
+
+      gradient.addColorStop(
+        1,
+        "#06090d"
+      );
+
+      ctx.fillStyle =
+        gradient;
+
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.035)";
+
+      ctx.lineWidth =
+        1;
+
+      const spacing =
+        50;
+
+      for (
+        let x = 0;
+        x <= width;
+        x += spacing
+      ) {
+        ctx.beginPath();
+
+        ctx.moveTo(
+          x,
+          0
+        );
+
+        ctx.lineTo(
+          x,
+          height
+        );
+
+        ctx.stroke();
+      }
+
+      for (
+        let y = 0;
+        y <= height;
+        y += spacing
+      ) {
+        ctx.beginPath();
+
+        ctx.moveTo(
+          0,
+          y
+        );
+
+        ctx.lineTo(
+          width,
+          y
+        );
+
+        ctx.stroke();
+      }
+    }
+
+    // ==================================================
+    // AIRFOIL
+    // ==================================================
+
+    function drawAirfoil() {
+      if (
+        geometryPoints.length <
+        3
+      ) {
+        return;
+      }
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        physicalToScreenX(
+          geometryPoints[0].x
+        ),
+        physicalToScreenY(
+          geometryPoints[0].y
+        )
+      );
+
+      for (
+        let i = 1;
+        i < geometryPoints.length;
+        i++
+      ) {
+        ctx.lineTo(
+          physicalToScreenX(
+            geometryPoints[i].x
+          ),
+          physicalToScreenY(
+            geometryPoints[i].y
+          )
+        );
+      }
+
+      ctx.closePath();
+
+      const bodyGradient =
+        ctx.createLinearGradient(
+          0,
+          physicalToScreenY(
+            0.5
+          ),
+          0,
+          physicalToScreenY(
+            -0.5
+          )
+        );
+
+      bodyGradient.addColorStop(
+        0,
+        "#1a2732"
+      );
+
+      bodyGradient.addColorStop(
+        1,
+        "#0b1117"
+      );
+
+      ctx.fillStyle =
+        bodyGradient;
+
+      ctx.fill();
+
+      ctx.strokeStyle =
+        "rgba(220,237,246,0.58)";
+
+      ctx.lineWidth =
+        1.4;
+
+      ctx.stroke();
+
+      /*
+        Trailing-edge marker.
+      */
+
+      const trailingEdge =
+        joukowski({
+          re: b,
+          im: 0
+        });
+
+      ctx.beginPath();
+
+      ctx.arc(
+        physicalToScreenX(
+          trailingEdge.re
+        ),
+        physicalToScreenY(
+          trailingEdge.im
+        ),
+        2.6,
+        0,
+        2 * Math.PI
+      );
+
+      ctx.fillStyle =
+        "#f0c677";
+
+      ctx.fill();
+    }
+
+    // ==================================================
+    // PARTICLE / TRAIL DRAWING
+    // ==================================================
+
+    function drawTrailCanvas() {
+      if (!showTrails) {
+        return;
+      }
+
+      ctx.save();
+
+      ctx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+
+      ctx.drawImage(
+        trailCanvas,
+        0,
+        0
+      );
+
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      if (!showParticles) {
+        return;
+      }
+
+      ctx.fillStyle =
+        "rgba(220,243,255,0.68)";
+
+      for (
+        let i = 0;
+        i < particleCount;
+        i += 2
+      ) {
+        if (
+          pointInsideAirfoil(
+            particleX[i],
+            particleY[i]
+          )
+        ) {
+          continue;
+        }
+
+        ctx.fillRect(
+          physicalToScreenX(
+            particleX[i]
+          ),
+          physicalToScreenY(
+            particleY[i]
+          ),
+          1.5,
+          1.5
+        );
+      }
+    }
+
+    // ==================================================
+    // FREESTREAM INDICATOR
+    // ==================================================
+
+    function drawFreestreamArrow() {
+      const x = 28;
+      const y = 35;
+
+      const length =
+        58;
+
+      const angle =
+        -alpha;
+
+      const dx =
+        length *
+        Math.cos(angle);
+
+      const dy =
+        length *
+        Math.sin(angle);
+
+      const endX =
+        x + dx;
+
+      const endY =
+        y + dy;
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.62)";
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.72)";
+
+      ctx.lineWidth =
+        1.6;
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        x,
+        y
+      );
+
+      ctx.lineTo(
+        endX,
+        endY
+      );
+
+      ctx.stroke();
+
+      const headAngle =
+        Math.atan2(
+          dy,
+          dx
+        );
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        endX,
+        endY
+      );
+
+      ctx.lineTo(
+        endX -
+        7 *
+        Math.cos(
+          headAngle -
+          Math.PI / 6
+        ),
+        endY -
+        7 *
+        Math.sin(
+          headAngle -
+          Math.PI / 6
+        )
+      );
+
+      ctx.lineTo(
+        endX -
+        7 *
+        Math.cos(
+          headAngle +
+          Math.PI / 6
+        ),
+        endY -
+        7 *
+        Math.sin(
+          headAngle +
+          Math.PI / 6
+        )
+      );
+
+      ctx.closePath();
+
+      ctx.fill();
+
+      ctx.font =
+        "12px system-ui, sans-serif";
+
+      ctx.fillText(
+        "U∞",
+        x,
+        y - 10
+      );
+    }
+
+    // ==================================================
+    // PROBE
+    // ==================================================
+
+    function updateProbe() {
+      if (!probeActive) {
+        probePanel.hidden =
+          true;
+
+        return;
+      }
+
+      probePanel.hidden =
+        false;
+
+      probeXOutput.textContent =
+        `${probeX.toFixed(2)} m`;
+
+      probeYOutput.textContent =
+        `${probeY.toFixed(2)} m`;
+
+      const velocity =
+        velocityAt(
+          probeX,
+          probeY
+        );
+
+      if (!velocity) {
+        probeUOutput.textContent =
+          "—";
+
+        probeVOutput.textContent =
+          "—";
+
+        probeSpeedOutput.textContent =
+          "airfoil";
+
+        return;
+      }
+
+      probeUOutput.textContent =
+        `${velocity.u.toFixed(2)} m/s`;
+
+      probeVOutput.textContent =
+        `${velocity.v.toFixed(2)} m/s`;
+
+      probeSpeedOutput.textContent =
+        `${Math.hypot(
+          velocity.u,
+          velocity.v
+        ).toFixed(2)} m/s`;
+    }
+
+    function drawProbeMarker() {
+      if (!probeActive) {
+        return;
+      }
+
+      const x =
+        physicalToScreenX(
+          probeX
+        );
+
+      const y =
+        physicalToScreenY(
+          probeY
+        );
+
+      ctx.save();
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.48)";
+
+      ctx.lineWidth =
+        1;
+
+      ctx.beginPath();
+
+      ctx.arc(
+        x,
+        y,
+        4,
+        0,
+        2 * Math.PI
+      );
+
+      ctx.stroke();
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        x - 7,
+        y
+      );
+
+      ctx.lineTo(
+        x + 7,
+        y
+      );
+
+      ctx.moveTo(
+        x,
+        y - 7
+      );
+
+      ctx.lineTo(
+        x,
+        y + 7
+      );
+
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // ==================================================
+    // CP PLOT
+    // ==================================================
+
+    function drawCpPlot() {
+      const width =
+        cpCanvas.clientWidth;
+
+      const height =
+        cpCanvas.clientHeight;
+
+      cpCtx.fillStyle =
+        "#090e14";
+
+      cpCtx.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+      const allCp = [
+        ...upperSurface.map(
+          point => point.cp
+        ),
+        ...lowerSurface.map(
+          point => point.cp
+        )
+      ].filter(
+        Number.isFinite
+      );
+
+      if (
+        allCp.length === 0
+      ) {
+        return;
+      }
+
+      /*
+        Prevent one numerical point from destroying
+        the useful plot scale.
+      */
+
+      let cpMin =
+        Math.max(
+          -8,
+          Math.min(
+            ...allCp
+          )
+        );
+
+      let cpMax =
+        Math.min(
+          2,
+          Math.max(
+            1.1,
+            ...allCp
+          )
+        );
+
+      cpMin =
+        Math.min(
+          cpMin,
+          -0.5
+        );
+
+      const left = 48;
+      const right = 18;
+      const top = 20;
+      const bottom = 34;
+
+      const plotWidth =
+        width -
+        left -
+        right;
+
+      const plotHeight =
+        height -
+        top -
+        bottom;
+
+      function plotX(
+        xOverC: number
+      ) {
+        return (
+          left +
+          xOverC *
+          plotWidth
+        );
+      }
+
+      /*
+        Conventional aerodynamic Cp plot:
+        more negative Cp appears higher.
+      */
+
+      function plotY(
+        cp: number
+      ) {
+        return (
+          top +
+          (
+            cp -
+            cpMin
+          ) /
+          (
+            cpMax -
+            cpMin
+          ) *
+          plotHeight
+        );
+      }
+
+      cpCtx.strokeStyle =
+        "rgba(255,255,255,0.08)";
+
+      cpCtx.lineWidth =
+        1;
+
+      for (
+        let i = 0;
+        i <= 4;
+        i++
+      ) {
+        const x =
+          left +
+          i /
+          4 *
+          plotWidth;
+
+        cpCtx.beginPath();
+
+        cpCtx.moveTo(
+          x,
+          top
+        );
+
+        cpCtx.lineTo(
+          x,
+          top +
+          plotHeight
+        );
+
+        cpCtx.stroke();
+      }
+
+      for (
+        let i = 0;
+        i <= 4;
+        i++
+      ) {
+        const y =
+          top +
+          i /
+          4 *
+          plotHeight;
+
+        cpCtx.beginPath();
+
+        cpCtx.moveTo(
+          left,
+          y
+        );
+
+        cpCtx.lineTo(
+          left +
+          plotWidth,
+          y
+        );
+
+        cpCtx.stroke();
+      }
+
+      if (
+        cpMin <= 0 &&
+        cpMax >= 0
+      ) {
+        cpCtx.strokeStyle =
+          "rgba(255,255,255,0.22)";
+
+        cpCtx.beginPath();
+
+        cpCtx.moveTo(
+          left,
+          plotY(0)
+        );
+
+        cpCtx.lineTo(
+          left +
+          plotWidth,
+          plotY(0)
+        );
+
+        cpCtx.stroke();
+      }
+
+      function drawSurfaceCurve(
+        surface: SurfacePoint[],
+        colour: string
+      ) {
+        if (
+          surface.length <
+          2
+        ) {
+          return;
+        }
+
+        cpCtx.beginPath();
+
+        let started =
+          false;
+
+        for (
+          const point
+          of surface
+        ) {
+          if (
+            !Number.isFinite(
+              point.cp
+            )
+          ) {
+            continue;
+          }
+
+          const clampedCp =
+            Math.max(
+              cpMin,
+              Math.min(
+                cpMax,
+                point.cp
+              )
+            );
+
+          const x =
+            plotX(
+              point.x
+            );
+
+          const y =
+            plotY(
+              clampedCp
+            );
+
+          if (!started) {
+            cpCtx.moveTo(
+              x,
+              y
+            );
+
+            started =
+              true;
+          } else {
+            cpCtx.lineTo(
+              x,
+              y
+            );
+          }
+        }
+
+        cpCtx.strokeStyle =
+          colour;
+
+        cpCtx.lineWidth =
+          1.7;
+
+        cpCtx.stroke();
+      }
+
+      drawSurfaceCurve(
+        upperSurface,
+        "#67cfff"
+      );
+
+      drawSurfaceCurve(
+        lowerSurface,
+        "#f1b86a"
+      );
+
+      cpCtx.fillStyle =
+        "rgba(255,255,255,0.48)";
+
+      cpCtx.font =
+        "11px system-ui, sans-serif";
+
+      cpCtx.textAlign =
+        "center";
+
+      for (
+        let i = 0;
+        i <= 4;
+        i++
+      ) {
+        const value =
+          i /
+          4;
+
+        cpCtx.fillText(
+          value.toFixed(2),
+          plotX(value),
+          height - 10
+        );
+      }
+
+      cpCtx.textAlign =
+        "right";
+
+      cpCtx.fillText(
+        cpMin.toFixed(1),
+        left - 7,
+        top + 4
+      );
+
+      cpCtx.fillText(
+        cpMax.toFixed(1),
+        left - 7,
+        top + plotHeight
+      );
+
+      cpCtx.textAlign =
+        "left";
+
+      cpCtx.fillText(
+        "Cp",
+        10,
+        15
+      );
+
+      cpCtx.textAlign =
+        "center";
+
+      cpCtx.fillText(
+        "x/c",
+        left +
+        plotWidth /
+        2,
+        height - 10
+      );
+    }
+
+    // ==================================================
+    // OUTPUTS
+    // ==================================================
+
+    function updateOutputs() {
+      speedOutput.value =
+        `${U.toFixed(1)} m/s`;
+
+      alphaOutput.value =
+        `${(
+          alpha *
+          180 /
+          Math.PI
+        ).toFixed(1)}°`;
+
+      thicknessOutput.value =
+        epsilon.toFixed(3);
+
+      camberOutput.value =
+        eta.toFixed(3);
+
+      gammaOutput.textContent =
+        `${circulation.toFixed(3)} m²/s`;
+
+      clOutput.textContent =
+        liftCoefficient.toFixed(3);
+
+      chordOutput.textContent =
+        `${chord.toFixed(3)} m`;
+    }
+
+    // ==================================================
+    // DRAW FRAME
+    // ==================================================
+
+    function draw() {
+      drawBackground();
+
+      drawStreamlines();
+
+      drawVectorField();
+
+      drawTrailCanvas();
+
+      drawParticles();
+
+      /*
+        Draw the body over particles/trails so no
+        numerical artefacts are visible through it.
+      */
+
+      drawAirfoil();
+
+      drawFreestreamArrow();
+
+      drawProbeMarker();
+    }
+
+    // ==================================================
+    // ANIMATION
+    // ==================================================
+
+    function animate(
+      now: number
+    ) {
+      const rawDt =
+        (
+          now -
+          previousTime
+        ) /
+        1000;
+
+      previousTime =
+        now;
+
+      const dt =
+        Math.min(
+          rawDt,
+          0.03
+        );
+
+      if (running) {
+        updateParticles(
+          dt
+        );
+
+        if (showTrails) {
+          fadeTrails();
+
+          drawNewTrailSegments();
+        } else {
+          clearTrails();
+        }
+      }
+
+      updateProbe();
+
+      draw();
+
+      requestAnimationFrame(
+        animate
+      );
+    }
+
+    // ==================================================
+    // CONTROL UPDATE
+    // ==================================================
+
+    function readControls() {
+      U =
+        Number(
+          speedSlider.value
+        );
+
+      alpha =
+        Number(
+          alphaSlider.value
+        ) *
+        Math.PI /
+        180;
+
+      epsilon =
+        Number(
+          thicknessSlider.value
+        );
+
+      eta =
+        Number(
+          camberSlider.value
+        );
+
+      showParticles =
+        particlesToggle.checked;
+
+      showTrails =
+        trailsToggle.checked;
+
+      showStreamlines =
+        streamlinesToggle.checked;
+
+      showVectors =
+        vectorsToggle.checked;
+    }
+
+    function modelChanged() {
+      readControls();
+
+      rebuildGeometry();
+
+      seedAllParticles();
+    }
+
+    speedSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+    alphaSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+    thicknessSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+    camberSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+    particlesToggle.addEventListener(
+      "change",
+      () => {
+        showParticles =
+          particlesToggle.checked;
+      }
+    );
+
+    trailsToggle.addEventListener(
+      "change",
+      () => {
+        showTrails =
+          trailsToggle.checked;
+
+        if (!showTrails) {
+          clearTrails();
+        }
+      }
+    );
+
+    streamlinesToggle.addEventListener(
+      "change",
+      () => {
+        showStreamlines =
+          streamlinesToggle.checked;
+      }
+    );
+
+    vectorsToggle.addEventListener(
+      "change",
+      () => {
+        showVectors =
+          vectorsToggle.checked;
+      }
+    );
+
+    // ==================================================
+    // PAUSE / RESET
+    // ==================================================
+
+    pauseButton.addEventListener(
+      "click",
+      () => {
+        running =
+          !running;
+
+        pauseButton.textContent =
+          running
+            ? "Pause"
+            : "Play";
+      }
+    );
+
+    resetButton.addEventListener(
+      "click",
+      () => {
+        speedSlider.value =
+          "1.5";
+
+        alphaSlider.value =
+          "4";
+
+        thicknessSlider.value =
+          "0.12";
+
+        camberSlider.value =
+          "0.06";
+
+        particlesToggle.checked =
+          true;
+
+        trailsToggle.checked =
+          true;
+
+        streamlinesToggle.checked =
+          true;
+
+        vectorsToggle.checked =
+          false;
+
+        running =
+          true;
+
+        pauseButton.textContent =
+          "Pause";
+
+        probeActive =
+          false;
+
+        readControls();
+
+        rebuildGeometry();
+
+        seedAllParticles();
+      }
+    );
+
+    // ==================================================
+    // POINTER PROBE
+    // ==================================================
+
+    function updateProbeFromPointer(
+      event: PointerEvent
+    ) {
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const px =
+        Math.max(
+          0,
+          Math.min(
+            rect.width,
+            event.clientX -
+            rect.left
+          )
+        );
+
+      const py =
+        Math.max(
+          0,
+          Math.min(
+            rect.height,
+            event.clientY -
+            rect.top
+          )
+        );
+
+      probeX =
+        screenToPhysicalX(
+          px
+        );
+
+      probeY =
+        screenToPhysicalY(
+          py
+        );
+    }
+
+    canvas.addEventListener(
+      "pointerenter",
+      event => {
+        probeActive =
+          true;
+
+        updateProbeFromPointer(
+          event
+        );
+      }
+    );
+
+    canvas.addEventListener(
+      "pointermove",
+      event => {
+        probeActive =
+          true;
+
+        updateProbeFromPointer(
+          event
+        );
+      }
+    );
+
+    canvas.addEventListener(
+      "pointerleave",
+      () => {
+        probeActive =
+          false;
+      }
+    );
+
+    // ==================================================
+    // RESIZE
+    // ==================================================
+
+    function resizeCanvasElement(
+      targetCanvas: HTMLCanvasElement,
+      targetContext: CanvasRenderingContext2D
+    ) {
+      const rect =
+        targetCanvas.getBoundingClientRect();
+
+      const dpr =
+        Math.min(
+          window.devicePixelRatio ||
+          1,
+          2
+        );
+
+      const width =
+        Math.max(
+          1,
+          Math.round(
+            rect.width *
+            dpr
+          )
+        );
+
+      const height =
+        Math.max(
+          1,
+          Math.round(
+            rect.height *
+            dpr
+          )
+        );
+
+      if (
+        targetCanvas.width === width &&
+        targetCanvas.height === height
+      ) {
+        return false;
+      }
+
+      targetCanvas.width =
+        width;
+
+      targetCanvas.height =
+        height;
+
+      targetContext.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      return true;
+    }
+
+    function resizeAll() {
+      const mainChanged =
+        resizeCanvasElement(
+          canvas,
+          ctx
+        );
+
+      const cpChanged =
+        resizeCanvasElement(
+          cpCanvas,
+          cpCtx
+        );
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const dpr =
+        Math.min(
+          window.devicePixelRatio ||
+          1,
+          2
+        );
+
+      const trailWidth =
+        Math.max(
+          1,
+          Math.round(
+            rect.width *
+            dpr
+          )
+        );
+
+      const trailHeight =
+        Math.max(
+          1,
+          Math.round(
+            rect.height *
+            dpr
+          )
+        );
+
+      if (
+        trailCanvas.width !==
+        trailWidth ||
+        trailCanvas.height !==
+        trailHeight
+      ) {
+        trailCanvas.width =
+          trailWidth;
+
+        trailCanvas.height =
+          trailHeight;
+
+        trailCtx.setTransform(
+          dpr,
+          0,
+          0,
+          dpr,
+          0,
+          0
+        );
+
+        clearTrails();
+      }
+
+      if (mainChanged) {
+        streamlinesDirty =
+          true;
+      }
+
+      if (cpChanged) {
+        drawCpPlot();
+      }
+    }
+
+    if (
+      "ResizeObserver"
+      in window
+    ) {
+      const observer =
+        new ResizeObserver(
+          resizeAll
+        );
+
+      observer.observe(
+        canvas
+      );
+
+      observer.observe(
+        cpCanvas
+      );
+    } else {
+      window.addEventListener(
+        "resize",
+        resizeAll
+      );
+    }
+
+    // ==================================================
+    // START
+    // ==================================================
+
+    resizeAll();
+
+    readControls();
+
+    rebuildGeometry();
+
+    seedAllParticles();
+
+    requestAnimationFrame(
+      animate
+    );
+  }
+</script>
+
+<style>
+  .joukowski-explorer {
+    max-width: 950px;
+    margin: 2rem auto;
+    overflow: hidden;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.12);
+
+    border-radius: 20px;
+
+    background: #080c11;
+    color: #f5f7fa;
+
+    box-shadow:
+      0 18px 50px
+      rgba(0, 0, 0, 0.18);
+  }
+
+  .canvas-wrap {
+    position: relative;
+    background: #080c11;
+  }
+
+  .flow-canvas {
+    display: block;
+
+    width: 100%;
+    height: 500px;
+
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .canvas-label {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+
+    padding:
+      0.42rem
+      0.68rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.09);
+
+    border-radius: 8px;
+
+    background:
+      rgba(3, 7, 11, 0.55);
+
+    backdrop-filter:
+      blur(8px);
+
+    color:
+      rgba(255, 255, 255, 0.5);
+
+    font-size: 0.72rem;
+
+    pointer-events: none;
+  }
+
+  .probe-panel {
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+
+    width: 150px;
+
+    padding:
+      0.7rem
+      0.75rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.09);
+
+    border-radius: 10px;
+
+    background:
+      rgba(3, 7, 11, 0.72);
+
+    backdrop-filter:
+      blur(10px);
+
+    pointer-events: none;
+  }
+
+  .probe-title {
+    margin-bottom: 0.45rem;
+
+    color:
+      rgba(255, 255, 255, 0.72);
+
+    font-size: 0.68rem;
+    font-weight: 600;
+
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .probe-grid {
+    display: grid;
+
+    grid-template-columns:
+      auto 1fr;
+
+    gap:
+      0.18rem
+      0.6rem;
+
+    font-size: 0.69rem;
+  }
+
+  .probe-grid span {
+    color:
+      rgba(255, 255, 255, 0.4);
+  }
+
+  .probe-grid strong {
+    text-align: right;
+
+    color:
+      rgba(255, 255, 255, 0.78);
+
+    font-weight: 500;
+
+    font-variant-numeric:
+      tabular-nums;
+  }
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+
+    padding: 1.45rem;
+
+    border-top:
+      1px solid
+      rgba(255, 255, 255, 0.09);
+
+    background:
+      linear-gradient(
+        180deg,
+        #0d131a,
+        #090d12
+      );
+  }
+
+  .section-title {
+    color: #798692;
+
+    font-size: 0.72rem;
+    font-weight: 600;
+
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .control-row {
+    display: grid;
+
+    grid-template-columns:
+      180px
+      120px
+      1fr;
+
+    align-items: center;
+
+    gap: 1rem;
+  }
+
+  output {
+    color: #9ca9b5;
+
+    font-size: 0.85rem;
+
+    font-variant-numeric:
+      tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+
+    accent-color: #65c7ff;
+
+    cursor: pointer;
+  }
+
+  .derived-values {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 0.7rem;
+
+    margin-top: 0.15rem;
+  }
+
+  .derived-values > div {
+    display: flex;
+
+    justify-content:
+      space-between;
+
+    align-items: center;
+
+    gap: 1rem;
+
+    padding:
+      0.7rem
+      0.8rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.07);
+
+    border-radius: 9px;
+
+    background:
+      rgba(255, 255, 255, 0.025);
+
+    color: #7f8b96;
+
+    font-size: 0.76rem;
+  }
+
+  .derived-values strong {
+    color: #d4dee7;
+
+    font-weight: 500;
+
+    font-variant-numeric:
+      tabular-nums;
+  }
+
+  .visual-section {
+    padding:
+      0.8rem
+      0;
+
+    border-top:
+      1px solid
+      rgba(255, 255, 255, 0.055);
+
+    border-bottom:
+      1px solid
+      rgba(255, 255, 255, 0.055);
+  }
+
+  .toggle-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 0.7rem;
+
+    margin-top: 0.65rem;
+  }
+
+  .toggle {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.55rem;
+
+    color: #a1abb5;
+
+    font-size: 0.8rem;
+
+    cursor: pointer;
+  }
+
+  .toggle input {
+    width: 15px;
+    height: 15px;
+
+    accent-color: #65c7ff;
+  }
+
+  .cp-section {
+    padding: 1rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.065);
+
+    border-radius: 12px;
+
+    background:
+      rgba(255, 255, 255, 0.02);
+  }
+
+  .cp-heading {
+    display: flex;
+
+    justify-content:
+      space-between;
+
+    align-items:
+      flex-start;
+
+    gap: 1rem;
+
+    margin-bottom:
+      0.75rem;
+  }
+
+  .cp-subtitle {
+    margin-top: 0.2rem;
+
+    color: #6e7b87;
+
+    font-size: 0.74rem;
+  }
+
+  .cp-legend {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.42rem;
+
+    color: #8d99a5;
+
+    font-size: 0.72rem;
+
+    white-space: nowrap;
+  }
+
+  .upper-dot,
+  .lower-dot {
+    width: 8px;
+    height: 8px;
+
+    display: inline-block;
+
+    border-radius: 50%;
+  }
+
+  .upper-dot {
+    background: #67cfff;
+  }
+
+  .lower-dot {
+    margin-left: 0.45rem;
+
+    background: #f1b86a;
+  }
+
+  .cp-canvas {
+    display: block;
+
+    width: 100%;
+    height: 220px;
+
+    border-radius: 8px;
+
+    background: #090e14;
+  }
+
+  .model-details {
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.065);
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    background:
+      rgba(255, 255, 255, 0.018);
+  }
+
+  .model-details summary {
+    padding:
+      0.72rem
+      0.9rem;
+
+    cursor: pointer;
+
+    color: #9ca7b2;
+
+    font-size: 0.8rem;
+
+    user-select: none;
+  }
+
+  .model-details summary:hover {
+    color: #d7dee6;
+  }
+
+  .model-content {
+    padding:
+      0
+      0.9rem
+      0.9rem;
+
+    color: #8d99a4;
+
+    font-size: 0.78rem;
+
+    line-height: 1.6;
+  }
+
+  .model-content p {
+    margin:
+      0.3rem
+      0
+      0.7rem;
+  }
+
+  .model-content ul {
+    padding-left: 1.2rem;
+  }
+
+  .equation {
+    margin:
+      0.45rem
+      0;
+
+    padding:
+      0.55rem
+      0.7rem;
+
+    border-radius: 7px;
+
+    background:
+      rgba(255, 255, 255, 0.035);
+
+    color: #c7d1db;
+
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+
+    font-size: 0.75rem;
+
+    overflow-wrap: anywhere;
+  }
+
+  .model-note {
+    color: #74808c;
+  }
+
+  .bottom-row {
+    display: flex;
+
+    justify-content:
+      space-between;
+
+    align-items: center;
+
+    gap: 1rem;
+  }
+
+  .model-info {
+    color: #7f8b96;
+
+    font-size: 0.79rem;
+  }
+
+  .model-info strong {
+    color: #adb8c2;
+
+    font-weight: 500;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  button {
+    min-height: 38px;
+
+    padding:
+      0.62rem
+      0.95rem;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.15);
+
+    border-radius: 9px;
+
+    background:
+      rgba(255, 255, 255, 0.055);
+
+    color:
+      rgba(255, 255, 255, 0.86);
+
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color:
+      rgba(255, 255, 255, 0.24);
+
+    background:
+      rgba(255, 255, 255, 0.1);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline:
+      2px solid
+      rgba(101, 199, 255, 0.8);
+
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 760px) {
+    .flow-canvas {
+      height: 400px;
+    }
+
+    .control-row {
+      grid-template-columns:
+        1fr auto;
+    }
+
+    .control-row input[type="range"] {
+      grid-column:
+        1 / -1;
+    }
+
+    .derived-values {
+      grid-template-columns: 1fr;
+    }
+
+    .toggle-grid {
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(
+            0,
+            1fr
+          )
+        );
+    }
+
+    .cp-heading {
+      flex-direction: column;
+    }
+
+    .bottom-row {
+      flex-direction: column;
+
+      align-items:
+        flex-start;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .flow-canvas {
+      height: 340px;
+    }
+
+    .canvas-label {
+      display: none;
+    }
+
+    .controls {
+      padding: 1.05rem;
+    }
+
+    .toggle-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cp-canvas {
+      height: 190px;
+    }
+
+    .probe-panel {
+      right: 10px;
+      bottom: 10px;
+
+      width: 138px;
+    }
+  }
+</style>
