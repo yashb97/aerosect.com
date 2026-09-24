@@ -1,0 +1,3320 @@
+<section class="magnetic-pendulum" data-magnetic-pendulum>
+  <div class="canvas-wrap">
+    <canvas
+      aria-label="Interactive magnetic pendulum and basin-of-attraction fractal visualisation"
+    ></canvas>
+
+    <div class="canvas-label" data-canvas-label>
+      Drag the bob, then release
+    </div>
+
+    <div class="mode-badge" data-mode-badge>
+      Live pendulum
+    </div>
+
+    <div class="magnet-legend">
+      <span>Final attractor</span>
+      <div class="magnet-legend-row">
+        <span><i class="swatch swatch-blue"></i>Blue</span>
+        <span><i class="swatch swatch-red"></i>Red</span>
+        <span><i class="swatch swatch-yellow"></i>Yellow</span>
+      </div>
+    </div>
+
+    <div class="map-progress" data-map-progress hidden>
+      <div class="progress-topline">
+        <span>Computing basin</span>
+        <strong data-progress-output>0%</strong>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" data-progress-fill></div>
+      </div>
+      <span class="progress-note">Each pixel is one virtual pendulum</span>
+    </div>
+
+    <div class="probe-panel" data-probe-panel hidden>
+      <div class="probe-title">Starting position</div>
+      <div class="probe-grid">
+        <span>x</span>
+        <strong data-probe-x>—</strong>
+        <span>y</span>
+        <strong data-probe-y>—</strong>
+        <span>Attractor</span>
+        <strong data-probe-winner>—</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label class="control-row">
+      <span>Natural frequency ω₀</span>
+      <output data-frequency-output>1.00 s⁻¹</output>
+      <input
+        data-frequency
+        type="range"
+        min="0.60"
+        max="1.60"
+        step="0.02"
+        value="1.00"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Damping c</span>
+      <output data-damping-output>0.18 s⁻¹</output>
+      <input
+        data-damping
+        type="range"
+        min="0.04"
+        max="0.55"
+        step="0.01"
+        value="0.18"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Magnet strength A</span>
+      <output data-strength-output>0.75 m³/s²</output>
+      <input
+        data-strength
+        type="range"
+        min="0.20"
+        max="1.80"
+        step="0.02"
+        value="0.75"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Vertical magnet gap h</span>
+      <output data-gap-output>0.18 m</output>
+      <input
+        data-gap
+        type="range"
+        min="0.08"
+        max="0.35"
+        step="0.01"
+        value="0.18"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Magnet spacing d</span>
+      <output data-spacing-output>0.92 m</output>
+      <input
+        data-spacing
+        type="range"
+        min="0.65"
+        max="1.20"
+        step="0.01"
+        value="0.92"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Fractal resolution</span>
+      <output data-resolution-output>150 px</output>
+      <input
+        data-resolution
+        type="range"
+        min="90"
+        max="220"
+        step="10"
+        value="150"
+      />
+    </label>
+
+    <div class="start-position-panel">
+      <div class="start-position-header">
+        <div>
+          <strong>Live starting point</strong>
+          <span>Replay the exact basin-map trajectory from any sampled coordinate.</span>
+        </div>
+        <span class="zero-velocity-badge">v₀ = 0</span>
+      </div>
+
+      <div class="start-position-controls">
+        <label class="coordinate-field">
+          <span>x₀</span>
+          <div class="coordinate-input-wrap">
+            <input
+              data-start-x
+              aria-label="Pendulum starting x coordinate"
+              type="number"
+              min="-5"
+              max="5"
+              step="0.000001"
+              value="-1.080000"
+              inputmode="decimal"
+            />
+            <span>m</span>
+          </div>
+        </label>
+
+        <label class="coordinate-field">
+          <span>y₀</span>
+          <div class="coordinate-input-wrap">
+            <input
+              data-start-y
+              aria-label="Pendulum starting y coordinate"
+              type="number"
+              min="-5"
+              max="5"
+              step="0.000001"
+              value="0.620000"
+              inputmode="decimal"
+            />
+            <span>m</span>
+          </div>
+        </label>
+
+        <button class="coordinate-release-button" data-start-release type="button">
+          Set &amp; release
+        </button>
+      </div>
+
+      <div class="start-position-status" data-start-status aria-live="polite">
+        Enter coordinates manually, or click a computed fractal pixel to load it. Set & release replays the same solver used to colour the map.
+      </div>
+    </div>
+
+    <div class="derived-values">
+      <div>
+        <span>Bob speed</span>
+        <strong data-speed-output>0.00 m/s</strong>
+      </div>
+      <div>
+        <span>Current state</span>
+        <strong data-state-output>In motion</strong>
+      </div>
+      <div>
+        <span>Map zoom</span>
+        <strong data-zoom-output>1.00×</strong>
+      </div>
+    </div>
+
+    <div class="map-actions">
+      <button class="primary-button" data-map type="button">
+        Map all starting positions
+      </button>
+      <button data-live type="button">
+        Live pendulum
+      </button>
+    </div>
+
+    <div class="visual-controls">
+      <div class="visual-title">Visual layers</div>
+      <div class="toggle-grid">
+        <label class="toggle">
+          <input data-trail-toggle type="checkbox" checked />
+          <span>Trajectory trail</span>
+        </label>
+
+        <label class="toggle">
+          <input data-field-toggle type="checkbox" checked />
+          <span>Force field</span>
+        </label>
+
+        <label class="toggle">
+          <input data-velocity-toggle type="checkbox" checked />
+          <span>Velocity vector</span>
+        </label>
+
+        <label class="toggle">
+          <input data-capture-toggle type="checkbox" checked />
+          <span>Capture zones</span>
+        </label>
+      </div>
+    </div>
+
+    <details class="model-details">
+      <summary>Model assumptions</summary>
+      <div class="model-content">
+        <p>
+          The bob is represented by its horizontal displacement r = (x, y).
+          Gravity gives a linear restoring force, viscous damping removes energy,
+          and three fixed magnets attract the bob from a vertical distance h.
+        </p>
+
+        <div class="equation">
+          r̈ = −ω₀²r − c ṙ + A Σᵢ (rᵢ − r) / (|rᵢ − r|² + h²)³ᐟ²
+        </div>
+
+        <p>
+          The finite vertical gap h regularises the magnetic force and prevents a
+          singularity directly above a magnet. The basin map launches one virtual
+          pendulum from every coloured pixel with zero initial velocity.
+        </p>
+
+        <ul>
+          <li>Small-angle horizontal pendulum approximation</li>
+          <li>Point-mass bob and fixed point attractors</li>
+          <li>Linear viscous damping</li>
+          <li>Softened inverse-distance magnetic attraction</li>
+          <li>No magnet saturation, hysteresis or bob rotation</li>
+          <li>Map colour denotes the final attracting magnet</li>
+          <li>Coordinate replay uses the same fixed-step integration as the basin map</li>
+        </ul>
+
+        <p class="model-note">
+          This is a qualitative chaos model: it captures sensitive dependence and
+          fractal basin boundaries, not the detailed field of a real magnet geometry.
+        </p>
+      </div>
+    </details>
+
+    <div class="bottom-row">
+      <div class="model-info">
+        <strong>Model:</strong>
+        damped 2-D pendulum + three magnetic attractors
+      </div>
+
+      <div class="buttons">
+        <button data-pause type="button">Pause</button>
+        <button data-reset type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const pendulumExplorers =
+    document.querySelectorAll<HTMLElement>(
+      "[data-magnetic-pendulum]"
+    );
+
+  for (const root of pendulumExplorers) {
+    // ==================================================
+    // ELEMENTS
+    // ==================================================
+
+    const canvas =
+      root.querySelector<HTMLCanvasElement>("canvas");
+
+    const frequencySlider =
+      root.querySelector<HTMLInputElement>("[data-frequency]");
+
+    const dampingSlider =
+      root.querySelector<HTMLInputElement>("[data-damping]");
+
+    const strengthSlider =
+      root.querySelector<HTMLInputElement>("[data-strength]");
+
+    const gapSlider =
+      root.querySelector<HTMLInputElement>("[data-gap]");
+
+    const spacingSlider =
+      root.querySelector<HTMLInputElement>("[data-spacing]");
+
+    const resolutionSlider =
+      root.querySelector<HTMLInputElement>("[data-resolution]");
+
+    const frequencyOutput =
+      root.querySelector<HTMLOutputElement>("[data-frequency-output]");
+
+    const dampingOutput =
+      root.querySelector<HTMLOutputElement>("[data-damping-output]");
+
+    const strengthOutput =
+      root.querySelector<HTMLOutputElement>("[data-strength-output]");
+
+    const gapOutput =
+      root.querySelector<HTMLOutputElement>("[data-gap-output]");
+
+    const spacingOutput =
+      root.querySelector<HTMLOutputElement>("[data-spacing-output]");
+
+    const resolutionOutput =
+      root.querySelector<HTMLOutputElement>("[data-resolution-output]");
+
+    const startXInput =
+      root.querySelector<HTMLInputElement>("[data-start-x]");
+
+    const startYInput =
+      root.querySelector<HTMLInputElement>("[data-start-y]");
+
+    const startReleaseButton =
+      root.querySelector<HTMLButtonElement>("[data-start-release]");
+
+    const startStatus =
+      root.querySelector<HTMLElement>("[data-start-status]");
+
+    const speedOutput =
+      root.querySelector<HTMLElement>("[data-speed-output]");
+
+    const stateOutput =
+      root.querySelector<HTMLElement>("[data-state-output]");
+
+    const zoomOutput =
+      root.querySelector<HTMLElement>("[data-zoom-output]");
+
+    const trailToggle =
+      root.querySelector<HTMLInputElement>("[data-trail-toggle]");
+
+    const fieldToggle =
+      root.querySelector<HTMLInputElement>("[data-field-toggle]");
+
+    const velocityToggle =
+      root.querySelector<HTMLInputElement>("[data-velocity-toggle]");
+
+    const captureToggle =
+      root.querySelector<HTMLInputElement>("[data-capture-toggle]");
+
+    const mapButton =
+      root.querySelector<HTMLButtonElement>("[data-map]");
+
+    const liveButton =
+      root.querySelector<HTMLButtonElement>("[data-live]");
+
+    const pauseButton =
+      root.querySelector<HTMLButtonElement>("[data-pause]");
+
+    const resetButton =
+      root.querySelector<HTMLButtonElement>("[data-reset]");
+
+    const canvasLabel =
+      root.querySelector<HTMLElement>("[data-canvas-label]");
+
+    const modeBadge =
+      root.querySelector<HTMLElement>("[data-mode-badge]");
+
+    const mapProgress =
+      root.querySelector<HTMLElement>("[data-map-progress]");
+
+    const progressOutput =
+      root.querySelector<HTMLElement>("[data-progress-output]");
+
+    const progressFill =
+      root.querySelector<HTMLElement>("[data-progress-fill]");
+
+    const probePanel =
+      root.querySelector<HTMLElement>("[data-probe-panel]");
+
+    const probeXOutput =
+      root.querySelector<HTMLElement>("[data-probe-x]");
+
+    const probeYOutput =
+      root.querySelector<HTMLElement>("[data-probe-y]");
+
+    const probeWinnerOutput =
+      root.querySelector<HTMLElement>("[data-probe-winner]");
+
+    if (
+      !canvas ||
+      !frequencySlider ||
+      !dampingSlider ||
+      !strengthSlider ||
+      !gapSlider ||
+      !spacingSlider ||
+      !resolutionSlider ||
+      !frequencyOutput ||
+      !dampingOutput ||
+      !strengthOutput ||
+      !gapOutput ||
+      !spacingOutput ||
+      !resolutionOutput ||
+      !startXInput ||
+      !startYInput ||
+      !startReleaseButton ||
+      !startStatus ||
+      !speedOutput ||
+      !stateOutput ||
+      !zoomOutput ||
+      !trailToggle ||
+      !fieldToggle ||
+      !velocityToggle ||
+      !captureToggle ||
+      !mapButton ||
+      !liveButton ||
+      !pauseButton ||
+      !resetButton ||
+      !canvasLabel ||
+      !modeBadge ||
+      !mapProgress ||
+      !progressOutput ||
+      !progressFill ||
+      !probePanel ||
+      !probeXOutput ||
+      !probeYOutput ||
+      !probeWinnerOutput
+    ) {
+      continue;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      continue;
+    }
+
+    // ==================================================
+    // COLOURS / CONSTANTS
+    // ==================================================
+
+    const magnetColours = [
+      "#58b9ff",
+      "#ff667a",
+      "#ffc857"
+    ];
+
+    const magnetRgb = [
+      [88, 185, 255],
+      [255, 102, 122],
+      [255, 200, 87]
+    ];
+
+    const magnetNames = [
+      "Blue",
+      "Red",
+      "Yellow"
+    ];
+
+    const baseLiveHalfWidth = 1.8;
+    const baseMapHalfWidth = 1.8;
+    const coordinateLimit = 5;
+    const captureRadius = 0.115;
+    const mapDt = 0.03;
+    const mapMaxSteps = 1000;
+
+    // ==================================================
+    // MODEL STATE
+    // ==================================================
+
+    let omega0 = 1.0;
+    let damping = 0.18;
+    let magnetStrength = 0.75;
+    let magnetGap = 0.18;
+    let magnetSpacing = 0.92;
+
+    let showTrail = true;
+    let showField = true;
+    let showVelocity = true;
+    let showCaptureZones = true;
+
+    let bobX = -1.08;
+    let bobY = 0.62;
+    let bobVx = 0;
+    let bobVy = 0;
+
+    let releaseStartX = bobX;
+    let releaseStartY = bobY;
+    let reportedOutcome = -1;
+
+    let mapReplayActive = false;
+    let mapReplayStep = 0;
+
+    let running = true;
+    let settledMagnet = -1;
+    let settledTime = 0;
+
+    let previousTime = performance.now();
+    let integrationAccumulator = 0;
+
+    // ==================================================
+    // MAGNET GEOMETRY
+    // ==================================================
+
+    const magnetX = new Float64Array(3);
+    const magnetY = new Float64Array(3);
+
+    function updateMagnetPositions() {
+      const triangleHeight =
+        Math.sqrt(3) * magnetSpacing / 2;
+
+      magnetX[0] = 0;
+      magnetY[0] = 2 * triangleHeight / 3;
+
+      magnetX[1] = -magnetSpacing / 2;
+      magnetY[1] = -triangleHeight / 3;
+
+      magnetX[2] = magnetSpacing / 2;
+      magnetY[2] = -triangleHeight / 3;
+    }
+
+    // ==================================================
+    // VIEW STATE
+    // ==================================================
+
+    let mode: "live" | "map" = "live";
+
+    let liveHalfWidth = baseLiveHalfWidth;
+
+    let mapCenterX = 0;
+    let mapCenterY = 0;
+    let mapHalfWidth = baseMapHalfWidth;
+
+    function canvasAspect() {
+      return Math.max(
+        0.35,
+        canvas.clientWidth /
+          Math.max(1, canvas.clientHeight)
+      );
+    }
+
+    function currentViewBounds() {
+      const halfWidth =
+        mode === "map"
+          ? mapHalfWidth
+          : liveHalfWidth;
+
+      const centreX =
+        mode === "map"
+          ? mapCenterX
+          : 0;
+
+      const centreY =
+        mode === "map"
+          ? mapCenterY
+          : 0;
+
+      const halfHeight =
+        halfWidth / canvasAspect();
+
+      return {
+        xmin: centreX - halfWidth,
+        xmax: centreX + halfWidth,
+        ymin: centreY - halfHeight,
+        ymax: centreY + halfHeight
+      };
+    }
+
+    function worldToScreenX(x: number) {
+      const bounds = currentViewBounds();
+
+      return (
+        (x - bounds.xmin) /
+        (bounds.xmax - bounds.xmin) *
+        canvas.clientWidth
+      );
+    }
+
+    function worldToScreenY(y: number) {
+      const bounds = currentViewBounds();
+
+      return (
+        canvas.clientHeight -
+        (y - bounds.ymin) /
+        (bounds.ymax - bounds.ymin) *
+        canvas.clientHeight
+      );
+    }
+
+    function screenToWorld(
+      px: number,
+      py: number
+    ) {
+      const bounds = currentViewBounds();
+
+      return {
+        x:
+          bounds.xmin +
+          px / canvas.clientWidth *
+          (bounds.xmax - bounds.xmin),
+
+        y:
+          bounds.ymax -
+          py / canvas.clientHeight *
+          (bounds.ymax - bounds.ymin)
+      };
+    }
+
+    // ==================================================
+    // PHYSICS
+    // ==================================================
+
+    function accelerationAt(
+      x: number,
+      y: number,
+      vx: number,
+      vy: number
+    ) {
+      let ax =
+        -omega0 * omega0 * x -
+        damping * vx;
+
+      let ay =
+        -omega0 * omega0 * y -
+        damping * vy;
+
+      const h2 = magnetGap * magnetGap;
+
+      for (let i = 0; i < 3; i++) {
+        const dx = magnetX[i] - x;
+        const dy = magnetY[i] - y;
+
+        const r2 =
+          dx * dx +
+          dy * dy +
+          h2;
+
+        const invR3 =
+          1 / (r2 * Math.sqrt(r2));
+
+        ax +=
+          magnetStrength * dx * invR3;
+
+        ay +=
+          magnetStrength * dy * invR3;
+      }
+
+      return { ax, ay };
+    }
+
+    function integrateLive(step: number) {
+      // RK2 midpoint method.
+      const a1 = accelerationAt(
+        bobX,
+        bobY,
+        bobVx,
+        bobVy
+      );
+
+      const midX =
+        bobX + 0.5 * bobVx * step;
+
+      const midY =
+        bobY + 0.5 * bobVy * step;
+
+      const midVx =
+        bobVx + 0.5 * a1.ax * step;
+
+      const midVy =
+        bobVy + 0.5 * a1.ay * step;
+
+      const a2 = accelerationAt(
+        midX,
+        midY,
+        midVx,
+        midVy
+      );
+
+      bobX += midVx * step;
+      bobY += midVy * step;
+      bobVx += a2.ax * step;
+      bobVy += a2.ay * step;
+
+      detectLiveCapture(step);
+      appendTrailPoint();
+    }
+
+    function integrateMapReplay() {
+      if (settledMagnet >= 0) {
+        bobX +=
+          (magnetX[settledMagnet] - bobX) * 0.10;
+
+        bobY +=
+          (magnetY[settledMagnet] - bobY) * 0.10;
+
+        bobVx *= 0.74;
+        bobVy *= 0.74;
+
+        appendTrailPoint();
+        return;
+      }
+
+      // This deliberately matches classifyStartingPosition():
+      // semi-implicit Euler, the same dt, the same capture
+      // threshold and the same finite-time fallback.
+      const acceleration = accelerationAt(
+        bobX,
+        bobY,
+        bobVx,
+        bobVy
+      );
+
+      bobVx += acceleration.ax * mapDt;
+      bobVy += acceleration.ay * mapDt;
+
+      bobX += bobVx * mapDt;
+      bobY += bobVy * mapDt;
+
+      if (mapReplayStep > 35) {
+        const speedSquared =
+          bobVx * bobVx +
+          bobVy * bobVy;
+
+        if (speedSquared < 0.06) {
+          for (let i = 0; i < 3; i++) {
+            const dx = bobX - magnetX[i];
+            const dy = bobY - magnetY[i];
+
+            if (
+              dx * dx + dy * dy <
+              captureRadius * captureRadius
+            ) {
+              settledMagnet = i;
+              settledTime = 0;
+              break;
+            }
+          }
+        }
+      }
+
+      mapReplayStep++;
+
+      if (
+        settledMagnet < 0 &&
+        mapReplayStep >= mapMaxSteps
+      ) {
+        let nearest = 0;
+        let nearestR2 = Infinity;
+
+        for (let i = 0; i < 3; i++) {
+          const dx = bobX - magnetX[i];
+          const dy = bobY - magnetY[i];
+          const r2 = dx * dx + dy * dy;
+
+          if (r2 < nearestR2) {
+            nearestR2 = r2;
+            nearest = i;
+          }
+        }
+
+        settledMagnet = nearest;
+      }
+
+      appendTrailPoint();
+    }
+
+    function detectLiveCapture(step: number) {
+      const speedSquared =
+        bobVx * bobVx +
+        bobVy * bobVy;
+
+      let nearest = -1;
+      let nearestR2 = Infinity;
+
+      for (let i = 0; i < 3; i++) {
+        const dx = bobX - magnetX[i];
+        const dy = bobY - magnetY[i];
+        const r2 = dx * dx + dy * dy;
+
+        if (r2 < nearestR2) {
+          nearestR2 = r2;
+          nearest = i;
+        }
+      }
+
+      const captured =
+        nearestR2 < captureRadius * captureRadius &&
+        speedSquared < 0.06;
+
+      if (captured) {
+        settledTime += step;
+
+        if (settledTime > 0.34) {
+          settledMagnet = nearest;
+
+          bobX +=
+            (magnetX[nearest] - bobX) * 0.12;
+
+          bobY +=
+            (magnetY[nearest] - bobY) * 0.12;
+
+          bobVx *= 0.82;
+          bobVy *= 0.82;
+        }
+      } else {
+        settledTime = 0;
+        settledMagnet = -1;
+      }
+    }
+
+    // ==================================================
+    // TRAJECTORY BUFFER
+    // ==================================================
+
+    const trailCapacity = 1100;
+    const trailX = new Float32Array(trailCapacity);
+    const trailY = new Float32Array(trailCapacity);
+
+    let trailStart = 0;
+    let trailLength = 0;
+    let trailSampleCounter = 0;
+
+    function clearTrail() {
+      trailStart = 0;
+      trailLength = 0;
+      trailSampleCounter = 0;
+    }
+
+    function appendTrailPoint(force = false) {
+      trailSampleCounter++;
+
+      if (!force && trailSampleCounter % 2 !== 0) {
+        return;
+      }
+
+      const index =
+        (trailStart + trailLength) %
+        trailCapacity;
+
+      trailX[index] = bobX;
+      trailY[index] = bobY;
+
+      if (trailLength < trailCapacity) {
+        trailLength++;
+      } else {
+        trailStart =
+          (trailStart + 1) %
+          trailCapacity;
+      }
+    }
+
+    // ==================================================
+    // FRACTAL MAP STORAGE
+    // ==================================================
+
+    const mapCanvas = document.createElement("canvas");
+    const mapCtx = mapCanvas.getContext("2d");
+
+    if (!mapCtx) {
+      continue;
+    }
+
+    let mapImageData: ImageData | null = null;
+    let mapWinners: Int8Array | null = null;
+
+    let mapWidth = 0;
+    let mapHeight = 0;
+    let mapPixelIndex = 0;
+    let mapGenerationId = 0;
+    let mapComputing = false;
+    let mapHasImage = false;
+
+    let mappedXmin = 0;
+    let mappedXmax = 0;
+    let mappedYmin = 0;
+    let mappedYmax = 0;
+
+    let remapTimer: number | null = null;
+
+    function cancelScheduledRemap() {
+      if (remapTimer !== null) {
+        window.clearTimeout(remapTimer);
+        remapTimer = null;
+      }
+    }
+
+    function scheduleRemap(delay = 260) {
+      if (mode !== "map") {
+        return;
+      }
+
+      cancelScheduledRemap();
+
+      remapTimer = window.setTimeout(
+        () => {
+          remapTimer = null;
+          startFractalMap();
+        },
+        delay
+      );
+    }
+
+    function cancelMapComputation() {
+      mapGenerationId++;
+      mapComputing = false;
+      mapProgress.hidden = true;
+    }
+
+    function classifyStartingPosition(
+      startX: number,
+      startY: number
+    ) {
+      let x = startX;
+      let y = startY;
+      let vx = 0;
+      let vy = 0;
+
+      const h2 = magnetGap * magnetGap;
+      const omegaSquared = omega0 * omega0;
+      const captureSquared =
+        captureRadius * captureRadius;
+
+      let winner = 3;
+      let step = 0;
+
+      for (
+        step = 0;
+        step < mapMaxSteps;
+        step++
+      ) {
+        let ax =
+          -omegaSquared * x -
+          damping * vx;
+
+        let ay =
+          -omegaSquared * y -
+          damping * vy;
+
+        for (let i = 0; i < 3; i++) {
+          const dx = magnetX[i] - x;
+          const dy = magnetY[i] - y;
+
+          const r2 =
+            dx * dx +
+            dy * dy +
+            h2;
+
+          const invR3 =
+            1 / (r2 * Math.sqrt(r2));
+
+          ax += magnetStrength * dx * invR3;
+          ay += magnetStrength * dy * invR3;
+        }
+
+        // Semi-implicit Euler is stable and inexpensive for
+        // the thousands of independent basin trajectories.
+        vx += ax * mapDt;
+        vy += ay * mapDt;
+
+        x += vx * mapDt;
+        y += vy * mapDt;
+
+        if (step > 35) {
+          const speedSquared =
+            vx * vx + vy * vy;
+
+          if (speedSquared < 0.06) {
+            for (let i = 0; i < 3; i++) {
+              const dx = x - magnetX[i];
+              const dy = y - magnetY[i];
+
+              if (
+                dx * dx + dy * dy <
+                captureSquared
+              ) {
+                winner = i;
+                return (step << 2) | winner;
+              }
+            }
+          }
+        }
+      }
+
+      // Extremely long-lived trajectories are assigned to
+      // the nearest attractor at the end of the integration.
+      let nearest = 0;
+      let nearestR2 = Infinity;
+
+      for (let i = 0; i < 3; i++) {
+        const dx = x - magnetX[i];
+        const dy = y - magnetY[i];
+        const r2 = dx * dx + dy * dy;
+
+        if (r2 < nearestR2) {
+          nearestR2 = r2;
+          nearest = i;
+        }
+      }
+
+      winner = nearest;
+      return (mapMaxSteps << 2) | winner;
+    }
+
+    function startFractalMap() {
+      cancelScheduledRemap();
+      cancelMapComputation();
+
+      mode = "map";
+      updateModeUi();
+
+      const generationId = mapGenerationId;
+
+      const requestedWidth =
+        Math.max(
+          70,
+          Math.round(
+            Number(resolutionSlider.value)
+          )
+        );
+
+      const aspect = canvasAspect();
+
+      mapWidth = requestedWidth;
+      mapHeight = Math.max(
+        54,
+        Math.round(requestedWidth / aspect)
+      );
+
+      mapCanvas.width = mapWidth;
+      mapCanvas.height = mapHeight;
+
+      mapImageData =
+        mapCtx.createImageData(
+          mapWidth,
+          mapHeight
+        );
+
+      mapWinners =
+        new Int8Array(
+          mapWidth * mapHeight
+        );
+
+      mapWinners.fill(-1);
+
+      const bounds = currentViewBounds();
+
+      mappedXmin = bounds.xmin;
+      mappedXmax = bounds.xmax;
+      mappedYmin = bounds.ymin;
+      mappedYmax = bounds.ymax;
+
+      mapPixelIndex = 0;
+      mapComputing = true;
+      mapHasImage = false;
+
+      mapProgress.hidden = false;
+      progressOutput.textContent = "0%";
+      progressFill.style.width = "0%";
+
+      processMapChunk(generationId);
+    }
+
+    function processMapChunk(generationId: number) {
+      if (
+        generationId !== mapGenerationId ||
+        !mapComputing ||
+        !mapImageData ||
+        !mapWinners
+      ) {
+        return;
+      }
+
+      const total = mapWidth * mapHeight;
+      const chunkStart = performance.now();
+      const pixels = mapImageData.data;
+
+      while (
+        mapPixelIndex < total &&
+        performance.now() - chunkStart < 10
+      ) {
+        const px = mapPixelIndex % mapWidth;
+        const py = Math.floor(
+          mapPixelIndex / mapWidth
+        );
+
+        const x =
+          mappedXmin +
+          (px + 0.5) / mapWidth *
+          (mappedXmax - mappedXmin);
+
+        const y =
+          mappedYmax -
+          (py + 0.5) / mapHeight *
+          (mappedYmax - mappedYmin);
+
+        const encoded =
+          classifyStartingPosition(x, y);
+
+        const winner = encoded & 3;
+        const settlingSteps = encoded >> 2;
+
+        mapWinners[mapPixelIndex] = winner;
+
+        const rgb = magnetRgb[winner];
+
+        // Fast captures are brighter. Long chaotic
+        // transients darken the fine basin boundaries.
+        const settlingFraction =
+          Math.min(
+            1,
+            settlingSteps / mapMaxSteps
+          );
+
+        const brightness =
+          0.92 - 0.30 * settlingFraction;
+
+        const offset = mapPixelIndex * 4;
+
+        pixels[offset] =
+          Math.round(rgb[0] * brightness);
+
+        pixels[offset + 1] =
+          Math.round(rgb[1] * brightness);
+
+        pixels[offset + 2] =
+          Math.round(rgb[2] * brightness);
+
+        pixels[offset + 3] = 255;
+
+        mapPixelIndex++;
+      }
+
+      mapCtx.putImageData(
+        mapImageData,
+        0,
+        0
+      );
+
+      mapHasImage = true;
+
+      const progress =
+        mapPixelIndex / total;
+
+      progressOutput.textContent =
+        `${Math.round(progress * 100)}%`;
+
+      progressFill.style.width =
+        `${progress * 100}%`;
+
+      if (mapPixelIndex < total) {
+        requestAnimationFrame(
+          () => processMapChunk(generationId)
+        );
+      } else {
+        mapComputing = false;
+        mapProgress.hidden = true;
+      }
+    }
+
+    // ==================================================
+    // DRAWING HELPERS
+    // ==================================================
+
+    function drawBackground() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      const gradient =
+        ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          height
+        );
+
+      gradient.addColorStop(0, "#091018");
+      gradient.addColorStop(1, "#06090d");
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.035)";
+      ctx.lineWidth = 1;
+
+      const spacing = 50;
+
+      for (let x = 0; x <= width; x += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y <= height; y += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawMapRaster() {
+      if (!mapHasImage) {
+        drawMapPlaceholder();
+        return;
+      }
+
+      const left = worldToScreenX(mappedXmin);
+      const right = worldToScreenX(mappedXmax);
+      const top = worldToScreenY(mappedYmax);
+      const bottom = worldToScreenY(mappedYmin);
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.globalAlpha = mapComputing ? 0.92 : 1;
+
+      ctx.drawImage(
+        mapCanvas,
+        left,
+        top,
+        right - left,
+        bottom - top
+      );
+
+      ctx.restore();
+
+      // Subtle dark wash keeps overlays readable.
+      ctx.fillStyle = "rgba(2,5,8,0.07)";
+      ctx.fillRect(
+        0,
+        0,
+        canvas.clientWidth,
+        canvas.clientHeight
+      );
+    }
+
+    function drawMapPlaceholder() {
+      ctx.save();
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.38)";
+
+      ctx.font =
+        "13px system-ui, sans-serif";
+
+      ctx.textAlign = "center";
+
+      ctx.fillText(
+        "Computing basin of attraction…",
+        canvas.clientWidth / 2,
+        canvas.clientHeight / 2
+      );
+
+      ctx.restore();
+    }
+
+    function drawForceField() {
+      if (!showField || mode !== "live") {
+        return;
+      }
+
+      const horizontalCount = Math.max(
+        11,
+        Math.floor(canvas.clientWidth / 75)
+      );
+
+      const verticalCount = Math.max(
+        7,
+        Math.floor(canvas.clientHeight / 70)
+      );
+
+      const bounds = currentViewBounds();
+
+      for (
+        let iy = 0;
+        iy < verticalCount;
+        iy++
+      ) {
+        for (
+          let ix = 0;
+          ix < horizontalCount;
+          ix++
+        ) {
+          const x =
+            bounds.xmin +
+            (ix + 0.5) /
+            horizontalCount *
+            (bounds.xmax - bounds.xmin);
+
+          const y =
+            bounds.ymin +
+            (iy + 0.5) /
+            verticalCount *
+            (bounds.ymax - bounds.ymin);
+
+          const acceleration =
+            accelerationAt(x, y, 0, 0);
+
+          const magnitude = Math.hypot(
+            acceleration.ax,
+            acceleration.ay
+          );
+
+          if (magnitude < 1e-8) {
+            continue;
+          }
+
+          const ux = acceleration.ax / magnitude;
+          const uy = acceleration.ay / magnitude;
+
+          const length =
+            7 +
+            12 * Math.min(magnitude / 5, 1);
+
+          drawArrow(
+            worldToScreenX(x),
+            worldToScreenY(y),
+            ux * length,
+            -uy * length,
+            0.10 + 0.18 * Math.min(magnitude / 5, 1)
+          );
+        }
+      }
+    }
+
+    function drawArrow(
+      x: number,
+      y: number,
+      dx: number,
+      dy: number,
+      opacity: number
+    ) {
+      const endX = x + dx;
+      const endY = y + dy;
+
+      const angle = Math.atan2(dy, dx);
+      const headLength = 4;
+
+      ctx.strokeStyle =
+        `rgba(205,231,246,${opacity})`;
+
+      ctx.fillStyle =
+        `rgba(205,231,246,${opacity})`;
+
+      ctx.lineWidth = 0.8;
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(endX, endY);
+      ctx.lineTo(
+        endX - headLength *
+          Math.cos(angle - Math.PI / 6),
+        endY - headLength *
+          Math.sin(angle - Math.PI / 6)
+      );
+      ctx.lineTo(
+        endX - headLength *
+          Math.cos(angle + Math.PI / 6),
+        endY - headLength *
+          Math.sin(angle + Math.PI / 6)
+      );
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawPivot() {
+      if (mode !== "live") {
+        return;
+      }
+
+      const px = worldToScreenX(0);
+      const py = worldToScreenY(0);
+
+      ctx.save();
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.20)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.arc(px, py, 7, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(px - 11, py);
+      ctx.lineTo(px + 11, py);
+      ctx.moveTo(px, py - 11);
+      ctx.lineTo(px, py + 11);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawMagnets() {
+      for (let i = 0; i < 3; i++) {
+        const px = worldToScreenX(magnetX[i]);
+        const py = worldToScreenY(magnetY[i]);
+
+        if (showCaptureZones) {
+          const edgeX =
+            worldToScreenX(
+              magnetX[i] + captureRadius
+            );
+
+          const capturePixels =
+            Math.abs(edgeX - px);
+
+          ctx.save();
+          ctx.setLineDash([4, 5]);
+          ctx.strokeStyle =
+            `${magnetColours[i]}66`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(
+            px,
+            py,
+            Math.max(7, capturePixels),
+            0,
+            Math.PI * 2
+          );
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        const halo = ctx.createRadialGradient(
+          px,
+          py,
+          0,
+          px,
+          py,
+          27
+        );
+
+        halo.addColorStop(
+          0,
+          `${magnetColours[i]}42`
+        );
+
+        halo.addColorStop(
+          1,
+          `${magnetColours[i]}00`
+        );
+
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(px, py, 27, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(px, py, 10.5, 0, Math.PI * 2);
+        ctx.fillStyle = magnetColours[i];
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(px, py, 10.5, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,255,255,0.46)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    function drawTrail() {
+      if (
+        mode !== "live" ||
+        !showTrail ||
+        trailLength < 2
+      ) {
+        return;
+      }
+
+      ctx.save();
+      ctx.lineWidth = 1.35;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+
+      for (let segment = 1; segment < trailLength; segment++) {
+        const previousIndex =
+          (trailStart + segment - 1) %
+          trailCapacity;
+
+        const currentIndex =
+          (trailStart + segment) %
+          trailCapacity;
+
+        const alpha =
+          0.06 +
+          0.55 * segment / trailLength;
+
+        ctx.strokeStyle =
+          `rgba(219,239,250,${alpha})`;
+
+        ctx.beginPath();
+        ctx.moveTo(
+          worldToScreenX(trailX[previousIndex]),
+          worldToScreenY(trailY[previousIndex])
+        );
+        ctx.lineTo(
+          worldToScreenX(trailX[currentIndex]),
+          worldToScreenY(trailY[currentIndex])
+        );
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawBob() {
+      if (mode !== "live") {
+        return;
+      }
+
+      const px = worldToScreenX(bobX);
+      const py = worldToScreenY(bobY);
+      const pivotX = worldToScreenX(0);
+      const pivotY = worldToScreenY(0);
+
+      // Top-view projection of the pendulum rod.
+      ctx.strokeStyle =
+        "rgba(230,240,246,0.18)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pivotX, pivotY);
+      ctx.lineTo(px, py);
+      ctx.stroke();
+
+      const halo = ctx.createRadialGradient(
+        px,
+        py,
+        0,
+        px,
+        py,
+        25
+      );
+
+      halo.addColorStop(
+        0,
+        "rgba(235,247,255,0.20)"
+      );
+      halo.addColorStop(
+        1,
+        "rgba(235,247,255,0)"
+      );
+
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(px, py, 25, 0, Math.PI * 2);
+      ctx.fill();
+
+      const bobGradient = ctx.createRadialGradient(
+        px - 4,
+        py - 5,
+        2,
+        px,
+        py,
+        13
+      );
+
+      bobGradient.addColorStop(0, "#f8fcff");
+      bobGradient.addColorStop(0.38, "#d9e5ed");
+      bobGradient.addColorStop(1, "#74828d");
+
+      ctx.fillStyle = bobGradient;
+      ctx.beginPath();
+      ctx.arc(px, py, 10.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.55)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      if (showVelocity) {
+        const speed = Math.hypot(bobVx, bobVy);
+
+        if (speed > 0.015) {
+          const scale =
+            28 / Math.max(1.1, speed);
+
+          drawArrow(
+            px,
+            py,
+            bobVx * scale,
+            -bobVy * scale,
+            0.72
+          );
+        }
+      }
+    }
+
+    function drawMapCrosshair() {
+      if (
+        mode !== "map" ||
+        !probeActive
+      ) {
+        return;
+      }
+
+      const px = worldToScreenX(probeX);
+      const py = worldToScreenY(probeY);
+
+      ctx.save();
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.70)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(px - 8, py);
+      ctx.lineTo(px + 8, py);
+      ctx.moveTo(px, py - 8);
+      ctx.lineTo(px, py + 8);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function draw() {
+      drawBackground();
+
+      if (mode === "map") {
+        drawMapRaster();
+        drawMagnets();
+        drawMapCrosshair();
+      } else {
+        drawForceField();
+        drawPivot();
+        drawMagnets();
+        drawTrail();
+        drawBob();
+      }
+    }
+
+    // ==================================================
+    // OUTPUTS / UI STATE
+    // ==================================================
+
+    function updateControlOutputs() {
+      omega0 = Number(frequencySlider.value);
+      damping = Number(dampingSlider.value);
+      magnetStrength = Number(strengthSlider.value);
+      magnetGap = Number(gapSlider.value);
+      magnetSpacing = Number(spacingSlider.value);
+
+      showTrail = trailToggle.checked;
+      showField = fieldToggle.checked;
+      showVelocity = velocityToggle.checked;
+      showCaptureZones = captureToggle.checked;
+
+      frequencyOutput.value =
+        `${omega0.toFixed(2)} s⁻¹`;
+
+      dampingOutput.value =
+        `${damping.toFixed(2)} s⁻¹`;
+
+      strengthOutput.value =
+        `${magnetStrength.toFixed(2)} m³/s²`;
+
+      gapOutput.value =
+        `${magnetGap.toFixed(2)} m`;
+
+      spacingOutput.value =
+        `${magnetSpacing.toFixed(2)} m`;
+
+      resolutionOutput.value =
+        `${Math.round(Number(resolutionSlider.value))} px`;
+
+      updateMagnetPositions();
+    }
+
+    function updateDynamicOutputs() {
+      const speed = Math.hypot(bobVx, bobVy);
+
+      speedOutput.textContent =
+        `${speed.toFixed(2)} m/s`;
+
+      if (settledMagnet >= 0) {
+        stateOutput.textContent =
+          `${magnetNames[settledMagnet]} magnet`;
+
+        stateOutput.style.color =
+          magnetColours[settledMagnet];
+      } else {
+        stateOutput.textContent =
+          mode === "map"
+            ? mapComputing
+              ? "Mapping basins"
+              : "Fractal map"
+            : "In motion";
+
+        stateOutput.style.color = "";
+      }
+
+      zoomOutput.textContent =
+        `${(baseMapHalfWidth / mapHalfWidth).toFixed(2)}×`;
+
+      if (
+        settledMagnet >= 0 &&
+        settledMagnet !== reportedOutcome
+      ) {
+        reportedOutcome = settledMagnet;
+
+        startStatus.textContent =
+          `Start (${releaseStartX.toFixed(6)}, ${releaseStartY.toFixed(6)}) m → ${magnetNames[settledMagnet]} magnet`;
+
+        startStatus.style.color =
+          magnetColours[settledMagnet];
+      }
+    }
+
+    function updateModeUi() {
+      const mapMode = mode === "map";
+
+      modeBadge.textContent =
+        mapMode
+          ? "Basin fractal"
+          : "Live pendulum";
+
+      canvasLabel.textContent =
+        mapMode
+          ? "Click to load point · Scroll to zoom · Drag to pan"
+          : "Drag the bob, or enter an exact starting coordinate";
+
+      canvas.style.cursor =
+        mapMode
+          ? isPanning
+            ? "grabbing"
+            : "grab"
+          : isDraggingBob
+            ? "grabbing"
+            : "crosshair";
+
+      liveButton.classList.toggle(
+        "active",
+        !mapMode
+      );
+
+      mapButton.classList.toggle(
+        "active",
+        mapMode
+      );
+
+      if (!mapMode) {
+        mapProgress.hidden = true;
+        probePanel.hidden = true;
+      }
+    }
+
+    function invalidateMapFromPhysicsChange() {
+      updateControlOutputs();
+
+      if (mode === "map") {
+        scheduleRemap(240);
+      }
+    }
+
+    // ==================================================
+    // EXACT STARTING-POINT REPLAY
+    // ==================================================
+
+    function syncStartInputs(
+      x: number,
+      y: number
+    ) {
+      startXInput.value = x.toFixed(6);
+      startYInput.value = y.toFixed(6);
+    }
+
+    function makeLivePointVisible(
+      x: number,
+      y: number
+    ) {
+      const requiredHalfWidth = Math.max(
+        baseLiveHalfWidth,
+        Math.abs(x) * 1.16,
+        Math.abs(y) * canvasAspect() * 1.16
+      );
+
+      liveHalfWidth = Math.min(
+        coordinateLimit * 1.2,
+        requiredHalfWidth
+      );
+    }
+
+    function recordReleasePoint(
+      x: number,
+      y: number,
+      message: string
+    ) {
+      releaseStartX = x;
+      releaseStartY = y;
+      reportedOutcome = -1;
+
+      syncStartInputs(x, y);
+
+      startStatus.textContent = message;
+      startStatus.style.color = "";
+    }
+
+    function placeBobAtRest(
+      x: number,
+      y: number
+    ) {
+      bobX = x;
+      bobY = y;
+      bobVx = 0;
+      bobVy = 0;
+      settledMagnet = -1;
+      settledTime = 0;
+      integrationAccumulator = 0;
+
+      clearTrail();
+      appendTrailPoint(true);
+    }
+
+    function releaseFromCoordinateInputs() {
+      const x = Number(startXInput.value);
+      const y = Number(startYInput.value);
+
+      if (
+        !Number.isFinite(x) ||
+        !Number.isFinite(y)
+      ) {
+        startStatus.textContent =
+          "Enter finite numeric values for both x₀ and y₀.";
+        startStatus.style.color = "#ff8a98";
+        return;
+      }
+
+      if (
+        Math.abs(x) > coordinateLimit ||
+        Math.abs(y) > coordinateLimit
+      ) {
+        startStatus.textContent =
+          `Use coordinates between −${coordinateLimit} m and +${coordinateLimit} m.`;
+        startStatus.style.color = "#ff8a98";
+        return;
+      }
+
+      cancelScheduledRemap();
+      cancelMapComputation();
+
+      mode = "live";
+      probeActive = false;
+      probePanel.hidden = true;
+      isDraggingBob = false;
+      isPanning = false;
+
+      makeLivePointVisible(x, y);
+      placeBobAtRest(x, y);
+
+      mapReplayActive = true;
+      mapReplayStep = 0;
+
+      running = true;
+      pauseButton.textContent = "Pause";
+
+      recordReleasePoint(
+        x,
+        y,
+        `Replaying basin trajectory from (${x.toFixed(6)}, ${y.toFixed(6)}) m with v₀ = 0`
+      );
+
+      updateModeUi();
+    }
+
+    function sampledMapPointAt(
+      x: number,
+      y: number
+    ) {
+      if (
+        !mapWinners ||
+        !mapHasImage ||
+        x < mappedXmin ||
+        x > mappedXmax ||
+        y < mappedYmin ||
+        y > mappedYmax
+      ) {
+        return null;
+      }
+
+      const px = Math.max(
+        0,
+        Math.min(
+          mapWidth - 1,
+          Math.floor(
+            (x - mappedXmin) /
+            (mappedXmax - mappedXmin) *
+            mapWidth
+          )
+        )
+      );
+
+      const py = Math.max(
+        0,
+        Math.min(
+          mapHeight - 1,
+          Math.floor(
+            (mappedYmax - y) /
+            (mappedYmax - mappedYmin) *
+            mapHeight
+          )
+        )
+      );
+
+      const winner =
+        mapWinners[py * mapWidth + px];
+
+      const sampleX =
+        mappedXmin +
+        (px + 0.5) / mapWidth *
+        (mappedXmax - mappedXmin);
+
+      const sampleY =
+        mappedYmax -
+        (py + 0.5) / mapHeight *
+        (mappedYmax - mappedYmin);
+
+      return {
+        x: sampleX,
+        y: sampleY,
+        winner
+      };
+    }
+
+    // ==================================================
+    // POINTER STATE
+    // ==================================================
+
+    let isDraggingBob = false;
+    let isPanning = false;
+
+    let panStartPx = 0;
+    let panStartPy = 0;
+    let panStartCenterX = 0;
+    let panStartCenterY = 0;
+    let panMoved = false;
+
+    let probeActive = false;
+    let probeX = 0;
+    let probeY = 0;
+
+    function pointerPixelPosition(
+      event: { clientX: number; clientY: number }
+    ) {
+      const rect =
+        canvas.getBoundingClientRect();
+
+      return {
+        px: Math.max(
+          0,
+          Math.min(
+            rect.width,
+            event.clientX - rect.left
+          )
+        ),
+        py: Math.max(
+          0,
+          Math.min(
+            rect.height,
+            event.clientY - rect.top
+          )
+        )
+      };
+    }
+
+    function moveBobToPointer(
+      event: PointerEvent
+    ) {
+      const position =
+        pointerPixelPosition(event);
+
+      const world =
+        screenToWorld(
+          position.px,
+          position.py
+        );
+
+      bobX = world.x;
+      bobY = world.y;
+      bobVx = 0;
+      bobVy = 0;
+      settledMagnet = -1;
+      settledTime = 0;
+
+      clearTrail();
+      appendTrailPoint(true);
+    }
+
+    function updateMapProbe(
+      event: PointerEvent
+    ) {
+      const position =
+        pointerPixelPosition(event);
+
+      const world =
+        screenToWorld(
+          position.px,
+          position.py
+        );
+
+      probeX = world.x;
+      probeY = world.y;
+      probeActive = true;
+
+      probePanel.hidden = false;
+
+      probeXOutput.textContent =
+        `${probeX.toFixed(3)} m`;
+
+      probeYOutput.textContent =
+        `${probeY.toFixed(3)} m`;
+
+      const winner = winnerAtWorldPoint(
+        probeX,
+        probeY
+      );
+
+      if (winner >= 0) {
+        probeWinnerOutput.textContent =
+          magnetNames[winner];
+
+        probeWinnerOutput.style.color =
+          magnetColours[winner];
+      } else {
+        probeWinnerOutput.textContent =
+          mapComputing
+            ? "Computing…"
+            : "Outside map";
+
+        probeWinnerOutput.style.color = "";
+      }
+    }
+
+    function winnerAtWorldPoint(
+      x: number,
+      y: number
+    ) {
+      if (
+        !mapWinners ||
+        !mapHasImage ||
+        x < mappedXmin ||
+        x > mappedXmax ||
+        y < mappedYmin ||
+        y > mappedYmax
+      ) {
+        return -1;
+      }
+
+      const px = Math.max(
+        0,
+        Math.min(
+          mapWidth - 1,
+          Math.floor(
+            (x - mappedXmin) /
+            (mappedXmax - mappedXmin) *
+            mapWidth
+          )
+        )
+      );
+
+      const py = Math.max(
+        0,
+        Math.min(
+          mapHeight - 1,
+          Math.floor(
+            (mappedYmax - y) /
+            (mappedYmax - mappedYmin) *
+            mapHeight
+          )
+        )
+      );
+
+      return mapWinners[py * mapWidth + px];
+    }
+
+    canvas.addEventListener(
+      "pointerdown",
+      event => {
+        canvas.setPointerCapture(
+          event.pointerId
+        );
+
+        if (mode === "live") {
+          mapReplayActive = false;
+          mapReplayStep = 0;
+          isDraggingBob = true;
+          moveBobToPointer(event);
+        } else {
+          isPanning = true;
+
+          const position =
+            pointerPixelPosition(event);
+
+          panStartPx = position.px;
+          panStartPy = position.py;
+          panStartCenterX = mapCenterX;
+          panStartCenterY = mapCenterY;
+          panMoved = false;
+        }
+
+        updateModeUi();
+      }
+    );
+
+    canvas.addEventListener(
+      "pointermove",
+      event => {
+        if (mode === "live") {
+          if (isDraggingBob) {
+            moveBobToPointer(event);
+          }
+          return;
+        }
+
+        if (isPanning) {
+          const position =
+            pointerPixelPosition(event);
+
+          if (
+            Math.hypot(
+              position.px - panStartPx,
+              position.py - panStartPy
+            ) > 3
+          ) {
+            panMoved = true;
+          }
+
+          const bounds = currentViewBounds();
+
+          const worldPerPixelX =
+            (bounds.xmax - bounds.xmin) /
+            canvas.clientWidth;
+
+          const worldPerPixelY =
+            (bounds.ymax - bounds.ymin) /
+            canvas.clientHeight;
+
+          mapCenterX =
+            panStartCenterX -
+            (position.px - panStartPx) *
+            worldPerPixelX;
+
+          mapCenterY =
+            panStartCenterY +
+            (position.py - panStartPy) *
+            worldPerPixelY;
+        } else {
+          updateMapProbe(event);
+        }
+      }
+    );
+
+    canvas.addEventListener(
+      "pointerup",
+      event => {
+        if (mode === "live") {
+          if (isDraggingBob) {
+            moveBobToPointer(event);
+            isDraggingBob = false;
+
+            makeLivePointVisible(
+              bobX,
+              bobY
+            );
+
+            recordReleasePoint(
+              bobX,
+              bobY,
+              `Released by drag from (${bobX.toFixed(6)}, ${bobY.toFixed(6)}) m with v₀ = 0`
+            );
+          }
+        } else {
+          if (isPanning) {
+            const wasPan = panMoved;
+            isPanning = false;
+
+            if (wasPan) {
+              scheduleRemap(180);
+            } else {
+              // Restore the exact pre-click centre so a tap does
+              // not introduce a tiny accidental pan.
+              mapCenterX = panStartCenterX;
+              mapCenterY = panStartCenterY;
+
+              const position =
+                pointerPixelPosition(event);
+
+              const world =
+                screenToWorld(
+                  position.px,
+                  position.py
+                );
+
+              const sample =
+                sampledMapPointAt(
+                  world.x,
+                  world.y
+                );
+
+              if (
+                sample &&
+                sample.winner >= 0
+              ) {
+                syncStartInputs(
+                  sample.x,
+                  sample.y
+                );
+
+                startStatus.textContent =
+                  `Loaded exact map pixel (${sample.x.toFixed(6)}, ${sample.y.toFixed(6)}) m → ${magnetNames[sample.winner]}. Press Set & release to replay it.`;
+
+                startStatus.style.color =
+                  magnetColours[sample.winner];
+              } else if (sample) {
+                startStatus.textContent =
+                  "That fractal pixel is still being computed. Try it again when the map reaches that region.";
+
+                startStatus.style.color = "";
+              }
+            }
+          }
+
+          updateMapProbe(event);
+        }
+
+        if (
+          canvas.hasPointerCapture(
+            event.pointerId
+          )
+        ) {
+          canvas.releasePointerCapture(
+            event.pointerId
+          );
+        }
+
+        updateModeUi();
+      }
+    );
+
+    canvas.addEventListener(
+      "pointercancel",
+      () => {
+        isDraggingBob = false;
+        isPanning = false;
+        updateModeUi();
+      }
+    );
+
+    canvas.addEventListener(
+      "pointerleave",
+      () => {
+        if (
+          mode === "map" &&
+          !isPanning
+        ) {
+          probeActive = false;
+          probePanel.hidden = true;
+        }
+      }
+    );
+
+    canvas.addEventListener(
+      "wheel",
+      event => {
+        if (mode !== "map") {
+          return;
+        }
+
+        event.preventDefault();
+
+        const position =
+          pointerPixelPosition(event);
+
+        const before =
+          screenToWorld(
+            position.px,
+            position.py
+          );
+
+        const factor =
+          Math.exp(event.deltaY * 0.0012);
+
+        mapHalfWidth = Math.max(
+          0.045,
+          Math.min(
+            3.2,
+            mapHalfWidth * factor
+          )
+        );
+
+        const after =
+          screenToWorld(
+            position.px,
+            position.py
+          );
+
+        mapCenterX += before.x - after.x;
+        mapCenterY += before.y - after.y;
+
+        scheduleRemap(260);
+      },
+      { passive: false }
+    );
+
+    canvas.addEventListener(
+      "dblclick",
+      event => {
+        if (mode !== "map") {
+          return;
+        }
+
+        const position =
+          pointerPixelPosition(event);
+
+        const focus =
+          screenToWorld(
+            position.px,
+            position.py
+          );
+
+        mapCenterX = focus.x;
+        mapCenterY = focus.y;
+        mapHalfWidth = Math.max(
+          0.045,
+          mapHalfWidth * 0.5
+        );
+
+        scheduleRemap(80);
+      }
+    );
+
+    // ==================================================
+    // CONTROLS
+    // ==================================================
+
+    const physicsControls = [
+      frequencySlider,
+      dampingSlider,
+      strengthSlider,
+      gapSlider,
+      spacingSlider
+    ];
+
+    for (const control of physicsControls) {
+      control.addEventListener(
+        "input",
+        invalidateMapFromPhysicsChange
+      );
+    }
+
+    resolutionSlider.addEventListener(
+      "input",
+      () => {
+        updateControlOutputs();
+
+        if (mode === "map") {
+          scheduleRemap(220);
+        }
+      }
+    );
+
+    trailToggle.addEventListener(
+      "change",
+      updateControlOutputs
+    );
+
+    fieldToggle.addEventListener(
+      "change",
+      updateControlOutputs
+    );
+
+    velocityToggle.addEventListener(
+      "change",
+      updateControlOutputs
+    );
+
+    captureToggle.addEventListener(
+      "change",
+      updateControlOutputs
+    );
+
+    startReleaseButton.addEventListener(
+      "click",
+      releaseFromCoordinateInputs
+    );
+
+    for (const input of [
+      startXInput,
+      startYInput
+    ]) {
+      input.addEventListener(
+        "keydown",
+        event => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            releaseFromCoordinateInputs();
+          }
+        }
+      );
+    }
+
+    mapButton.addEventListener(
+      "click",
+      () => {
+        mode = "map";
+        updateModeUi();
+        startFractalMap();
+      }
+    );
+
+    liveButton.addEventListener(
+      "click",
+      () => {
+        cancelScheduledRemap();
+        cancelMapComputation();
+        mode = "live";
+        probeActive = false;
+        probePanel.hidden = true;
+        updateModeUi();
+      }
+    );
+
+    pauseButton.addEventListener(
+      "click",
+      () => {
+        running = !running;
+
+        pauseButton.textContent =
+          running
+            ? "Pause"
+            : "Play";
+      }
+    );
+
+    resetButton.addEventListener(
+      "click",
+      () => {
+        cancelScheduledRemap();
+        cancelMapComputation();
+
+        frequencySlider.value = "1.00";
+        dampingSlider.value = "0.18";
+        strengthSlider.value = "0.75";
+        gapSlider.value = "0.18";
+        spacingSlider.value = "0.92";
+        resolutionSlider.value = "150";
+
+        trailToggle.checked = true;
+        fieldToggle.checked = true;
+        velocityToggle.checked = true;
+        captureToggle.checked = true;
+
+        bobX = -1.08;
+        bobY = 0.62;
+        bobVx = 0;
+        bobVy = 0;
+
+        settledMagnet = -1;
+        settledTime = 0;
+
+        liveHalfWidth = baseLiveHalfWidth;
+
+        mapCenterX = 0;
+        mapCenterY = 0;
+        mapHalfWidth = baseMapHalfWidth;
+
+        mapHasImage = false;
+        mapWinners = null;
+        mapImageData = null;
+
+        mode = "live";
+        mapReplayActive = false;
+        mapReplayStep = 0;
+        running = true;
+
+        pauseButton.textContent = "Pause";
+
+        clearTrail();
+        appendTrailPoint(true);
+
+        releaseStartX = bobX;
+        releaseStartY = bobY;
+        reportedOutcome = -1;
+
+        syncStartInputs(
+          bobX,
+          bobY
+        );
+
+        startStatus.textContent =
+          "Enter coordinates manually, or click a computed fractal pixel to load it. Set & release replays the same solver used to colour the map.";
+
+        startStatus.style.color = "";
+
+        updateControlOutputs();
+        updateModeUi();
+      }
+    );
+
+    // ==================================================
+    // RESIZE
+    // ==================================================
+
+    function resizeCanvas() {
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
+      );
+
+      const width = Math.max(
+        1,
+        Math.round(rect.width * dpr)
+      );
+
+      const height = Math.max(
+        1,
+        Math.round(rect.height * dpr)
+      );
+
+      if (
+        canvas.width === width &&
+        canvas.height === height
+      ) {
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      if (
+        mode === "map" &&
+        mapHasImage
+      ) {
+        scheduleRemap(220);
+      }
+    }
+
+    const resizeObserver =
+      new ResizeObserver(resizeCanvas);
+
+    resizeObserver.observe(canvas);
+
+    // ==================================================
+    // ANIMATION LOOP
+    // ==================================================
+
+    function animate(now: number) {
+      const rawDt =
+        (now - previousTime) / 1000;
+
+      previousTime = now;
+
+      const dt = Math.min(rawDt, 0.04);
+
+      if (
+        mode === "live" &&
+        running &&
+        !isDraggingBob
+      ) {
+        integrationAccumulator += dt;
+
+        const fixedStep =
+          mapReplayActive
+            ? mapDt
+            : 1 / 120;
+
+        let safety = 0;
+
+        while (
+          integrationAccumulator >= fixedStep &&
+          safety < 8
+        ) {
+          if (mapReplayActive) {
+            integrateMapReplay();
+          } else {
+            integrateLive(fixedStep);
+          }
+
+          integrationAccumulator -= fixedStep;
+          safety++;
+        }
+      } else {
+        integrationAccumulator = 0;
+      }
+
+      updateDynamicOutputs();
+      draw();
+
+      requestAnimationFrame(animate);
+    }
+
+    // ==================================================
+    // START
+    // ==================================================
+
+    resizeCanvas();
+    updateControlOutputs();
+    updateMagnetPositions();
+    clearTrail();
+    appendTrailPoint(true);
+    updateModeUi();
+
+    requestAnimationFrame(animate);
+  }
+</script>
+
+<style>
+  .magnetic-pendulum {
+    max-width: 950px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    background: #080c11;
+    color: #f5f7fa;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  /* ================================================
+     CANVAS
+     ================================================ */
+
+  .canvas-wrap {
+    position: relative;
+    background: #080c11;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 500px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .canvas-label {
+    position: absolute;
+    right: 16px;
+    top: 14px;
+    padding: 0.42rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    background: rgba(3, 7, 11, 0.55);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.50);
+    font-size: 0.72rem;
+    pointer-events: none;
+  }
+
+  .mode-badge {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    padding: 0.42rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 999px;
+    background: rgba(3, 7, 11, 0.62);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.70);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* ================================================
+     LEGEND
+     ================================================ */
+
+  .magnet-legend {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    min-width: 184px;
+    padding: 0.58rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    background: rgba(3, 7, 11, 0.58);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.48);
+    font-size: 0.66rem;
+    pointer-events: none;
+  }
+
+  .magnet-legend-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.38rem;
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .magnet-legend-row span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+  }
+
+  .swatch-blue { background: #58b9ff; }
+  .swatch-red { background: #ff667a; }
+  .swatch-yellow { background: #ffc857; }
+
+  /* ================================================
+     MAP PROGRESS
+     ================================================ */
+
+  .map-progress {
+    position: absolute;
+    left: 50%;
+    bottom: 15px;
+    width: min(280px, calc(100% - 380px));
+    transform: translateX(-50%);
+    padding: 0.62rem 0.72rem;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    background: rgba(3, 7, 11, 0.74);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .progress-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.70);
+    font-size: 0.69rem;
+  }
+
+  .progress-topline strong {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-track {
+    height: 4px;
+    margin: 0.42rem 0 0.30rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  .progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      #58b9ff,
+      #ff667a,
+      #ffc857
+    );
+  }
+
+  .progress-note {
+    color: rgba(255, 255, 255, 0.38);
+    font-size: 0.62rem;
+  }
+
+  /* ================================================
+     PROBE
+     ================================================ */
+
+  .probe-panel {
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+    width: 164px;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    background: rgba(3, 7, 11, 0.72);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .probe-title {
+    margin-bottom: 0.45rem;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .probe-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.18rem 0.6rem;
+    font-size: 0.69rem;
+  }
+
+  .probe-grid span {
+    color: rgba(255, 255, 255, 0.40);
+  }
+
+  .probe-grid strong {
+    text-align: right;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================================================
+     CONTROL AREA
+     ================================================ */
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+    padding: 1.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, #0d131a, #090d12);
+  }
+
+  .control-row {
+    display: grid;
+    grid-template-columns: 190px 145px 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  output {
+    color: #9ca9b5;
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  /* ================================================
+     EXACT STARTING POSITION
+     ================================================ */
+
+  .start-position-panel {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.9rem;
+    border: 1px solid rgba(101, 199, 255, 0.14);
+    border-radius: 11px;
+    background: rgba(101, 199, 255, 0.035);
+  }
+
+  .start-position-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .start-position-header > div {
+    display: grid;
+    gap: 0.18rem;
+  }
+
+  .start-position-header strong {
+    color: #c8d2dc;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .start-position-header > div > span {
+    color: #73808c;
+    font-size: 0.71rem;
+    line-height: 1.45;
+  }
+
+  .zero-velocity-badge {
+    flex: 0 0 auto;
+    padding: 0.25rem 0.48rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #94a2ae;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+    font-size: 0.68rem;
+  }
+
+  .start-position-controls {
+    display: grid;
+    grid-template-columns:
+      minmax(140px, 1fr)
+      minmax(140px, 1fr)
+      auto;
+    align-items: end;
+    gap: 0.7rem;
+  }
+
+  .coordinate-field {
+    display: grid;
+    gap: 0.34rem;
+    min-width: 0;
+    color: #8794a0;
+    font-size: 0.72rem;
+  }
+
+  .coordinate-input-wrap {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    background: rgba(3, 7, 11, 0.42);
+  }
+
+  .coordinate-input-wrap input {
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    padding: 0 0.65rem;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #d8e1e8;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .coordinate-input-wrap:focus-within {
+    border-color: rgba(101, 199, 255, 0.56);
+    box-shadow: 0 0 0 2px rgba(101, 199, 255, 0.08);
+  }
+
+  .coordinate-input-wrap > span {
+    padding-right: 0.62rem;
+    color: #65717c;
+    font-size: 0.70rem;
+  }
+
+  .coordinate-release-button {
+    min-height: 38px;
+    white-space: nowrap;
+    border-color: rgba(101, 199, 255, 0.34);
+    background: rgba(101, 199, 255, 0.10);
+  }
+
+  .start-position-status {
+    min-height: 1.05rem;
+    color: #71808c;
+    font-size: 0.69rem;
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================================================
+     DERIVED VALUES
+     ================================================ */
+
+  .derived-values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.1rem;
+  }
+
+  .derived-values > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.72rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+    color: #7f8b96;
+    font-size: 0.78rem;
+  }
+
+  .derived-values strong {
+    color: #d6dee7;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================================================
+     MAP ACTIONS
+     ================================================ */
+
+  .map-actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.7rem;
+  }
+
+  .primary-button {
+    border-color: rgba(101, 199, 255, 0.34);
+    background: rgba(101, 199, 255, 0.10);
+  }
+
+  .primary-button:hover {
+    border-color: rgba(101, 199, 255, 0.54);
+    background: rgba(101, 199, 255, 0.16);
+  }
+
+  button.active {
+    border-color: rgba(101, 199, 255, 0.42);
+    background: rgba(101, 199, 255, 0.12);
+  }
+
+  /* ================================================
+     VISUAL CONTROLS
+     ================================================ */
+
+  .visual-controls {
+    padding: 0.8rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  }
+
+  .visual-title {
+    margin-bottom: 0.65rem;
+    color: #798692;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    color: #a1abb5;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .toggle input {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  /* ================================================
+     MODEL DETAILS
+     ================================================ */
+
+  .model-details {
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .model-details summary {
+    padding: 0.72rem 0.9rem;
+    cursor: pointer;
+    color: #9ca7b2;
+    font-size: 0.8rem;
+    user-select: none;
+  }
+
+  .model-details summary:hover {
+    color: #d7dee6;
+  }
+
+  .model-content {
+    padding: 0 0.9rem 0.9rem;
+    color: #8d99a4;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .model-content p {
+    margin: 0.2rem 0 0.7rem;
+  }
+
+  .model-content ul {
+    margin: 0.65rem 0;
+    padding-left: 1.2rem;
+  }
+
+  .equation {
+    margin: 0.45rem 0;
+    padding: 0.55rem 0.7rem;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #c7d1db;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .model-note {
+    color: #74808c;
+  }
+
+  /* ================================================
+     BOTTOM ROW
+     ================================================ */
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.1rem;
+  }
+
+  .model-info {
+    color: #7f8b96;
+    font-size: 0.79rem;
+  }
+
+  .model-info strong {
+    color: #aeb8c2;
+    font-weight: 500;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  button {
+    min-height: 38px;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.055);
+    color: rgba(255, 255, 255, 0.84);
+    cursor: pointer;
+    transition:
+      background 120ms ease,
+      border-color 120ms ease,
+      transform 120ms ease;
+  }
+
+  button:hover {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  button:active {
+    transform: translateY(1px);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid rgba(101, 199, 255, 0.8);
+    outline-offset: 3px;
+  }
+
+  /* ================================================
+     MOBILE
+     ================================================ */
+
+  @media (max-width: 760px) {
+    canvas {
+      height: 420px;
+    }
+
+    .control-row {
+      grid-template-columns: 1fr auto;
+    }
+
+    .control-row input[type="range"] {
+      grid-column: 1 / -1;
+    }
+
+    .toggle-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .start-position-controls {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .coordinate-release-button {
+      grid-column: 1 / -1;
+    }
+
+    .derived-values {
+      grid-template-columns: 1fr;
+    }
+
+    .bottom-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .map-progress {
+      left: 50%;
+      width: 230px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    canvas {
+      height: 380px;
+    }
+
+    .canvas-label {
+      display: none;
+    }
+
+    .magnet-legend {
+      left: 10px;
+      bottom: 10px;
+      min-width: 168px;
+    }
+
+    .probe-panel {
+      right: 10px;
+      bottom: 10px;
+      width: 145px;
+    }
+
+    .mode-badge {
+      left: 10px;
+      top: 10px;
+    }
+
+    .map-progress {
+      bottom: 72px;
+      width: min(240px, calc(100% - 24px));
+    }
+
+    .controls {
+      padding: 1.1rem;
+    }
+
+    .toggle-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .start-position-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .start-position-controls {
+      grid-template-columns: 1fr;
+    }
+
+    .coordinate-release-button {
+      grid-column: auto;
+      width: 100%;
+    }
+
+    .map-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      transition: none;
+    }
+  }
+</style>

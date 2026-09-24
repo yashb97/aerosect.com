@@ -7,7 +7,7 @@
     ></canvas>
 
     <div class="canvas-label">
-      Joukowski outer flow + Thwaites separation + discrete vortex wake
+      Coupled panel flow + transitional boundary layer + discrete vortex wake
     </div>
 
     <div class="probe-panel" data-probe-panel hidden>
@@ -33,8 +33,8 @@
 
     <label class="control-row">
       <span>Angle of attack α</span>
-      <output data-alpha-output>4.0°</output>
-      <input data-alpha type="range" min="-12" max="16" step="0.5" value="4" />
+      <output data-alpha-output>0.0°</output>
+      <input data-alpha type="range" min="-12" max="16" step="0.5" value="0" />
     </label>
 
     <label class="control-row">
@@ -45,8 +45,8 @@
 
     <label class="control-row">
       <span>Camber control η</span>
-      <output data-camber-output>0.060</output>
-      <input data-camber type="range" min="-0.18" max="0.18" step="0.005" value="0.06" />
+      <output data-camber-output>0.000</output>
+      <input data-camber type="range" min="-0.18" max="0.18" step="0.005" value="0" />
     </label>
 
     <label class="control-row">
@@ -57,8 +57,8 @@
 
     <label class="control-row">
       <span>Particle density</span>
-      <output data-particle-density-output>1,400 tracers</output>
-      <input data-particle-density type="range" min="600" max="3000" step="200" value="1400" />
+      <output data-particle-density-output>600 tracers</output>
+      <input data-particle-density type="range" min="600" max="3000" step="200" value="600" />
     </label>
 
     <div class="derived-values">
@@ -68,12 +68,12 @@
       </div>
 
       <div>
-        <span>Kutta circulation Γ</span>
+        <span>Effective circulation Γ</span>
         <strong data-gamma-output>—</strong>
       </div>
 
       <div>
-        <span>Ideal C<sub>L</sub></span>
+        <span>Mean C<sub>L</sub></span>
         <strong data-cl-output>—</strong>
       </div>
 
@@ -84,7 +84,7 @@
     </div>
 
     <div class="separation-panel">
-      <div class="section-title">Laminar separation estimate</div>
+      <div class="section-title">Boundary-layer state</div>
 
       <div class="separation-grid">
         <div>
@@ -104,9 +104,13 @@
       </div>
 
       <p class="separation-note">
-        Separation is predicted when the Thwaites pressure-gradient parameter reaches λ ≤ −0.09.
-        In v0.2, separated surfaces release regularised vortex blobs that convect in the outer flow
-        and interact with one another. The surface C<sub>p</sub> and separation calculation remain one-way coupled.
+        Laminar flow is marched with Thwaites. Michel’s criterion triggers natural transition; if laminar
+        separation occurs first, the separated laminar layer is treated as transitioning into a turbulent
+        layer. Head’s entrainment method then determines whether the layer recovers or reaches persistent
+        turbulent separation. Only persistent separation sheds a free vortex sheet. The same mean separation
+        position also drives a static-stall loading correction, so Cₗ rolls over as separation moves upstream
+        without imposing a fixed critical angle of attack. The discrete wake remains fully unsteady for the
+        particle and streamline visualisation.
       </p>
     </div>
 
@@ -120,13 +124,13 @@
         </label>
 
         <label class="toggle">
-          <input data-trails-toggle type="checkbox" checked />
+          <input data-trails-toggle type="checkbox" />
           <span>Trails</span>
         </label>
 
         <label class="toggle">
-          <input data-streamlines-toggle type="checkbox" checked />
-          <span>Outer streamlines</span>
+          <input data-streamlines-toggle type="checkbox" />
+          <span>Instantaneous streamlines</span>
         </label>
 
         <label class="toggle">
@@ -140,7 +144,7 @@
         </label>
 
         <label class="toggle">
-          <input data-wake-markers-toggle type="checkbox" checked />
+          <input data-wake-markers-toggle type="checkbox" />
           <span>Wake vortex markers</span>
         </label>
       </div>
@@ -151,7 +155,7 @@
         <div>
           <div class="section-title">Surface pressure</div>
           <div class="cp-subtitle">
-            Ideal incompressible C<sub>p</sub>; dashed lines show predicted laminar separation
+            Quasi-steady mean C<sub>p</sub> with separation/stall correction; dashed lines show turbulent separation
           </div>
         </div>
 
@@ -173,64 +177,77 @@
 
       <div class="model-content">
         <p>
-          The inviscid outer velocity Ue(s) is obtained from the Kutta-conditioned Joukowski solution.
-          A laminar Thwaites integral boundary-layer calculation is then marched independently from the
-          leading-edge stagnation region towards the trailing edge on the upper and lower surfaces.
+          The Joukowski map is used only to generate the airfoil geometry. Two related Hess–Smith panel
+          solutions are maintained. A quasi-steady solution driven by the freestream alone supplies the mean
+          surface pressure, boundary-layer development, separation point and aerodynamic loads. A second
+          instantaneous solution includes the discrete wake and is used for the particle/streamline velocity
+          field, while re-enforcing the airfoil no-penetration and trailing-edge Kutta conditions.
         </p>
 
         <div class="equation">
-          θ² = 0.45 ν Ue⁻⁶ ∫ Ue⁵ ds
-        </div>
-
-        <div class="equation">
-          λ = (θ²/ν) dUe/ds
-        </div>
-
-        <div class="equation">
-          separation estimate: λ ≤ −0.09
-        </div>
-
-        <div class="equation">
-          δ* = H(λ) θ
+          (U∞ + Upanels + Uwake) · n = 0
         </div>
 
         <p>
-          The Thwaites boundary-layer solution is used to locate separation; the boundary-layer envelope
-          itself is not drawn. An internal estimate δ99 ≈ 8.5θ is retained only to place newly released
-          wake vortices and tracers just outside the surface. From the predicted separation point, the
-          v0.2 wake model releases discrete regularised vortices with the sign of the local surface vorticity.
+          The laminar boundary layer is marched with Thwaites’ integral method. Transition is predicted with
+          the Michel/Cebeci–Smith momentum-thickness criterion. If laminar separation occurs before natural
+          transition, transition is initiated at that location and the turbulent layer is continued with Head’s
+          entrainment method rather than automatically declaring the airfoil fully separated.
         </p>
 
         <div class="equation">
-          ΔΓ ≈ ± Ue Uc Δtshed
+          Reθ,tr = 1.174 (1 + 22400/Rex) Rex^0.46
         </div>
 
         <div class="equation">
-          ublob = Γ/(2π) [−Δy, Δx] / (r² + σ²)
+          dθ/ds + (H + 2)(θ/Ue)dUe/ds = Cf/2
+        </div>
+
+        <div class="equation">
+          (1/Ue)d(Ue θ H1)/ds = 0.0306(H1 − 3)^−0.6169
+        </div>
+
+        <p>
+          Persistent turbulent separation is identified when the turbulent shape factor reaches H ≈ 2.4.
+          The chordwise suction-side separation position f = xsep/c is then used as the static-stall state
+          variable. A Kirchhoff-type separated-flow factor reduces the attached lift as f moves from one
+          toward zero. There is therefore no hard-coded stall angle: thickness, camber, viscosity/Reynolds
+          number and incidence influence stall through the boundary-layer solution. The corrected Cₚ field is
+          unloaded downstream of separation and blended so its integrated lift follows the same stall model.
+          The displayed effective circulation is then made consistent with that mean lift. The separated shear
+          layer still releases regularised vortex blobs for the unsteady flow visualisation, while particle
+          tracers remain completely passive.
+        </p>
+
+        <div class="equation">
+          CL,stall = CL,attached [(1 + √f)/2]²,  f = xsep/c
+        </div>
+
+        <div class="equation">
+          dΓ/dt ≈ ± ½ Ue²
         </div>
 
         <div class="equation">
           σ²(t) = σ₀² + 4νt
         </div>
 
-        <p>
-          Wake vortices are convected by the Joukowski outer flow plus the velocity induced by every other
-          wake vortex. Because v0.2 does not yet solve unsteady bound circulation self-consistently, an
-          equal-and-opposite regularised bound reaction removes the spurious domain-scale circulation that
-          would otherwise accumulate as same-sign wake vortices are released. Particle tracers use this
-          instantaneous combined field, while the outer-flow streamlines remain the steady inviscid reference.
-        </p>
+        <div class="equation">
+          Γeff = sign(Γattached) · ½ |CL| U∞ c
+        </div>
 
         <ul>
-          <li>Two-dimensional and incompressible</li>
-          <li>Potential-flow outer solution</li>
-          <li>Laminar Thwaites separation estimate</li>
-          <li>Regularised discrete-vortex separated wake</li>
-          <li>Viscously growing vortex cores</li>
-          <li>Particle density affects visual tracer sampling only</li>
-          <li>No transition model yet</li>
-          <li>No turbulent boundary-layer closure yet</li>
-          <li>No wake-to-surface pressure or bound-circulation feedback yet</li>
+          <li>Two-dimensional incompressible reduced-order model</li>
+          <li>Hess–Smith panel solution with Kutta condition</li>
+          <li>Quasi-steady mean panel solution for Cₚ, boundary layer and loads</li>
+          <li>Wake-coupled panel solution for the instantaneous visual flow field</li>
+          <li>Thwaites laminar boundary layer</li>
+          <li>Michel/Cebeci–Smith transition criterion</li>
+          <li>Head turbulent integral boundary layer</li>
+          <li>Turbulent separation criterion H ≈ 2.4</li>
+          <li>Kirchhoff-type static-stall correction driven by the predicted separation position</li>
+          <li>Separated-pressure loading relaxation consistent with the stall-corrected mean lift</li>
+          <li>Regularised discrete-vortex wake with viscous core growth</li>
+          <li>No RANS/LES and no detailed transition-zone or reverse-flow solution</li>
         </ul>
       </div>
     </details>
@@ -238,7 +255,7 @@
     <div class="bottom-row">
       <div class="model-info">
         <strong>Model:</strong>
-        Joukowski + Thwaites separation + discrete vortex wake
+        Panel method + transitional integral BL + discrete vortex wake
       </div>
 
       <div class="buttons">
@@ -250,49 +267,61 @@
 </section>
 
 <script>
-  type Complex = {
-    re: number;
-    im: number;
-  };
+  type Complex = { re: number; im: number };
+  type Point = { x: number; y: number };
+  type SurfacePoint = { x: number; y: number; cp: number };
+  type Regime = "laminar" | "turbulent";
+  type WakeSource = "upper" | "lower" | "te";
 
-  type Point = {
-    x: number;
-    y: number;
-  };
-
-  type SurfacePoint = {
-    x: number;
-    y: number;
-    cp: number;
+  type Panel = {
+    a: Point;
+    b: Point;
+    mid: Point;
+    tangent: Point;
+    normal: Point;
+    leftNormal: Point;
+    control: Point;
+    length: number;
   };
 
   type SurfaceSample = {
     body: Point;
     lab: Point;
+    normalBody: Point;
     xOverC: number;
     speed: number;
+    cp: number;
+    panelIndex: number;
   };
 
   type BoundaryLayerPoint = {
-    x: number;
-    y: number;
+    body: Point;
+    lab: Point;
+    normalBody: Point;
     xOverC: number;
     s: number;
     ue: number;
     theta: number;
     deltaStar: number;
-    delta99: number;
     shapeFactor: number;
-    lambda: number;
     cf: number;
+    regime: Regime;
   };
 
   type BoundaryLayerResult = {
     points: BoundaryLayerPoint[];
+    transition: BoundaryLayerPoint | null;
+    laminarSeparation: BoundaryLayerPoint | null;
     separation: BoundaryLayerPoint | null;
   };
 
-  type WakeSource = "upper" | "lower";
+  type DisplaySeparationState = {
+    xOverC: number;
+    confidence: number;
+    visible: boolean;
+    initialized: boolean;
+    samples: number[];
+  };
 
   type WakeVortex = {
     x: number;
@@ -302,11 +331,20 @@
     source: WakeSource;
   };
 
+  type LUFactor = {
+    lu: number[][];
+    permutation: number[];
+  };
+
   const explorers = document.querySelectorAll<HTMLElement>(
     "[data-viscous-airfoil-explorer]"
   );
 
   for (const root of explorers) {
+    // ==================================================
+    // DOM
+    // ==================================================
+
     const canvas = root.querySelector<HTMLCanvasElement>("[data-flow-canvas]");
     const cpCanvas = root.querySelector<HTMLCanvasElement>("[data-cp-canvas]");
 
@@ -331,6 +369,7 @@
 
     const upperSeparationOutput = root.querySelector<HTMLElement>("[data-upper-separation]");
     const lowerSeparationOutput = root.querySelector<HTMLElement>("[data-lower-separation]");
+    const wakeCountOutput = root.querySelector<HTMLElement>("[data-wake-count]");
 
     const particlesToggle = root.querySelector<HTMLInputElement>("[data-particles-toggle]");
     const trailsToggle = root.querySelector<HTMLInputElement>("[data-trails-toggle]");
@@ -338,7 +377,6 @@
     const vectorsToggle = root.querySelector<HTMLInputElement>("[data-vectors-toggle]");
     const wakeToggle = root.querySelector<HTMLInputElement>("[data-wake-toggle]");
     const wakeMarkersToggle = root.querySelector<HTMLInputElement>("[data-wake-markers-toggle]");
-    const wakeCountOutput = root.querySelector<HTMLElement>("[data-wake-count]");
 
     const pauseButton = root.querySelector<HTMLButtonElement>("[data-pause]");
     const resetButton = root.querySelector<HTMLButtonElement>("[data-reset]");
@@ -351,61 +389,29 @@
     const probeSpeedOutput = root.querySelector<HTMLElement>("[data-probe-speed]");
 
     if (
-      !canvas ||
-      !cpCanvas ||
-      !speedSlider ||
-      !alphaSlider ||
-      !thicknessSlider ||
-      !camberSlider ||
-      !viscositySlider ||
-      !particleDensitySlider ||
-      !speedOutput ||
-      !alphaOutput ||
-      !thicknessOutput ||
-      !camberOutput ||
-      !viscosityOutput ||
-      !particleDensityOutput ||
-      !reOutput ||
-      !gammaOutput ||
-      !clOutput ||
-      !chordOutput ||
-      !upperSeparationOutput ||
-      !lowerSeparationOutput ||
-      !particlesToggle ||
-      !trailsToggle ||
-      !streamlinesToggle ||
-      !vectorsToggle ||
-      !wakeToggle ||
-      !wakeMarkersToggle ||
-      !wakeCountOutput ||
-      !pauseButton ||
-      !resetButton ||
-      !probePanel ||
-      !probeXOutput ||
-      !probeYOutput ||
-      !probeUOutput ||
-      !probeVOutput ||
-      !probeSpeedOutput
+      !canvas || !cpCanvas || !speedSlider || !alphaSlider || !thicknessSlider ||
+      !camberSlider || !viscositySlider || !particleDensitySlider || !speedOutput ||
+      !alphaOutput || !thicknessOutput || !camberOutput || !viscosityOutput ||
+      !particleDensityOutput || !reOutput || !gammaOutput || !clOutput ||
+      !chordOutput || !upperSeparationOutput || !lowerSeparationOutput ||
+      !wakeCountOutput || !particlesToggle || !trailsToggle || !streamlinesToggle ||
+      !vectorsToggle || !wakeToggle || !wakeMarkersToggle || !pauseButton ||
+      !resetButton || !probePanel || !probeXOutput || !probeYOutput ||
+      !probeUOutput || !probeVOutput || !probeSpeedOutput
     ) {
       continue;
     }
 
     const ctx = canvas.getContext("2d");
     const cpCtx = cpCanvas.getContext("2d");
-
-    if (!ctx || !cpCtx) {
-      continue;
-    }
+    if (!ctx || !cpCtx) continue;
 
     const trailCanvas = document.createElement("canvas");
     const trailCtx = trailCanvas.getContext("2d");
-
-    if (!trailCtx) {
-      continue;
-    }
+    if (!trailCtx) continue;
 
     // ==================================================
-    // DISPLAY DOMAIN
+    // DOMAIN / MODEL CONSTANTS
     // ==================================================
 
     const xmin = -0.8;
@@ -413,210 +419,172 @@
     const ymin = -0.48;
     const ymax = 0.48;
 
-    const maxParticleCount = 3000;
-    let activeParticleCount = 1400;
-
-    /*
-      Reserve a small part of the tracer population for
-      particles injected into separated shear layers.
-      Freestream tracers are therefore never progressively
-      overwritten by one-sided wake injection.
-    */
-    const wakeTracerFraction = 0.18;
-
-    const particleX = new Float32Array(maxParticleCount);
-    const particleY = new Float32Array(maxParticleCount);
-    const previousParticleX = new Float32Array(maxParticleCount);
-    const previousParticleY = new Float32Array(maxParticleCount);
-
-    // ==================================================
-    // MODEL STATE
-    // ==================================================
-
-    const b = 1.0;
     const targetChord = 1.0;
+    const joukowskiB = 1.0;
+    const panelCount = 64;
+    const maxParticles = 3000;
+    const maxWakeVortices = 96;
+
+    const wakeCore0 = 0.006 * targetChord;
+    const wakeSpacing = 0.030 * targetChord;
+    const physicsStep = 1 / 30;
+
+    // Display filtering is retained only as a gentle presentation layer.
+    // The aerodynamic quantities it receives are now quasi-steady mean values.
+    const cpDisplayTau = 0.35;
+    const loadDisplayTau = 0.35;
+    const separationDisplayTau = 0.35;
+    const separationPresenceTau = 0.65;
+    const separationDeadband = 0.0075;
+    const separationMaxRate = 0.035;
+    const separationMedianWindow = 11;
+
+    // Body-coordinate cached velocity field. It avoids evaluating
+    // every panel and wake vortex for every tracer every frame.
+    const gridNx = 54;
+    const gridNy = 36;
+    const gridXmin = -1.02;
+    const gridXmax = 1.02;
+    const gridYmin = -0.76;
+    const gridYmax = 0.76;
+    const gridNodeCount = gridNx * gridNy;
+
+    // ==================================================
+    // STATE
+    // ==================================================
 
     let U = 1.5;
-    let alpha = 4 * Math.PI / 180;
+    let alpha = 0;
     let epsilon = 0.12;
-    let eta = 0.06;
+    let eta = 0;
     let nu = 1.5e-5;
-
-    let circleCentre: Complex = {
-      re: -epsilon,
-      im: eta
-    };
-
-    let circleRadius = 1;
-    let trailingEdgeAngle = 0;
-
-    let circulation = 0;
-    let physicalCirculation = 0;
-    let liftCoefficient = 0;
-
-    let rawChord = 4;
-    let rawMidX = 0;
-    let rawMidY = 0;
-    let rawGeometryMinX = -2;
-    let rawGeometryMaxX = 2;
-    let lengthScale = targetChord / rawChord;
-
-    let geometryPoints: Point[] = [];
-    let airfoilCentroid: Point = { x: 0, y: 0 };
-
-    let upperSurface: SurfacePoint[] = [];
-    let lowerSurface: SurfacePoint[] = [];
-
-    let upperBoundaryLayer: BoundaryLayerResult = {
-      points: [],
-      separation: null
-    };
-
-    let lowerBoundaryLayer: BoundaryLayerResult = {
-      points: [],
-      separation: null
-    };
-
-    let wakeVortices: WakeVortex[] = [];
-    let upperShedClock = 0;
-    let lowerShedClock = 0;
-    let wakeTracerCursor = 0;
-    let wakeSerial = 0;
-    let wakeCirculationSum = 0;
-
-    const maxWakeVortices = 120;
-    const initialWakeCoreRadius = 0.008 * targetChord;
-    const nominalWakeSpacing = 0.035 * targetChord;
-
-    // ==================================================
-    // VISUAL STATE
-    // ==================================================
-
-    let showParticles = true;
-    let showTrails = true;
-    let showStreamlines = true;
-    let showVectors = false;
-    let showBoundaryLayer = false;
-    let showWake = true;
-    let showWakeMarkers = true;
+    let activeParticleCount = 600;
 
     let running = true;
+    let showParticles = true;
+    let showTrails = false;
+    let showStreamlines = false;
+    let showVectors = false;
+    let showWake = true;
+    let showWakeMarkers = false;
+
     let previousTime = performance.now();
+    let physicsAccumulator = 0;
+    let cpAccumulator = 0;
+    let streamlineAccumulator = 0;
 
     let probeActive = false;
     let probeX = 0;
     let probeY = 0;
 
-    let streamlinesDirty = true;
+    const particleX = new Float32Array(maxParticles);
+    const particleY = new Float32Array(maxParticles);
+    const previousParticleX = new Float32Array(maxParticles);
+    const previousParticleY = new Float32Array(maxParticles);
+    const particleSpeed = new Float32Array(maxParticles);
+
+    let rawGeometryMinX = -2;
+    let rawGeometryMaxX = 2;
+    let rawMidX = 0;
+    let rawMidY = 0;
+    let rawChord = 4;
+    let lengthScale = 0.25;
+    let circleCentre: Complex = { re: -epsilon, im: eta };
+    let circleRadius = 1;
+    let trailingEdgeAngle = 0;
+
+    let bodyGeometryPoints: Point[] = [];
+    let geometryPoints: Point[] = [];
+    let panelNodes: Point[] = [];
+    let panels: Panel[] = [];
+    let perimeter = 1;
+
+    let panelMatrixFactor: LUFactor | null = null;
+
+    // Instantaneous wake-coupled panel solution used only for the visible flow field.
+    let sourceStrengths = new Float64Array(panelCount);
+    let vortexSheetStrength = 0;
+    let instantaneousBoundCirculation = 0;
+
+    // Quasi-steady freestream-only panel solution used for mean pressure,
+    // boundary-layer development, separation and aerodynamic instrumentation.
+    let meanSourceStrengths = new Float64Array(panelCount);
+    let meanVortexSheetStrength = 0;
+    let meanAttachedBoundCirculation = 0;
+
+    // Stable mean aerodynamic outputs derived from the corrected mean Cp field.
+    let boundCirculation = 0;
+    let liftCoefficient = 0;
+
+    // Display-only aerodynamic loads. The instantaneous values above
+    // continue to drive the coupled solver; these are low-pass filtered
+    // only for the numerical instrumentation shown to the user.
+    let displayBoundCirculation = 0;
+    let displayLiftCoefficient = 0;
+    let displayLoadsInitialized = false;
+
+    let controlSourceX = new Float64Array(panelCount * panelCount);
+    let controlSourceY = new Float64Array(panelCount * panelCount);
+    let controlVortexX = new Float64Array(panelCount);
+    let controlVortexY = new Float64Array(panelCount);
+
+    let gridSourceX = new Float32Array(gridNodeCount * panelCount);
+    let gridSourceY = new Float32Array(gridNodeCount * panelCount);
+    let gridVortexX = new Float32Array(gridNodeCount);
+    let gridVortexY = new Float32Array(gridNodeCount);
+    let gridVelocityX = new Float32Array(gridNodeCount);
+    let gridVelocityY = new Float32Array(gridNodeCount);
+    let gridValid = new Uint8Array(gridNodeCount);
+
+    let panelSamples: SurfaceSample[] = [];
+    let upperSurface: SurfacePoint[] = [];
+    let lowerSurface: SurfacePoint[] = [];
+    let upperPanelIndices: number[] = [];
+    let lowerPanelIndices: number[] = [];
+
+    // Instantaneous aerodynamic state is kept separate from the
+    // time-filtered visual instrumentation.
+    let displayUpperSurface: SurfacePoint[] = [];
+    let displayLowerSurface: SurfacePoint[] = [];
+    let displayUpperSeparation: DisplaySeparationState = {
+      xOverC: 0, confidence: 0, visible: false, initialized: false, samples: []
+    };
+    let displayLowerSeparation: DisplaySeparationState = {
+      xOverC: 0, confidence: 0, visible: false, initialized: false, samples: []
+    };
+
+    let upperBoundaryLayer: BoundaryLayerResult = {
+      points: [], transition: null, laminarSeparation: null, separation: null
+    };
+    let lowerBoundaryLayer: BoundaryLayerResult = {
+      points: [], transition: null, laminarSeparation: null, separation: null
+    };
+
+    let wakeVortices: WakeVortex[] = [];
+    let upperShedClock = 0;
+    let lowerShedClock = 0;
+
     let cachedStreamlines: Point[][] = [];
+    let streamlinesDirty = true;
 
     // ==================================================
-    // COMPLEX ARITHMETIC
+    // COMPLEX / JOUKOWSKI GEOMETRY
     // ==================================================
 
-    function cAdd(a: Complex, other: Complex): Complex {
-      return {
-        re: a.re + other.re,
-        im: a.im + other.im
-      };
+    function cDiv(a: Complex, b: Complex): Complex {
+      const d = b.re * b.re + b.im * b.im;
+      return d < 1e-18
+        ? { re: 0, im: 0 }
+        : {
+            re: (a.re * b.re + a.im * b.im) / d,
+            im: (a.im * b.re - a.re * b.im) / d
+          };
     }
 
-    function cSub(a: Complex, other: Complex): Complex {
-      return {
-        re: a.re - other.re,
-        im: a.im - other.im
-      };
+    function joukowski(zeta: Complex): Complex {
+      const inv = cDiv({ re: joukowskiB * joukowskiB, im: 0 }, zeta);
+      return { re: zeta.re + inv.re, im: zeta.im + inv.im };
     }
-
-    function cMul(a: Complex, other: Complex): Complex {
-      return {
-        re: a.re * other.re - a.im * other.im,
-        im: a.re * other.im + a.im * other.re
-      };
-    }
-
-    function cScale(a: Complex, scale: number): Complex {
-      return {
-        re: a.re * scale,
-        im: a.im * scale
-      };
-    }
-
-    function cDiv(a: Complex, other: Complex): Complex {
-      const denominator = other.re * other.re + other.im * other.im;
-
-      if (denominator < 1e-16) {
-        return { re: 0, im: 0 };
-      }
-
-      return {
-        re: (a.re * other.re + a.im * other.im) / denominator,
-        im: (a.im * other.re - a.re * other.im) / denominator
-      };
-    }
-
-    function cAbs2(a: Complex): number {
-      return a.re * a.re + a.im * a.im;
-    }
-
-    function cSqrt(z: Complex): Complex {
-      const magnitude = Math.hypot(z.re, z.im);
-
-      const realPart = Math.sqrt(
-        Math.max(0, (magnitude + z.re) / 2)
-      );
-
-      let imaginaryPart = Math.sqrt(
-        Math.max(0, (magnitude - z.re) / 2)
-      );
-
-      if (z.im < 0) {
-        imaginaryPart *= -1;
-      }
-
-      return {
-        re: realPart,
-        im: imaginaryPart
-      };
-    }
-
-    // ==================================================
-    // BODY / LAB TRANSFORMS
-    // ==================================================
-
-    function bodyToLabPoint(point: Point): Point {
-      const cosAlpha = Math.cos(alpha);
-      const sinAlpha = Math.sin(alpha);
-
-      return {
-        x: cosAlpha * point.x + sinAlpha * point.y,
-        y: -sinAlpha * point.x + cosAlpha * point.y
-      };
-    }
-
-    function labToBodyPoint(point: Point): Point {
-      const cosAlpha = Math.cos(alpha);
-      const sinAlpha = Math.sin(alpha);
-
-      return {
-        x: cosAlpha * point.x - sinAlpha * point.y,
-        y: sinAlpha * point.x + cosAlpha * point.y
-      };
-    }
-
-    function bodyToLabVelocity(u: number, v: number) {
-      const cosAlpha = Math.cos(alpha);
-      const sinAlpha = Math.sin(alpha);
-
-      return {
-        u: cosAlpha * u + sinAlpha * v,
-        v: -sinAlpha * u + cosAlpha * v
-      };
-    }
-
-    // ==================================================
-    // RAW JOUKOWSKI / NORMALISED BODY COORDINATES
-    // ==================================================
 
     function rawMappedToBody(z: Complex): Point {
       return {
@@ -625,1125 +593,1397 @@
       };
     }
 
-    function bodyToRawMapped(point: Point): Complex {
+    // ==================================================
+    // BODY / LAB TRANSFORMS
+    // Positive alpha pitches the physical airfoil nose-up while
+    // the laboratory freestream remains horizontal.
+    // ==================================================
+
+    function bodyToLabPoint(p: Point): Point {
+      const c = Math.cos(alpha);
+      const s = Math.sin(alpha);
+      return { x: c * p.x + s * p.y, y: -s * p.x + c * p.y };
+    }
+
+    function labToBodyPoint(p: Point): Point {
+      const c = Math.cos(alpha);
+      const s = Math.sin(alpha);
+      return { x: c * p.x - s * p.y, y: s * p.x + c * p.y };
+    }
+
+    function bodyToLabVelocity(u: number, v: number) {
+      const c = Math.cos(alpha);
+      const s = Math.sin(alpha);
+      return { u: c * u + s * v, v: -s * u + c * v };
+    }
+
+    function freestreamBody() {
       return {
-        re: point.x / lengthScale + rawMidX,
-        im: point.y / lengthScale + rawMidY
+        x: U * Math.cos(alpha),
+        y: U * Math.sin(alpha)
       };
     }
 
     // ==================================================
-    // JOUKOWSKI TRANSFORMATION
+    // PANEL GEOMETRY
     // ==================================================
 
-    function joukowski(zeta: Complex): Complex {
-      const inverse = cDiv(
-        { re: b * b, im: 0 },
-        zeta
-      );
-
-      return cAdd(zeta, inverse);
-    }
-
-    function joukowskiDerivative(zeta: Complex): Complex {
-      const zetaSquared = cMul(zeta, zeta);
-
-      const fraction = cDiv(
-        { re: b * b, im: 0 },
-        zetaSquared
-      );
-
-      return {
-        re: 1 - fraction.re,
-        im: -fraction.im
-      };
-    }
-
-    function inverseJoukowski(z: Complex): Complex {
-      const zSquared = cMul(z, z);
-
-      const discriminant = cSub(
-        zSquared,
-        { re: 4 * b * b, im: 0 }
-      );
-
-      const root = cSqrt(discriminant);
-
-      const root1 = cScale(cAdd(z, root), 0.5);
-      const root2 = cScale(cSub(z, root), 0.5);
-
-      const distance1 = cAbs2(cSub(root1, circleCentre));
-      const distance2 = cAbs2(cSub(root2, circleCentre));
-
-      return distance1 >= distance2 ? root1 : root2;
-    }
-
-    // ==================================================
-    // CYLINDER-PLANE FLOW
-    // ==================================================
-
-    function circleVelocityComplex(zeta: Complex): Complex {
-      const relative = cSub(zeta, circleCentre);
-      const relativeSquared = cMul(relative, relative);
-
-      const expMinusAlpha: Complex = {
-        re: Math.cos(alpha),
-        im: -Math.sin(alpha)
-      };
-
-      const expPlusAlpha: Complex = {
-        re: Math.cos(alpha),
-        im: Math.sin(alpha)
-      };
-
-      const uniform = cScale(expMinusAlpha, U);
-
-      const cylinderTerm = cScale(
-        cDiv(expPlusAlpha, relativeSquared),
-        U * circleRadius * circleRadius
-      );
-
-      const inverseRelative = cDiv(
-        { re: 1, im: 0 },
-        relative
-      );
-
-      const vortexCoefficient: Complex = {
-        re: 0,
-        im: -circulation / (2 * Math.PI)
-      };
-
-      const vortexTerm = cMul(
-        vortexCoefficient,
-        inverseRelative
-      );
-
-      return cAdd(
-        cSub(uniform, cylinderTerm),
-        vortexTerm
-      );
-    }
-
-    function bodyVelocityFromZeta(zeta: Complex) {
-      const mappingDerivative = joukowskiDerivative(zeta);
-
-      if (cAbs2(mappingDerivative) < 1e-12) {
-        return null;
+    function signedArea(points: Point[]) {
+      let area = 0;
+      for (let i = 0; i < points.length - 1; i++) {
+        area += points[i].x * points[i + 1].y - points[i + 1].x * points[i].y;
       }
-
-      const circleVelocity = circleVelocityComplex(zeta);
-      const mappedVelocity = cDiv(circleVelocity, mappingDerivative);
-
-      return {
-        u: mappedVelocity.re,
-        v: -mappedVelocity.im
-      };
+      return 0.5 * area;
     }
 
-    // ==================================================
-    // PHYSICAL OUTER FLOW
-    // ==================================================
-
-    function outerVelocityAt(x: number, y: number) {
-      if (pointInsideAirfoil(x, y)) {
-        return null;
-      }
-
-      const bodyPoint = labToBodyPoint({ x, y });
-      const rawMappedPoint = bodyToRawMapped(bodyPoint);
-      const zeta = inverseJoukowski(rawMappedPoint);
-
-      const radiusFromCentre = Math.hypot(
-        zeta.re - circleCentre.re,
-        zeta.im - circleCentre.im
-      );
-
-      if (radiusFromCentre < circleRadius * 0.998) {
-        return null;
-      }
-
-      const bodyVelocity = bodyVelocityFromZeta(zeta);
-
-      if (!bodyVelocity) {
-        return null;
-      }
-
-      return bodyToLabVelocity(
-        bodyVelocity.u,
-        bodyVelocity.v
-      );
-    }
-
-    // ==================================================
-    // AIRFOIL GEOMETRY
-    // ==================================================
-
-    function rebuildGeometry() {
-      circleCentre = {
-        re: -epsilon,
-        im: eta
-      };
-
+    function rebuildBodyGeometry() {
+      circleCentre = { re: -epsilon, im: eta };
       circleRadius = Math.hypot(
-        b - circleCentre.re,
+        joukowskiB - circleCentre.re,
         -circleCentre.im
       );
-
       trailingEdgeAngle = Math.atan2(
         -circleCentre.im,
-        b - circleCentre.re
+        joukowskiB - circleCentre.re
       );
 
-      circulation =
-        4 *
-        Math.PI *
-        circleRadius *
-        U *
-        Math.sin(trailingEdgeAngle - alpha);
-
-      const rawGeometry: Complex[] = [];
-
+      const rawDense: Complex[] = [];
       rawGeometryMinX = Infinity;
       rawGeometryMaxX = -Infinity;
+      let rawMinY = Infinity;
+      let rawMaxY = -Infinity;
 
-      let rawGeometryMinY = Infinity;
-      let rawGeometryMaxY = -Infinity;
-
-      const sampleCount = 520;
-
-      for (let i = 0; i < sampleCount; i++) {
-        const theta =
-          trailingEdgeAngle +
-          (i / (sampleCount - 1)) *
-          2 *
-          Math.PI;
-
-        const zeta: Complex = {
+      const denseCount = 520;
+      for (let i = 0; i < denseCount; i++) {
+        const theta = trailingEdgeAngle + (i / (denseCount - 1)) * 2 * Math.PI;
+        const zeta = {
           re: circleCentre.re + circleRadius * Math.cos(theta),
           im: circleCentre.im + circleRadius * Math.sin(theta)
         };
-
         const z = joukowski(zeta);
-
-        rawGeometry.push(z);
-
+        rawDense.push(z);
         rawGeometryMinX = Math.min(rawGeometryMinX, z.re);
         rawGeometryMaxX = Math.max(rawGeometryMaxX, z.re);
-        rawGeometryMinY = Math.min(rawGeometryMinY, z.im);
-        rawGeometryMaxY = Math.max(rawGeometryMaxY, z.im);
+        rawMinY = Math.min(rawMinY, z.im);
+        rawMaxY = Math.max(rawMaxY, z.im);
       }
 
       rawChord = rawGeometryMaxX - rawGeometryMinX;
       rawMidX = 0.5 * (rawGeometryMinX + rawGeometryMaxX);
-      rawMidY = 0.5 * (rawGeometryMinY + rawGeometryMaxY);
+      rawMidY = 0.5 * (rawMinY + rawMaxY);
       lengthScale = targetChord / rawChord;
 
-      geometryPoints = [];
+      bodyGeometryPoints = rawDense.map(rawMappedToBody);
 
-      let centroidX = 0;
-      let centroidY = 0;
-
-      for (const rawPoint of rawGeometry) {
-        const bodyPoint = rawMappedToBody(rawPoint);
-        const labPoint = bodyToLabPoint(bodyPoint);
-
-        geometryPoints.push(labPoint);
-
-        centroidX += labPoint.x;
-        centroidY += labPoint.y;
+      panelNodes = [];
+      for (let i = 0; i <= panelCount; i++) {
+        const theta = trailingEdgeAngle + (i / panelCount) * 2 * Math.PI;
+        const zeta = {
+          re: circleCentre.re + circleRadius * Math.cos(theta),
+          im: circleCentre.im + circleRadius * Math.sin(theta)
+        };
+        panelNodes.push(rawMappedToBody(joukowski(zeta)));
       }
 
-      airfoilCentroid = {
-        x: centroidX / geometryPoints.length,
-        y: centroidY / geometryPoints.length
+      rebuildPanels();
+      updateLabGeometry();
+      buildPanelMatrix();
+      precomputeGridPanelInfluence();
+    }
+
+    function updateLabGeometry() {
+      geometryPoints = bodyGeometryPoints.map(bodyToLabPoint);
+    }
+
+    function rebuildPanels() {
+      panels = [];
+      perimeter = 0;
+      const ccw = signedArea(panelNodes) > 0;
+      const controlOffset = 1e-6 * targetChord;
+
+      for (let i = 0; i < panelCount; i++) {
+        const a = panelNodes[i];
+        const b = panelNodes[i + 1];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const length = Math.max(Math.hypot(dx, dy), 1e-10);
+        const tangent = { x: dx / length, y: dy / length };
+        const leftNormal = { x: -tangent.y, y: tangent.x };
+        const normal = ccw
+          ? { x: tangent.y, y: -tangent.x }
+          : { x: -tangent.y, y: tangent.x };
+        const mid = { x: 0.5 * (a.x + b.x), y: 0.5 * (a.y + b.y) };
+        const control = {
+          x: mid.x + normal.x * controlOffset,
+          y: mid.y + normal.y * controlOffset
+        };
+
+        panels.push({ a, b, mid, tangent, normal, leftNormal, control, length });
+        perimeter += length;
+      }
+    }
+
+    // ==================================================
+    // ANALYTIC CONSTANT PANEL INFLUENCE
+    // Unit source sheet and unit vortex sheet over one straight panel.
+    // ==================================================
+
+    function panelInfluence(panel: Panel, target: Point, vortex: boolean): Point {
+      const rx = target.x - panel.a.x;
+      const ry = target.y - panel.a.y;
+      const x = rx * panel.tangent.x + ry * panel.tangent.y;
+      const y = rx * panel.leftNormal.x + ry * panel.leftNormal.y;
+
+      const r1sq = Math.max(x * x + y * y, 1e-24);
+      const xm = x - panel.length;
+      const r2sq = Math.max(xm * xm + y * y, 1e-24);
+
+      let localU = Math.log(r1sq / r2sq) / (4 * Math.PI);
+      let beta = Math.atan2(y, xm) - Math.atan2(y, x);
+      if (beta > Math.PI) beta -= 2 * Math.PI;
+      if (beta < -Math.PI) beta += 2 * Math.PI;
+      let localV = beta / (2 * Math.PI);
+
+      if (vortex) {
+        const oldU = localU;
+        localU = -localV;
+        localV = oldU;
+      }
+
+      return {
+        x: localU * panel.tangent.x + localV * panel.leftNormal.x,
+        y: localU * panel.tangent.y + localV * panel.leftNormal.y
       };
+    }
 
-      physicalCirculation = circulation * lengthScale;
+    // ==================================================
+    // LU SOLVER
+    // ==================================================
 
-      liftCoefficient =
-        -2 *
-        physicalCirculation /
-        (U * targetChord);
+    function luDecompose(matrix: number[][]): LUFactor {
+      const n = matrix.length;
+      const lu = matrix.map(row => row.slice());
+      const permutation = Array.from({ length: n }, (_, i) => i);
 
-      rebuildSurfacePressure();
-      rebuildBoundaryLayers();
+      for (let k = 0; k < n; k++) {
+        let pivot = k;
+        let maxValue = Math.abs(lu[k][k]);
+        for (let i = k + 1; i < n; i++) {
+          const value = Math.abs(lu[i][k]);
+          if (value > maxValue) {
+            maxValue = value;
+            pivot = i;
+          }
+        }
 
-      streamlinesDirty = true;
+        if (pivot !== k) {
+          [lu[k], lu[pivot]] = [lu[pivot], lu[k]];
+          [permutation[k], permutation[pivot]] = [permutation[pivot], permutation[k]];
+        }
 
-      clearTrails();
-      updateOutputs();
-      drawCpPlot();
+        if (Math.abs(lu[k][k]) < 1e-12) {
+          lu[k][k] = lu[k][k] >= 0 ? 1e-12 : -1e-12;
+        }
+
+        for (let i = k + 1; i < n; i++) {
+          lu[i][k] /= lu[k][k];
+          for (let j = k + 1; j < n; j++) {
+            lu[i][j] -= lu[i][k] * lu[k][j];
+          }
+        }
+      }
+
+      return { lu, permutation };
+    }
+
+    function luSolve(factor: LUFactor, rhs: number[]) {
+      const n = rhs.length;
+      const y = new Array<number>(n);
+      const x = new Array<number>(n);
+
+      for (let i = 0; i < n; i++) {
+        let sum = rhs[factor.permutation[i]];
+        for (let j = 0; j < i; j++) sum -= factor.lu[i][j] * y[j];
+        y[i] = sum;
+      }
+
+      for (let i = n - 1; i >= 0; i--) {
+        let sum = y[i];
+        for (let j = i + 1; j < n; j++) sum -= factor.lu[i][j] * x[j];
+        x[i] = sum / factor.lu[i][i];
+      }
+
+      return x;
+    }
+
+    // ==================================================
+    // PANEL MATRIX / KUTTA CONDITION
+    // ==================================================
+
+    function buildPanelMatrix() {
+      const n = panelCount;
+      const matrix = Array.from({ length: n + 1 }, () => new Array<number>(n + 1).fill(0));
+      controlSourceX = new Float64Array(n * n);
+      controlSourceY = new Float64Array(n * n);
+      controlVortexX = new Float64Array(n);
+      controlVortexY = new Float64Array(n);
+
+      for (let i = 0; i < n; i++) {
+        const target = panels[i].control;
+        let vortexX = 0;
+        let vortexY = 0;
+
+        for (let j = 0; j < n; j++) {
+          const source = panelInfluence(panels[j], target, false);
+          const vortex = panelInfluence(panels[j], target, true);
+          const index = i * n + j;
+          controlSourceX[index] = source.x;
+          controlSourceY[index] = source.y;
+          vortexX += vortex.x;
+          vortexY += vortex.y;
+          matrix[i][j] = source.x * panels[i].normal.x + source.y * panels[i].normal.y;
+        }
+
+        controlVortexX[i] = vortexX;
+        controlVortexY[i] = vortexY;
+        matrix[i][n] = vortexX * panels[i].normal.x + vortexY * panels[i].normal.y;
+      }
+
+      // Kutta condition: tangential velocities at the two TE panels
+      // are equal in physical direction. Their contour tangents point
+      // oppositely, therefore Vt_upper + Vt_lower = 0.
+      const first = 0;
+      const last = n - 1;
+      for (let j = 0; j < n; j++) {
+        const i0 = first * n + j;
+        const i1 = last * n + j;
+        matrix[n][j] =
+          panels[first].tangent.x * controlSourceX[i0] +
+          panels[first].tangent.y * controlSourceY[i0] +
+          panels[last].tangent.x * controlSourceX[i1] +
+          panels[last].tangent.y * controlSourceY[i1];
+      }
+
+      matrix[n][n] =
+        panels[first].tangent.x * controlVortexX[first] +
+        panels[first].tangent.y * controlVortexY[first] +
+        panels[last].tangent.x * controlVortexX[last] +
+        panels[last].tangent.y * controlVortexY[last];
+
+      panelMatrixFactor = luDecompose(matrix);
+    }
+
+    // ==================================================
+    // WAKE-INDUCED VELOCITY
+    // ==================================================
+
+    function vortexVelocity(
+      x: number,
+      y: number,
+      vortex: WakeVortex
+    ): Point {
+      const dx = x - vortex.x;
+      const dy = y - vortex.y;
+      const r2 = dx * dx + dy * dy;
+      const core2 = wakeCore0 * wakeCore0 + 4 * nu * Math.max(vortex.age, 0);
+
+      if (r2 < 1e-16) return { x: 0, y: 0 };
+
+      const factor =
+        vortex.gamma /
+        (2 * Math.PI * r2) *
+        (1 - Math.exp(-r2 / Math.max(core2, 1e-12)));
+
+      return { x: -factor * dy, y: factor * dx };
+    }
+
+    function wakeVelocityAtBody(x: number, y: number, exclude = -1): Point {
+      if (!showWake || wakeVortices.length === 0) return { x: 0, y: 0 };
+      let u = 0;
+      let v = 0;
+      for (let i = 0; i < wakeVortices.length; i++) {
+        if (i === exclude) continue;
+        const induced = vortexVelocity(x, y, wakeVortices[i]);
+        u += induced.x;
+        v += induced.y;
+      }
+      return { x: u, y: v };
+    }
+
+    // ==================================================
+    // PANEL SOLUTION WITH WAKE FEEDBACK
+    // ==================================================
+
+    function solvePanelFlow() {
+      if (!panelMatrixFactor) return;
+      const n = panelCount;
+      const free = freestreamBody();
+      const rhs = new Array<number>(n + 1).fill(0);
+
+      for (let i = 0; i < n; i++) {
+        const wake = wakeVelocityAtBody(panels[i].control.x, panels[i].control.y);
+        const u = free.x + wake.x;
+        const v = free.y + wake.y;
+        rhs[i] = -(u * panels[i].normal.x + v * panels[i].normal.y);
+      }
+
+      const first = 0;
+      const last = n - 1;
+      const wakeFirst = wakeVelocityAtBody(panels[first].control.x, panels[first].control.y);
+      const wakeLast = wakeVelocityAtBody(panels[last].control.x, panels[last].control.y);
+      const uFirst = free.x + wakeFirst.x;
+      const vFirst = free.y + wakeFirst.y;
+      const uLast = free.x + wakeLast.x;
+      const vLast = free.y + wakeLast.y;
+
+      rhs[n] = -(
+        uFirst * panels[first].tangent.x +
+        vFirst * panels[first].tangent.y +
+        uLast * panels[last].tangent.x +
+        vLast * panels[last].tangent.y
+      );
+
+      const solution = luSolve(panelMatrixFactor, rhs);
+      for (let i = 0; i < n; i++) sourceStrengths[i] = solution[i];
+      vortexSheetStrength = solution[n];
+      instantaneousBoundCirculation = vortexSheetStrength * perimeter;
+    }
+
+    function solveMeanPanelFlow() {
+      if (!panelMatrixFactor) return;
+      const n = panelCount;
+      const free = freestreamBody();
+      const rhs = new Array<number>(n + 1).fill(0);
+
+      // Mean aerodynamic instrumentation deliberately excludes the
+      // instantaneous discrete wake. This is a quasi-steady operating-point
+      // solution, not a frame-by-frame unsteady pressure measurement.
+      for (let i = 0; i < n; i++) {
+        rhs[i] = -(
+          free.x * panels[i].normal.x +
+          free.y * panels[i].normal.y
+        );
+      }
+
+      const first = 0;
+      const last = n - 1;
+      rhs[n] = -(
+        free.x * panels[first].tangent.x +
+        free.y * panels[first].tangent.y +
+        free.x * panels[last].tangent.x +
+        free.y * panels[last].tangent.y
+      );
+
+      const solution = luSolve(panelMatrixFactor, rhs);
+      for (let i = 0; i < n; i++) meanSourceStrengths[i] = solution[i];
+      meanVortexSheetStrength = solution[n];
+      meanAttachedBoundCirculation = meanVortexSheetStrength * perimeter;
+    }
+
+    function boundVelocityAtBody(x: number, y: number): Point {
+      const free = freestreamBody();
+      let u = free.x;
+      let v = free.y;
+      let vortexX = 0;
+      let vortexY = 0;
+
+      const target = { x, y };
+      for (let j = 0; j < panelCount; j++) {
+        const source = panelInfluence(panels[j], target, false);
+        const vortex = panelInfluence(panels[j], target, true);
+        u += sourceStrengths[j] * source.x;
+        v += sourceStrengths[j] * source.y;
+        vortexX += vortex.x;
+        vortexY += vortex.y;
+      }
+
+      u += vortexSheetStrength * vortexX;
+      v += vortexSheetStrength * vortexY;
+      return { x: u, y: v };
+    }
+
+    function totalVelocityAtBodyExact(x: number, y: number): Point {
+      const bound = boundVelocityAtBody(x, y);
+      const wake = wakeVelocityAtBody(x, y);
+      return { x: bound.x + wake.x, y: bound.y + wake.y };
     }
 
     // ==================================================
     // POINT-IN-AIRFOIL
     // ==================================================
 
-    function pointInsideAirfoil(x: number, y: number) {
+    function pointInsideBody(x: number, y: number) {
       let inside = false;
-
-      for (
-        let i = 0, j = geometryPoints.length - 1;
-        i < geometryPoints.length;
-        j = i++
-      ) {
-        const pi = geometryPoints[i];
-        const pj = geometryPoints[j];
-
+      for (let i = 0, j = bodyGeometryPoints.length - 1; i < bodyGeometryPoints.length; j = i++) {
+        const pi = bodyGeometryPoints[i];
+        const pj = bodyGeometryPoints[j];
         const intersects =
           ((pi.y > y) !== (pj.y > y)) &&
-          (
-            x <
-            (pj.x - pi.x) *
-            (y - pi.y) /
-            (pj.y - pi.y) +
-            pi.x
-          );
-
-        if (intersects) {
-          inside = !inside;
-        }
+          (x < (pj.x - pi.x) * (y - pi.y) / (pj.y - pi.y) + pi.x);
+        if (intersects) inside = !inside;
       }
-
       return inside;
     }
 
+    function pointInsideAirfoil(x: number, y: number) {
+      const body = labToBodyPoint({ x, y });
+      return pointInsideBody(body.x, body.y);
+    }
+
     // ==================================================
-    // PRESSURE COEFFICIENT
+    // PRECOMPUTED PANEL FIELD ON BODY GRID
     // ==================================================
 
-    function samplePressureSurface(direction: number): SurfacePoint[] {
-      const points: SurfacePoint[] = [];
+    function gridBodyPoint(ix: number, iy: number): Point {
+      return {
+        x: gridXmin + (ix / (gridNx - 1)) * (gridXmax - gridXmin),
+        y: gridYmin + (iy / (gridNy - 1)) * (gridYmax - gridYmin)
+      };
+    }
 
-      const count = 190;
-      const edgeOffset = 0.012;
+    function precomputeGridPanelInfluence() {
+      gridSourceX = new Float32Array(gridNodeCount * panelCount);
+      gridSourceY = new Float32Array(gridNodeCount * panelCount);
+      gridVortexX = new Float32Array(gridNodeCount);
+      gridVortexY = new Float32Array(gridNodeCount);
+      gridValid = new Uint8Array(gridNodeCount);
 
-      for (let i = 0; i < count; i++) {
-        const fraction = i / (count - 1);
+      for (let iy = 0; iy < gridNy; iy++) {
+        for (let ix = 0; ix < gridNx; ix++) {
+          const g = iy * gridNx + ix;
+          const p = gridBodyPoint(ix, iy);
+          gridValid[g] = pointInsideBody(p.x, p.y) ? 0 : 1;
+          let vx = 0;
+          let vy = 0;
 
-        const arc =
-          edgeOffset +
-          fraction *
-          (Math.PI - 2 * edgeOffset);
+          for (let j = 0; j < panelCount; j++) {
+            const source = panelInfluence(panels[j], p, false);
+            const vortex = panelInfluence(panels[j], p, true);
+            const index = g * panelCount + j;
+            gridSourceX[index] = source.x;
+            gridSourceY[index] = source.y;
+            vx += vortex.x;
+            vy += vortex.y;
+          }
 
-        const theta =
-          trailingEdgeAngle +
-          direction * arc;
-
-        const zeta: Complex = {
-          re: circleCentre.re + circleRadius * Math.cos(theta),
-          im: circleCentre.im + circleRadius * Math.sin(theta)
-        };
-
-        const z = joukowski(zeta);
-        const velocity = bodyVelocityFromZeta(zeta);
-
-        if (!velocity) {
-          continue;
+          gridVortexX[g] = vx;
+          gridVortexY[g] = vy;
         }
-
-        const speed = Math.hypot(velocity.u, velocity.v);
-        const cp = 1 - (speed * speed) / (U * U);
-
-        points.push({
-          x: (z.re - rawGeometryMinX) / rawChord,
-          y: z.im,
-          cp
-        });
-      }
-
-      return points;
-    }
-
-    function rebuildSurfacePressure() {
-      const branchA = samplePressureSurface(1);
-      const branchB = samplePressureSurface(-1);
-
-      const midA = branchA[Math.floor(branchA.length / 2)];
-      const midB = branchB[Math.floor(branchB.length / 2)];
-
-      if (midA && midB && midA.y >= midB.y) {
-        upperSurface = branchA;
-        lowerSurface = branchB;
-      } else {
-        upperSurface = branchB;
-        lowerSurface = branchA;
       }
     }
 
+    function rebuildVelocityGrid() {
+      const free = freestreamBody();
+
+      for (let iy = 0; iy < gridNy; iy++) {
+        for (let ix = 0; ix < gridNx; ix++) {
+          const g = iy * gridNx + ix;
+          if (!gridValid[g]) {
+            gridVelocityX[g] = 0;
+            gridVelocityY[g] = 0;
+            continue;
+          }
+
+          let u = free.x;
+          let v = free.y;
+          const base = g * panelCount;
+          for (let j = 0; j < panelCount; j++) {
+            u += sourceStrengths[j] * gridSourceX[base + j];
+            v += sourceStrengths[j] * gridSourceY[base + j];
+          }
+          u += vortexSheetStrength * gridVortexX[g];
+          v += vortexSheetStrength * gridVortexY[g];
+
+          if (showWake && wakeVortices.length > 0) {
+            const p = gridBodyPoint(ix, iy);
+            const wake = wakeVelocityAtBody(p.x, p.y);
+            u += wake.x;
+            v += wake.y;
+          }
+
+          gridVelocityX[g] = u;
+          gridVelocityY[g] = v;
+        }
+      }
+    }
+
+    function sampleVelocityGridBody(x: number, y: number): Point | null {
+      // Close to the body use the exact coupled panel+wake field.
+      // This prevents grid interpolation from smearing the no-penetration
+      // condition across the thin airfoil surface.
+      if (x > -0.58 && x < 0.58 && Math.abs(y) < 0.14) {
+        if (pointInsideBody(x, y)) return null;
+        return totalVelocityAtBodyExact(x, y);
+      }
+
+      if (x < gridXmin || x > gridXmax || y < gridYmin || y > gridYmax) {
+        return totalVelocityAtBodyExact(x, y);
+      }
+
+      const gx = (x - gridXmin) / (gridXmax - gridXmin) * (gridNx - 1);
+      const gy = (y - gridYmin) / (gridYmax - gridYmin) * (gridNy - 1);
+      const ix0 = Math.max(0, Math.min(gridNx - 2, Math.floor(gx)));
+      const iy0 = Math.max(0, Math.min(gridNy - 2, Math.floor(gy)));
+      const fx = gx - ix0;
+      const fy = gy - iy0;
+
+      const g00 = iy0 * gridNx + ix0;
+      const g10 = g00 + 1;
+      const g01 = g00 + gridNx;
+      const g11 = g01 + 1;
+
+      if (!gridValid[g00] || !gridValid[g10] || !gridValid[g01] || !gridValid[g11]) {
+        if (pointInsideBody(x, y)) return null;
+        return totalVelocityAtBodyExact(x, y);
+      }
+
+      const u0 = gridVelocityX[g00] * (1 - fx) + gridVelocityX[g10] * fx;
+      const u1 = gridVelocityX[g01] * (1 - fx) + gridVelocityX[g11] * fx;
+      const v0 = gridVelocityY[g00] * (1 - fx) + gridVelocityY[g10] * fx;
+      const v1 = gridVelocityY[g01] * (1 - fx) + gridVelocityY[g11] * fx;
+
+      return {
+        x: u0 * (1 - fy) + u1 * fy,
+        y: v0 * (1 - fy) + v1 * fy
+      };
+    }
+
+    function velocityAt(x: number, y: number) {
+      const body = labToBodyPoint({ x, y });
+      if (pointInsideBody(body.x, body.y)) return null;
+      const bodyVelocity = sampleVelocityGridBody(body.x, body.y);
+      if (!bodyVelocity) return null;
+      return bodyToLabVelocity(bodyVelocity.x, bodyVelocity.y);
+    }
+
     // ==================================================
-    // FULL SURFACE SAMPLING FOR BOUNDARY LAYER
+    // QUASI-STEADY MEAN SURFACE AERODYNAMICS
+    // The discrete wake does not enter Cp/BL/CL instrumentation.
     // ==================================================
 
-    function buildFullSurfaceSamples(): SurfaceSample[] {
-      const samples: SurfaceSample[] = [];
-      const count = 900;
-      const edgeOffset = 0.004;
+    function meanSurfaceVelocityForPanel(i: number): Point {
+      const free = freestreamBody();
+      let u = free.x;
+      let v = free.y;
+      const base = i * panelCount;
 
-      for (let i = 0; i < count; i++) {
-        const fraction = i / (count - 1);
+      for (let j = 0; j < panelCount; j++) {
+        u += meanSourceStrengths[j] * controlSourceX[base + j];
+        v += meanSourceStrengths[j] * controlSourceY[base + j];
+      }
 
-        const theta =
-          trailingEdgeAngle +
-          edgeOffset +
-          fraction *
-          (2 * Math.PI - 2 * edgeOffset);
+      u += meanVortexSheetStrength * controlVortexX[i];
+      v += meanVortexSheetStrength * controlVortexY[i];
+      return { x: u, y: v };
+    }
 
-        const zeta: Complex = {
-          re: circleCentre.re + circleRadius * Math.cos(theta),
-          im: circleCentre.im + circleRadius * Math.sin(theta)
-        };
+    function meanBodyY(samples: SurfaceSample[]) {
+      if (samples.length === 0) return 0;
+      let sum = 0;
+      for (const sample of samples) sum += sample.body.y;
+      return sum / samples.length;
+    }
 
-        const rawMapped = joukowski(zeta);
-        const body = rawMappedToBody(rawMapped);
+    function rebuildMeanSurfaceAerodynamics() {
+      panelSamples = [];
+
+      for (let i = 0; i < panelCount; i++) {
+        const vel = meanSurfaceVelocityForPanel(i);
+        const speed = Math.hypot(vel.x, vel.y);
+        const cp = 1 - (speed * speed) / Math.max(U * U, 1e-12);
+        const body = panels[i].mid;
         const lab = bodyToLabPoint(body);
-        const velocity = bodyVelocityFromZeta(zeta);
+        const xOverC = Math.max(0, Math.min(1, body.x / targetChord + 0.5));
 
-        if (!velocity) {
-          continue;
-        }
-
-        samples.push({
+        panelSamples.push({
           body,
           lab,
-          xOverC: (rawMapped.re - rawGeometryMinX) / rawChord,
-          speed: Math.hypot(velocity.u, velocity.v)
+          normalBody: panels[i].normal,
+          xOverC,
+          speed,
+          cp,
+          panelIndex: i
         });
       }
 
-      return samples;
+      let leIndex = 0;
+      let minX = Infinity;
+      for (let i = 0; i < panelSamples.length; i++) {
+        if (panelSamples[i].body.x < minX) {
+          minX = panelSamples[i].body.x;
+          leIndex = i;
+        }
+      }
+
+      const branchA = panelSamples.slice(0, leIndex + 1).reverse();
+      const branchB = panelSamples.slice(leIndex + 1);
+      const upperBranch = meanBodyY(branchA) >= meanBodyY(branchB) ? branchA : branchB;
+      const lowerBranch = upperBranch === branchA ? branchB : branchA;
+
+      upperPanelIndices = upperBranch.map(p => p.panelIndex);
+      lowerPanelIndices = lowerBranch.map(p => p.panelIndex);
+
+      upperSurface = upperBranch
+        .map(p => ({ x: p.xOverC, y: p.body.y, cp: p.cp }))
+        .sort((a, b) => a.x - b.x);
+      lowerSurface = lowerBranch
+        .map(p => ({ x: p.xOverC, y: p.body.y, cp: p.cp }))
+        .sort((a, b) => a.x - b.x);
     }
 
-    function meanBodyY(path: SurfaceSample[]) {
-      if (path.length === 0) {
-        return 0;
-      }
-
-      const start = Math.min(4, path.length - 1);
-      const end = Math.min(path.length, Math.max(start + 1, Math.floor(path.length * 0.55)));
-
-      let sum = 0;
-      let count = 0;
-
-      for (let i = start; i < end; i++) {
-        sum += path[i].body.y;
-        count++;
-      }
-
-      return count > 0 ? sum / count : 0;
+    function smoothstep01(value: number) {
+      const x = Math.max(0, Math.min(1, value));
+      return x * x * (3 - 2 * x);
     }
 
-    function splitSurfaceAtLeadingStagnation() {
-      const samples = buildFullSurfaceSamples();
+    function interpolateSurfaceCp(surface: SurfacePoint[], x: number) {
+      if (surface.length === 0) return 0;
+      if (x <= surface[0].x) return surface[0].cp;
+      if (x >= surface[surface.length - 1].x) return surface[surface.length - 1].cp;
 
-      if (samples.length < 20) {
-        return {
-          upper: [] as SurfaceSample[],
-          lower: [] as SurfaceSample[]
-        };
+      for (let i = 1; i < surface.length; i++) {
+        if (surface[i].x >= x) {
+          const a = surface[i - 1];
+          const b = surface[i];
+          const span = Math.max(b.x - a.x, 1e-9);
+          const t = (x - a.x) / span;
+          return a.cp + t * (b.cp - a.cp);
+        }
+      }
+      return surface[surface.length - 1].cp;
+    }
+
+    function integrateLiftFromCp(cpValues: Float64Array | number[]) {
+      let forceBodyX = 0;
+      let forceBodyY = 0;
+
+      for (let i = 0; i < panelCount; i++) {
+        const cp = cpValues[i];
+        forceBodyX += -cp * panels[i].normal.x * panels[i].length / targetChord;
+        forceBodyY += -cp * panels[i].normal.y * panels[i].length / targetChord;
       }
 
-      let stagnationIndex = -1;
-      let minimumSpeed = Infinity;
+      return bodyToLabVelocity(forceBodyX, forceBodyY).v;
+    }
+
+    function meanSuctionSideSeparation(attachedLift: number) {
+      if (Math.abs(attachedLift) < 1e-6) return null;
+      return attachedLift >= 0
+        ? upperBoundaryLayer.separation
+        : lowerBoundaryLayer.separation;
+    }
+
+    function kirchhoffStallFactor(separation: BoundaryLayerPoint | null) {
+      /*
+        Kirchhoff/Leishman-Beddoes static separated-flow factor.
+
+        f = x_sep / c
+
+        f = 1  -> attached flow, factor = 1
+        f = 0  -> leading-edge separation, factor = 0.25
+
+        The stall onset angle is not prescribed. It emerges from the
+        boundary-layer model through the predicted persistent separation
+        position, so geometry and Reynolds number influence the rollover.
+      */
+      if (!separation) return 1;
+      const f = Math.max(0, Math.min(1, separation.xOverC));
+      const rootF = Math.sqrt(f);
+      return 0.25 * (1 + rootF) * (1 + rootF);
+    }
+
+    function applyMeanSeparatedPressureCorrection() {
+      /*
+        1. Start from the quasi-steady attached panel Cp field.
+        2. Let the integral BL model determine persistent separation.
+        3. Use the suction-side separation point in a Kirchhoff-type
+           static-stall law to obtain the target mean lift.
+        4. Construct a fully unloaded downstream Cp shape, then blend
+           toward it until its integrated lift matches the stall target.
+
+        This keeps Cp, CL and effective circulation mutually consistent,
+        while avoiding any hard-coded critical angle of attack.
+      */
+      const rawUpper = upperSurface.map(point => ({ ...point }));
+      const rawLower = lowerSurface.map(point => ({ ...point }));
+
+      const rawCp = new Float64Array(panelCount);
+      const fullyRelaxedCp = new Float64Array(panelCount);
+      for (let i = 0; i < panelCount; i++) {
+        rawCp[i] = panelSamples[i].cp;
+        fullyRelaxedCp[i] = panelSamples[i].cp;
+      }
+
+      const attachedLift = integrateLiftFromCp(rawCp);
+      const suctionSeparation = meanSuctionSideSeparation(attachedLift);
+      const stallFactor = kirchhoffStallFactor(suctionSeparation);
+      const targetLift = attachedLift * stallFactor;
+
+      const relaxSide = (
+        indices: number[],
+        separation: BoundaryLayerPoint | null,
+        opposite: SurfacePoint[]
+      ) => {
+        if (!separation) return;
+        const xSep = Math.max(0, Math.min(0.995, separation.xOverC));
+        const remaining = Math.max(1 - xSep, 1e-6);
+
+        for (const panelIndex of indices) {
+          const sample = panelSamples[panelIndex];
+          if (sample.xOverC <= xSep) continue;
+
+          const xi = (sample.xOverC - xSep) / remaining;
+          const loadingRelaxation = smoothstep01(xi);
+          const oppositeCp = interpolateSurfaceCp(opposite, sample.xOverC);
+          fullyRelaxedCp[panelIndex] =
+            sample.cp +
+            loadingRelaxation * (oppositeCp - sample.cp);
+        }
+      };
+
+      relaxSide(upperPanelIndices, upperBoundaryLayer.separation, rawLower);
+      relaxSide(lowerPanelIndices, lowerBoundaryLayer.separation, rawUpper);
+
+      const fullyRelaxedLift = integrateLiftFromCp(fullyRelaxedCp);
+      const liftChangeAvailable = fullyRelaxedLift - attachedLift;
+      const liftChangeRequired = targetLift - attachedLift;
+
+      let relaxationBlend = 0;
+      if (Math.abs(liftChangeAvailable) > 1e-8) {
+        relaxationBlend = Math.max(
+          0,
+          Math.min(1, liftChangeRequired / liftChangeAvailable)
+        );
+      }
+
+      const correctedCp = new Float64Array(panelCount);
+      for (let i = 0; i < panelCount; i++) {
+        correctedCp[i] =
+          rawCp[i] +
+          relaxationBlend * (fullyRelaxedCp[i] - rawCp[i]);
+      }
+
+      liftCoefficient = integrateLiftFromCp(correctedCp);
 
       /*
-        Exclude the trailing-edge region and search the
-        forward part of the airfoil for the leading-side
-        surface stagnation point.
+        In very deep separation the downstream unloading shape can, in
+        principle, be insufficient to reach the Kirchhoff target exactly.
+        Apply a small residual scaling to the pressure *loading* only, not
+        to the mean pressure level. This preserves the Cp shape while making
+        the displayed Cp integral and CL agree.
       */
-      for (let i = 4; i < samples.length - 4; i++) {
-        const sample = samples[i];
+      if (
+        suctionSeparation &&
+        Math.abs(liftCoefficient) > 1e-8 &&
+        Math.abs(targetLift - liftCoefficient) > 0.01
+      ) {
+        const loadScale = Math.max(
+          0.15,
+          Math.min(1, targetLift / liftCoefficient)
+        );
 
-        if (sample.xOverC > 0.42) {
-          continue;
+        const pairedUpper = upperSurface;
+        const pairedLower = lowerSurface;
+
+        for (let i = 0; i < panelCount; i++) {
+          const sample = panelSamples[i];
+          const opposite = upperPanelIndices.includes(i)
+            ? interpolateSurfaceCp(pairedLower, sample.xOverC)
+            : interpolateSurfaceCp(pairedUpper, sample.xOverC);
+          const meanCp = 0.5 * (correctedCp[i] + opposite);
+          correctedCp[i] = meanCp + loadScale * (correctedCp[i] - meanCp);
         }
 
-        if (sample.speed < minimumSpeed) {
-          minimumSpeed = sample.speed;
+        liftCoefficient = integrateLiftFromCp(correctedCp);
+      }
+
+      upperSurface = upperPanelIndices
+        .map(i => ({
+          x: panelSamples[i].xOverC,
+          y: panelSamples[i].body.y,
+          cp: correctedCp[i]
+        }))
+        .sort((a, b) => a.x - b.x);
+
+      lowerSurface = lowerPanelIndices
+        .map(i => ({
+          x: panelSamples[i].xOverC,
+          y: panelSamples[i].body.y,
+          cp: correctedCp[i]
+        }))
+        .sort((a, b) => a.x - b.x);
+
+      // Effective mean circulation is kept consistent with the stall-aware
+      // pressure-integrated mean lift, not the instantaneous wake-coupled
+      // bound-vortex strength.
+      const gammaSign = Math.abs(meanAttachedBoundCirculation) > 1e-10
+        ? Math.sign(meanAttachedBoundCirculation)
+        : -Math.sign(liftCoefficient || 1);
+      boundCirculation =
+        gammaSign * 0.5 * Math.abs(liftCoefficient) * U * targetChord;
+    }
+
+    function splitSurfaceAtStagnation() {
+      if (panelSamples.length < 10) {
+        return { upper: [] as SurfaceSample[], lower: [] as SurfaceSample[] };
+      }
+
+      let stagnationIndex = 0;
+      let minSpeed = Infinity;
+      for (let i = 0; i < panelSamples.length; i++) {
+        const sample = panelSamples[i];
+        if (sample.xOverC > 0.42) continue;
+        if (sample.speed < minSpeed) {
+          minSpeed = sample.speed;
           stagnationIndex = i;
         }
       }
 
-      if (stagnationIndex < 0) {
-        stagnationIndex = Math.floor(samples.length / 2);
-      }
-
       const pathA: SurfaceSample[] = [];
-
-      for (let i = stagnationIndex; i >= 0; i--) {
-        pathA.push(samples[i]);
-      }
-
-      const pathB = samples.slice(stagnationIndex);
+      for (let i = stagnationIndex; i >= 0; i--) pathA.push(panelSamples[i]);
+      const pathB = panelSamples.slice(stagnationIndex);
 
       if (meanBodyY(pathA) >= meanBodyY(pathB)) {
-        return {
-          upper: pathA,
-          lower: pathB
-        };
+        return { upper: pathA, lower: pathB };
       }
-
-      return {
-        upper: pathB,
-        lower: pathA
-      };
+      return { upper: pathB, lower: pathA };
     }
 
     // ==================================================
-    // THWAITES CORRELATIONS
+    // LAMINAR THWAITES + MICHEL TRANSITION + HEAD TURBULENT BL
     // ==================================================
 
     function thwaitesShapeFactor(lambda: number) {
-      if (lambda >= 0) {
-        return 2.61 - 3.75 * lambda + 5.24 * lambda * lambda;
-      }
-
-      const safeLambda = Math.max(lambda, -0.099);
-
-      return 2.088 + 0.0731 / (safeLambda + 0.14);
+      if (lambda >= 0) return 2.61 - 3.75 * lambda + 5.24 * lambda * lambda;
+      const safe = Math.max(lambda, -0.099);
+      return 2.088 + 0.0731 / (safe + 0.14);
     }
 
     function thwaitesShearFunction(lambda: number) {
-      if (lambda >= 0) {
-        return 0.22 + 1.57 * lambda - 1.8 * lambda * lambda;
+      if (lambda >= 0) return 0.22 + 1.57 * lambda - 1.8 * lambda * lambda;
+      const safe = Math.max(lambda, -0.099);
+      return 0.22 + 1.402 * safe + (0.018 * safe) / (safe + 0.107);
+    }
+
+    function headH1(H: number) {
+      if (H <= 1.6) {
+        return 3.3 + 0.8234 * Math.pow(Math.max(H - 1.1, 1e-4), -1.287);
       }
+      return 3.3 + 1.5501 * Math.pow(Math.max(H - 0.6778, 1e-4), -3.064);
+    }
 
-      const safeLambda = Math.max(lambda, -0.099);
+    function headH1Derivative(H: number) {
+      if (H <= 1.6) {
+        return -1.287 * 0.8234 * Math.pow(Math.max(H - 1.1, 1e-4), -2.287);
+      }
+      return -3.064 * 1.5501 * Math.pow(Math.max(H - 0.6778, 1e-4), -4.064);
+    }
 
-      return (
-        0.22 +
-        1.402 * safeLambda +
-        (0.018 * safeLambda) /
-        (safeLambda + 0.107)
-      );
+    function headDerivatives(theta: number, H: number, ue: number, dueDs: number) {
+      const safeUe = Math.max(ue, 1e-5);
+      const reTheta = Math.max(safeUe * theta / nu, 10);
+      const cf = 0.246 * Math.pow(10, -0.678 * H) * Math.pow(reTheta, -0.268);
+      const dTheta = cf / 2 - (H + 2) * theta / safeUe * dueDs;
+      const H1 = headH1(H);
+      const entrainment = 0.0306 * Math.pow(Math.max(H1 - 3, 0.03), -0.6169);
+      const dH1 = (
+        entrainment -
+        H1 * dTheta -
+        theta * H1 * dueDs / safeUe
+      ) / Math.max(theta, 1e-9);
+      const derivative = headH1Derivative(H);
+      const dH = dH1 / (Math.abs(derivative) > 1e-10 ? derivative : -1e-10);
+      return { dTheta, dH, cf };
+    }
+
+    function smoothSurfaceSpeed(values: number[]) {
+      if (values.length < 3) return values.slice();
+      const result = values.slice();
+      for (let i = 1; i < values.length - 1; i++) {
+        result[i] = 0.25 * values[i - 1] + 0.5 * values[i] + 0.25 * values[i + 1];
+      }
+      return result;
     }
 
     function marchBoundaryLayer(path: SurfaceSample[]): BoundaryLayerResult {
-      if (path.length < 8) {
-        return {
-          points: [],
-          separation: null
-        };
-      }
-
-      const s: number[] = new Array(path.length).fill(0);
-      const ue: number[] = path.map(sample => Math.max(sample.speed, 1e-8));
-
-      for (let i = 1; i < path.length; i++) {
-        s[i] =
-          s[i - 1] +
-          Math.hypot(
-            path[i].lab.x - path[i - 1].lab.x,
-            path[i].lab.y - path[i - 1].lab.y
-          );
-      }
-
-      const startThreshold = Math.max(0.02 * U, 1e-4);
-
-      let startIndex = 1;
-
-      while (
-        startIndex < path.length - 3 &&
-        ue[startIndex] < startThreshold
-      ) {
-        startIndex++;
-      }
-
-      const derivativeAt = (index: number) => {
-        if (index <= 0) {
-          const ds = Math.max(s[1] - s[0], 1e-9);
-          return (ue[1] - ue[0]) / ds;
-        }
-
-        if (index >= path.length - 1) {
-          const ds = Math.max(s[index] - s[index - 1], 1e-9);
-          return (ue[index] - ue[index - 1]) / ds;
-        }
-
-        const ds = Math.max(s[index + 1] - s[index - 1], 1e-9);
-        return (ue[index + 1] - ue[index - 1]) / ds;
+      const empty: BoundaryLayerResult = {
+        points: [], transition: null, laminarSeparation: null, separation: null
       };
+      if (path.length < 8) return empty;
 
+      const s = new Array<number>(path.length).fill(0);
+      for (let i = 1; i < path.length; i++) {
+        s[i] = s[i - 1] + Math.hypot(
+          path[i].body.x - path[i - 1].body.x,
+          path[i].body.y - path[i - 1].body.y
+        );
+      }
+
+      const ue = smoothSurfaceSpeed(path.map(p => Math.max(p.speed, 1e-8)));
+      const startThreshold = Math.max(0.02 * U, 1e-4);
+      let start = 1;
+      while (start < path.length - 2 && ue[start] < startThreshold) start++;
+      if (start >= path.length - 2) return empty;
+
+      const ds0 = Math.max(s[start + 1] - s[start], 1e-8);
       const initialGradient = Math.max(
-        derivativeAt(startIndex),
-        1e-6
+        (ue[start + 1] - ue[start]) / ds0,
+        1e-4 * U / targetChord
       );
-
-      const initialThetaSquared =
-        0.075 *
-        nu /
-        initialGradient;
-
-      let thwaitesIntegralState =
-        initialThetaSquared *
-        Math.pow(ue[startIndex], 6);
+      let thetaSquared = Math.max(0.075 * nu / initialGradient, 1e-12);
+      let thwaitesIntegral = thetaSquared * Math.pow(ue[start], 6);
+      let theta = Math.sqrt(thetaSquared);
+      let H = thwaitesShapeFactor(0);
+      let regime: Regime = "laminar";
 
       const points: BoundaryLayerPoint[] = [];
+      let transition: BoundaryLayerPoint | null = null;
+      let laminarSeparation: BoundaryLayerPoint | null = null;
       let separation: BoundaryLayerPoint | null = null;
+      let transitionIndex = -1;
 
-      for (let i = startIndex; i < path.length; i++) {
-        if (i > startIndex) {
-          const ds = Math.max(s[i] - s[i - 1], 0);
+      for (let i = start; i < path.length; i++) {
+        const sample = path[i];
 
-          thwaitesIntegralState +=
-            0.45 *
-            nu *
-            0.5 *
-            (
-              Math.pow(ue[i - 1], 5) +
-              Math.pow(ue[i], 5)
-            ) *
-            ds;
+        if (regime === "laminar") {
+          if (i > start) {
+            const ds = Math.max(s[i] - s[i - 1], 0);
+            thwaitesIntegral +=
+              0.45 * nu * 0.5 *
+              (Math.pow(ue[i - 1], 5) + Math.pow(ue[i], 5)) * ds;
+          }
+
+          thetaSquared = Math.max(
+            thwaitesIntegral / Math.max(Math.pow(ue[i], 6), 1e-30),
+            1e-12
+          );
+          theta = Math.sqrt(thetaSquared);
+
+          const dueDs = i === path.length - 1
+            ? (ue[i] - ue[i - 1]) / Math.max(s[i] - s[i - 1], 1e-8)
+            : (ue[i + 1] - ue[Math.max(start, i - 1)]) /
+              Math.max(s[i + 1] - s[Math.max(start, i - 1)], 1e-8);
+
+          const lambda = thetaSquared / nu * dueDs;
+          H = thwaitesShapeFactor(lambda);
+          const shearFunction = thwaitesShearFunction(lambda);
+          const cf = 2 * nu * shearFunction / Math.max(ue[i] * theta, 1e-12);
+
+          const point: BoundaryLayerPoint = {
+            body: sample.body,
+            lab: sample.lab,
+            normalBody: sample.normalBody,
+            xOverC: sample.xOverC,
+            s: s[i],
+            ue: ue[i],
+            theta,
+            deltaStar: H * theta,
+            shapeFactor: H,
+            cf,
+            regime: "laminar"
+          };
+          points.push(point);
+
+          const reX = ue[i] * Math.max(s[i], 1e-8) / nu;
+          const reTheta = ue[i] * theta / nu;
+          const criticalReTheta =
+            1.174 *
+            (1 + 22400 / Math.max(reX, 1)) *
+            Math.pow(Math.max(reX, 1), 0.46);
+
+          const laminarSeparated = lambda <= -0.09;
+          const naturalTransition = reX > 1e4 && reTheta >= criticalReTheta;
+
+          if (laminarSeparated || naturalTransition) {
+            if (laminarSeparated) laminarSeparation = point;
+            transition = point;
+            transitionIndex = i;
+            regime = "turbulent";
+            H = 1.4;
+          }
+
+          continue;
         }
 
-        const localUe = Math.max(ue[i], 1e-6);
+        if (i === transitionIndex) continue;
 
-        const thetaSquared = Math.max(
-          thwaitesIntegralState /
-          Math.pow(localUe, 6),
-          0
-        );
+        const ds = Math.max(s[i] - s[i - 1], 1e-8);
+        const u0 = Math.max(ue[i - 1], 1e-5);
+        const u1 = Math.max(ue[i], 1e-5);
+        const um = 0.5 * (u0 + u1);
+        const dueDs = (u1 - u0) / ds;
 
-        const theta = Math.sqrt(thetaSquared);
-        const dueDs = derivativeAt(i);
-        const lambda = thetaSquared / nu * dueDs;
+        const k1 = headDerivatives(theta, H, u0, dueDs);
+        const thetaMid = Math.max(theta + 0.5 * ds * k1.dTheta, 1e-7);
+        const hMid = Math.max(1.2, Math.min(3.2, H + 0.5 * ds * k1.dH));
+        const k2 = headDerivatives(thetaMid, hMid, um, dueDs);
 
-        const separated = lambda <= -0.09;
-
-        const shapeFactor = thwaitesShapeFactor(
-          separated ? -0.09 : lambda
-        );
-
-        const shearFunction = separated
-          ? 0
-          : thwaitesShearFunction(lambda);
-
-        const reTheta = localUe * theta / nu;
-
-        const cf =
-          reTheta > 1e-10
-            ? 2 * shearFunction / reTheta
-            : 0;
-
-        const deltaStar = shapeFactor * theta;
-        const delta99 = 8.5 * theta;
+        theta = Math.max(theta + ds * k2.dTheta, 1e-7);
+        H = Math.max(1.2, Math.min(4.0, H + ds * k2.dH));
+        const reTheta = Math.max(u1 * theta / nu, 10);
+        const cf = 0.246 * Math.pow(10, -0.678 * H) * Math.pow(reTheta, -0.268);
 
         const point: BoundaryLayerPoint = {
-          x: path[i].lab.x,
-          y: path[i].lab.y,
-          xOverC: Math.max(0, Math.min(1, path[i].xOverC)),
+          body: sample.body,
+          lab: sample.lab,
+          normalBody: sample.normalBody,
+          xOverC: sample.xOverC,
           s: s[i],
-          ue: localUe,
+          ue: u1,
           theta,
-          deltaStar,
-          delta99,
-          shapeFactor,
-          lambda,
-          cf
+          deltaStar: H * theta,
+          shapeFactor: H,
+          cf,
+          regime: "turbulent"
         };
-
         points.push(point);
 
-        if (separated) {
+        // Head/Ludwieg-Tillmann does not itself drive Cf exactly
+        // to zero. H≈2.4 is the standard integral-method turbulent
+        // separation indicator used here.
+        if (H >= 2.4) {
           separation = point;
           break;
         }
       }
 
-      return {
-        points,
-        separation
-      };
+      return { points, transition, laminarSeparation, separation };
     }
 
     function rebuildBoundaryLayers() {
-      const split = splitSurfaceAtLeadingStagnation();
-
+      const split = splitSurfaceAtStagnation();
       upperBoundaryLayer = marchBoundaryLayer(split.upper);
       lowerBoundaryLayer = marchBoundaryLayer(split.lower);
     }
 
     // ==================================================
+    // TIME-AVERAGED DISPLAY STATE
+    // Solver and wake remain instantaneous. Only the displayed Cp
+    // curves and separation instrumentation are filtered.
+    // ==================================================
+
+    function cloneSurface(surface: SurfacePoint[]) {
+      return surface.map(point => ({ ...point }));
+    }
+
+    function resetDisplaySeparation(
+      state: DisplaySeparationState,
+      result: BoundaryLayerResult
+    ) {
+      state.samples = [];
+
+      if (result.separation) {
+        state.xOverC = result.separation.xOverC;
+        state.samples.push(result.separation.xOverC);
+        state.confidence = 1;
+        state.visible = true;
+        state.initialized = true;
+      } else {
+        state.xOverC = 0;
+        state.confidence = 0;
+        state.visible = false;
+        state.initialized = false;
+      }
+    }
+
+    function resetDisplayAverages() {
+      displayUpperSurface = cloneSurface(upperSurface);
+      displayLowerSurface = cloneSurface(lowerSurface);
+      resetDisplaySeparation(displayUpperSeparation, upperBoundaryLayer);
+      resetDisplaySeparation(displayLowerSeparation, lowerBoundaryLayer);
+
+      displayBoundCirculation = boundCirculation;
+      displayLiftCoefficient = liftCoefficient;
+      displayLoadsInitialized = true;
+    }
+
+    function filterSurfaceForDisplay(
+      displayed: SurfacePoint[],
+      instantaneous: SurfacePoint[],
+      dt: number
+    ) {
+      if (displayed.length !== instantaneous.length) {
+        return cloneSurface(instantaneous);
+      }
+
+      const gain = 1 - Math.exp(-dt / cpDisplayTau);
+
+      for (let i = 0; i < instantaneous.length; i++) {
+        const current = instantaneous[i];
+        const filtered = displayed[i];
+
+        // Geometry changes should update immediately rather than being
+        // blended with coordinates belonging to the old airfoil.
+        if (Math.abs(filtered.x - current.x) > 1e-7) {
+          return cloneSurface(instantaneous);
+        }
+
+        filtered.x = current.x;
+        filtered.y = current.y;
+        filtered.cp += gain * (current.cp - filtered.cp);
+      }
+
+      return displayed;
+    }
+
+    function median(values: number[]) {
+      if (values.length === 0) return 0;
+      const sorted = values.slice().sort((a, b) => a - b);
+      const middle = Math.floor(sorted.length / 2);
+      return sorted.length % 2 === 0
+        ? 0.5 * (sorted[middle - 1] + sorted[middle])
+        : sorted[middle];
+    }
+
+    function updateDisplaySeparation(
+      state: DisplaySeparationState,
+      result: BoundaryLayerResult,
+      dt: number
+    ) {
+      const separation = result.separation;
+      const presenceGain = 1 - Math.exp(-dt / separationPresenceTau);
+      const positionGain = 1 - Math.exp(-dt / separationDisplayTau);
+      const targetPresence = separation ? 1 : 0;
+
+      state.confidence += presenceGain * (targetPresence - state.confidence);
+
+      if (separation) {
+        state.samples.push(separation.xOverC);
+        if (state.samples.length > separationMedianWindow) state.samples.shift();
+
+        const target = median(state.samples);
+
+        if (!state.initialized) {
+          state.xOverC = target;
+          state.initialized = true;
+        } else {
+          const error = target - state.xOverC;
+
+          // Ignore small wake-induced excursions entirely. For larger
+          // movements, remove the deadband first, then apply both an EMA
+          // and a chord-normalised slew-rate limit. This stabilises the
+          // displayed marker without changing the instantaneous BL state.
+          if (Math.abs(error) > separationDeadband) {
+            const effectiveError =
+              error - Math.sign(error) * separationDeadband;
+            const filteredStep = positionGain * effectiveError;
+            const maxStep = separationMaxRate * dt;
+            state.xOverC += Math.max(-maxStep, Math.min(maxStep, filteredStep));
+          }
+        }
+      }
+
+      // Presence hysteresis prevents intermittent solver crossings from
+      // making the displayed separation marker blink frame-to-frame.
+      if (state.visible) {
+        if (state.confidence < 0.15) state.visible = false;
+      } else if (state.confidence > 0.68 && state.initialized) {
+        state.visible = true;
+      }
+
+      if (!separation && state.confidence < 0.02) {
+        state.initialized = false;
+        state.samples = [];
+      }
+    }
+
+    function updateDisplayLoads(dt: number) {
+      if (!displayLoadsInitialized) {
+        displayBoundCirculation = boundCirculation;
+        displayLiftCoefficient = liftCoefficient;
+        displayLoadsInitialized = true;
+        return;
+      }
+
+      const gain = 1 - Math.exp(-dt / loadDisplayTau);
+      displayBoundCirculation += gain * (boundCirculation - displayBoundCirculation);
+      displayLiftCoefficient += gain * (liftCoefficient - displayLiftCoefficient);
+    }
+
+    function updateDisplayAverages(dt: number) {
+      displayUpperSurface = filterSurfaceForDisplay(displayUpperSurface, upperSurface, dt);
+      displayLowerSurface = filterSurfaceForDisplay(displayLowerSurface, lowerSurface, dt);
+      updateDisplaySeparation(displayUpperSeparation, upperBoundaryLayer, dt);
+      updateDisplaySeparation(displayLowerSeparation, lowerBoundaryLayer, dt);
+      updateDisplayLoads(dt);
+    }
+
+    // ==================================================
     // DISCRETE VORTEX WAKE
+    // No shielding or prescribed separated-particle velocity.
     // ==================================================
 
     function clearWake() {
       wakeVortices = [];
       upperShedClock = 0;
       lowerShedClock = 0;
-      wakeTracerCursor = 0;
-      wakeSerial = 0;
-      wakeCirculationSum = 0;
       wakeCountOutput.textContent = "0";
     }
 
-    function separationFrame(result: BoundaryLayerResult) {
-      const separation = result.separation;
-
-      if (!separation || result.points.length < 2) {
-        return null;
+    function addWakeVortex(vortex: WakeVortex) {
+      wakeVortices.push(vortex);
+      if (wakeVortices.length > maxWakeVortices) {
+        wakeVortices.splice(0, wakeVortices.length - maxWakeVortices);
       }
-
-      const index = Math.max(
-        0,
-        result.points.indexOf(separation)
-      );
-
-      const previous = result.points[Math.max(0, index - 1)];
-      const next = result.points[Math.min(result.points.length - 1, index + 1)];
-
-      const tangentX = next.x - previous.x;
-      const tangentY = next.y - previous.y;
-      const tangentLength = Math.hypot(tangentX, tangentY);
-
-      if (tangentLength < 1e-12) {
-        return null;
-      }
-
-      const tx = tangentX / tangentLength;
-      const ty = tangentY / tangentLength;
-      const normal = outwardNormal(result.points, index);
-
-      return {
-        point: separation,
-        tx,
-        ty,
-        nx: normal.x,
-        ny: normal.y
-      };
     }
 
-    function wakeCoreRadius(vortex: WakeVortex) {
-      /*
-        The initial blob core prevents the Biot-Savart
-        kernel from becoming singular. Core growth with
-        4νt gives the wake an explicit viscous diffusion
-        time scale while keeping the browser model cheap.
-      */
-      return Math.sqrt(
-        initialWakeCoreRadius * initialWakeCoreRadius +
-        4 * nu * vortex.age
-      );
+    function separationFor(source: "upper" | "lower") {
+      return source === "upper"
+        ? upperBoundaryLayer.separation
+        : lowerBoundaryLayer.separation;
     }
 
-    function recalculateWakeCirculation() {
-      let total = 0;
-
-      for (const vortex of wakeVortices) {
-        total += vortex.gamma;
-      }
-
-      wakeCirculationSum = total;
-    }
-
-    function boundReactionVelocity(
-      x: number,
-      y: number
+    function releaseSeparationPair(
+      source: "upper" | "lower",
+      separation: BoundaryLayerPoint,
+      interval: number
     ) {
-      /*
-        A fully coupled unsteady model would alter bound
-        circulation as vorticity is shed. v0.2 keeps the
-        surface solution one-way coupled, so this regularised
-        equal-and-opposite reaction supplies only the velocity
-        correction needed to prevent spurious net circulation
-        from growing across the whole domain.
-      */
-
-      if (Math.abs(wakeCirculationSum) < 1e-12) {
-        return { u: 0, v: 0 };
-      }
-
-      const dx = x - airfoilCentroid.x;
-      const dy = y - airfoilCentroid.y;
-      const r2 = dx * dx + dy * dy;
-      const core = 0.12 * targetChord;
-      const denominator = r2 + core * core;
-
-      const compensatingGamma = -wakeCirculationSum;
-      const factor =
-        compensatingGamma /
-        (2 * Math.PI * denominator);
-
-      return {
-        u: -factor * dy,
-        v: factor * dx
-      };
-    }
-
-    function wakeVelocityAt(
-      x: number,
-      y: number,
-      ignoreIndex = -1
-    ) {
-      let u = 0;
-      let v = 0;
-
-      if (!showWake || wakeVortices.length === 0) {
-        return { u, v };
-      }
-
-      for (let i = 0; i < wakeVortices.length; i++) {
-        if (i === ignoreIndex) {
-          continue;
-        }
-
-        const vortex = wakeVortices[i];
-        const dx = x - vortex.x;
-        const dy = y - vortex.y;
-        const r2 = dx * dx + dy * dy;
-        const core = wakeCoreRadius(vortex);
-        const denominator = r2 + core * core;
-
-        const factor =
-          vortex.gamma /
-          (2 * Math.PI * denominator);
-
-        u -= factor * dy;
-        v += factor * dx;
-      }
-
-      const reaction = boundReactionVelocity(x, y);
-
-      u += reaction.u;
-      v += reaction.v;
-
-      return { u, v };
-    }
-
-    function instantaneousVelocityAt(x: number, y: number) {
-      const outer = outerVelocityAt(x, y);
-
-      if (!outer) {
-        return null;
-      }
-
-      if (!showWake || wakeVortices.length === 0) {
-        return outer;
-      }
-
-      const wake = wakeVelocityAt(x, y);
-
-      return {
-        u: outer.u + wake.u,
-        v: outer.v + wake.v
-      };
-    }
-
-    function wakeSheddingPeriod(separation: BoundaryLayerPoint) {
-      /*
-        Blob release spacing is set in convective units,
-        so changing U∞ does not radically change the
-        apparent spatial resolution of the shear layer.
-      */
-      const convectionSpeed = Math.max(
-        0.35 * U,
-        0.55 * separation.ue
-      );
-
-      return Math.max(
-        0.018,
-        Math.min(
-          0.16,
-          nominalWakeSpacing / Math.max(convectionSpeed, 1e-6)
-        )
-      );
-    }
-
-    function seedWakeTracers(
-      frame: ReturnType<typeof separationFrame>,
-      count: number
-    ) {
-      if (!frame) {
-        return;
-      }
-
-      const baseOffset = Math.max(
-        0.004 * targetChord,
-        Math.min(
-          0.03 * targetChord,
-          1.15 * frame.point.delta99
-        )
-      );
-
-      const wakeStart = Math.floor(
-        activeParticleCount * (1 - wakeTracerFraction)
-      );
-
-      const wakeCapacity =
-        activeParticleCount - wakeStart;
-
-      if (wakeCapacity <= 0) {
-        return;
-      }
-
-      for (let n = 0; n < count; n++) {
-        const index =
-          wakeStart +
-          (wakeTracerCursor % wakeCapacity);
-
-        wakeTracerCursor++;
-
-        const tangentJitter =
-          (n - 0.5 * (count - 1)) *
-          0.0025 * targetChord;
-
-        const normalJitter =
-          (0.15 + 0.08 * Math.sin(wakeSerial + n)) *
-          baseOffset;
-
-        particleX[index] =
-          frame.point.x +
-          frame.tx * tangentJitter +
-          frame.nx * (baseOffset + normalJitter);
-
-        particleY[index] =
-          frame.point.y +
-          frame.ty * tangentJitter +
-          frame.ny * (baseOffset + normalJitter);
-
-        previousParticleX[index] = particleX[index];
-        previousParticleY[index] = particleY[index];
-      }
-    }
-
-    function shedWakeVortex(
-      result: BoundaryLayerResult,
-      source: WakeSource,
-      shedPeriod: number
-    ) {
-      const frame = separationFrame(result);
-
-      if (!frame) {
-        return;
-      }
-
-      const separation = frame.point;
-      const convectionSpeed = Math.max(
-        0.35 * U,
-        0.55 * separation.ue
-      );
-
-      /*
-        A separated shear layer has an approximate
-        vortex-sheet strength equal to its velocity jump.
-        Taking the inner separated-flow speed as small,
-        γsheet ≈ Ue. A blob represents a convected sheet
-        segment Uc Δt, hence ΔΓ ≈ Ue Uc Δt.
-
-        Upper-surface boundary-layer vorticity is negative
-        for left-to-right flow; lower-surface vorticity is
-        positive.
-      */
       const sign = source === "upper" ? -1 : 1;
+      const gamma = sign * 0.5 * separation.ue * separation.ue * interval;
+      const offset = Math.max(0.006 * targetChord, 0.5 * separation.deltaStar);
 
-      const gammaMagnitude = Math.min(
-        0.075 * U * targetChord,
-        0.55 * separation.ue * convectionSpeed * shedPeriod
-      );
-
-      if (gammaMagnitude < 1e-7) {
-        return;
-      }
-
-      const baseOffset = Math.max(
-        0.006 * targetChord,
-        Math.min(
-          0.035 * targetChord,
-          1.35 * separation.delta99
-        )
-      );
-
-      /*
-        A tiny deterministic perturbation seeds the
-        convective shear-layer instability without
-        changing vortex sign or adding random forcing.
-      */
-      const perturbation =
-        1 +
-        0.08 * Math.sin(2.3999632297 * wakeSerial);
-
-      const normalOffset = baseOffset * perturbation;
-      const tangentOffset = 0.006 * targetChord;
-
-      wakeVortices.push({
-        x:
-          separation.x +
-          frame.nx * normalOffset +
-          frame.tx * tangentOffset,
-
-        y:
-          separation.y +
-          frame.ny * normalOffset +
-          frame.ty * tangentOffset,
-
-        gamma: sign * gammaMagnitude,
+      addWakeVortex({
+        x: separation.body.x + separation.normalBody.x * offset,
+        y: separation.body.y + separation.normalBody.y * offset,
+        gamma,
         age: 0,
         source
       });
 
-      wakeSerial++;
-      seedWakeTracers(frame, 4);
+      // The opposite-sign sheet leaving the attached side at the TE
+      // prevents artificial accumulation of net free circulation.
+      const counterpartPanel = source === "upper" ? panels[panelCount - 1] : panels[0];
+      const te = panelNodes[0];
+      const flow = freestreamBody();
+      const flowMag = Math.max(Math.hypot(flow.x, flow.y), 1e-9);
+      const fx = flow.x / flowMag;
+      const fy = flow.y / flowMag;
 
-      if (wakeVortices.length > maxWakeVortices) {
-        wakeVortices.splice(
-          0,
-          wakeVortices.length - maxWakeVortices
-        );
-      }
-
-      recalculateWakeCirculation();
+      addWakeVortex({
+        x: te.x + 0.010 * fx + 0.004 * counterpartPanel.normal.x,
+        y: te.y + 0.010 * fy + 0.004 * counterpartPanel.normal.y,
+        gamma: -gamma,
+        age: 0,
+        source: "te"
+      });
     }
 
     function updateWakeShedding(dt: number) {
-      if (!showWake) {
-        return;
-      }
+      if (!showWake) return false;
+      let shed = false;
 
-      const upperSeparation = upperBoundaryLayer.separation;
-      const lowerSeparation = lowerBoundaryLayer.separation;
-
-      if (upperSeparation) {
-        upperShedClock += dt;
-        const period = wakeSheddingPeriod(upperSeparation);
-
-        while (upperShedClock >= period) {
-          upperShedClock -= period;
-          shedWakeVortex(upperBoundaryLayer, "upper", period);
+      const handle = (source: "upper" | "lower") => {
+        const separation = separationFor(source);
+        if (!separation) {
+          if (source === "upper") upperShedClock = 0;
+          else lowerShedClock = 0;
+          return;
         }
-      } else {
-        upperShedClock = 0;
-      }
 
-      if (lowerSeparation) {
-        lowerShedClock += dt;
-        const period = wakeSheddingPeriod(lowerSeparation);
+        let clock = source === "upper" ? upperShedClock : lowerShedClock;
+        clock += dt;
+        const interval = Math.max(
+          0.012,
+          wakeSpacing / Math.max(separation.ue, 0.25 * U)
+        );
 
-        while (lowerShedClock >= period) {
-          lowerShedClock -= period;
-          shedWakeVortex(lowerBoundaryLayer, "lower", period);
+        let releases = 0;
+        while (clock >= interval && releases < 2) {
+          clock -= interval;
+          releaseSeparationPair(source, separation, interval);
+          releases++;
+          shed = true;
         }
-      } else {
-        lowerShedClock = 0;
+
+        if (source === "upper") upperShedClock = clock;
+        else lowerShedClock = clock;
+      };
+
+      handle("upper");
+      handle("lower");
+      return shed;
+    }
+
+    function wakeVortexMotionVelocity(index: number, positions?: Point[]): Point {
+      const vortex = wakeVortices[index];
+      const p = positions ? positions[index] : { x: vortex.x, y: vortex.y };
+      const bound = boundVelocityAtBody(p.x, p.y);
+      let u = bound.x;
+      let v = bound.y;
+
+      if (showWake) {
+        for (let j = 0; j < wakeVortices.length; j++) {
+          if (j === index) continue;
+          const other = wakeVortices[j];
+          const ox = positions ? positions[j].x : other.x;
+          const oy = positions ? positions[j].y : other.y;
+          const temp: WakeVortex = { ...other, x: ox, y: oy };
+          const induced = vortexVelocity(p.x, p.y, temp);
+          u += induced.x;
+          v += induced.y;
+        }
       }
+
+      return { x: u, y: v };
     }
 
     function updateWakeVortices(dt: number) {
-      if (!showWake || wakeVortices.length === 0) {
-        wakeCountOutput.textContent = "0";
-        return;
+      if (!showWake || wakeVortices.length === 0) return;
+
+      const k1: Point[] = [];
+      const mid: Point[] = [];
+      for (let i = 0; i < wakeVortices.length; i++) {
+        const velocity = wakeVortexMotionVelocity(i);
+        k1.push(velocity);
+        mid.push({
+          x: wakeVortices[i].x + 0.5 * dt * velocity.x,
+          y: wakeVortices[i].y + 0.5 * dt * velocity.y
+        });
       }
 
-      const substeps = 2;
-      const subDt = dt / substeps;
+      const next: WakeVortex[] = [];
+      for (let i = 0; i < wakeVortices.length; i++) {
+        const velocity = wakeVortexMotionVelocity(i, mid);
+        const vortex = wakeVortices[i];
+        const x = vortex.x + dt * velocity.x;
+        const y = vortex.y + dt * velocity.y;
+        const age = vortex.age + dt;
 
-      for (let step = 0; step < substeps; step++) {
-        const nextX = new Float64Array(wakeVortices.length);
-        const nextY = new Float64Array(wakeVortices.length);
+        // Entering the solid is a numerical failure of the discrete
+        // approximation; discard that blob rather than applying a
+        // fictitious reflection or wall force.
+        if (pointInsideBody(x, y)) continue;
 
-        for (let i = 0; i < wakeVortices.length; i++) {
-          const vortex = wakeVortices[i];
-          const outer = outerVelocityAt(vortex.x, vortex.y);
-
-          const baseVelocity = outer ?? {
-            u: U,
-            v: 0
-          };
-
-          const induced = wakeVelocityAt(
-            vortex.x,
-            vortex.y,
-            i
-          );
-
-          let u = baseVelocity.u + induced.u;
-          let v = baseVelocity.v + induced.v;
-
-          /*
-            A generous speed limiter protects against a
-            rare pathological blob overlap without
-            changing ordinary wake dynamics.
-          */
-          const speed = Math.hypot(u, v);
-          const speedLimit = Math.max(8, 7 * U);
-
-          if (speed > speedLimit) {
-            const scale = speedLimit / speed;
-            u *= scale;
-            v *= scale;
-          }
-
-          nextX[i] = vortex.x + u * subDt;
-          nextY[i] = vortex.y + v * subDt;
-        }
-
-        for (let i = 0; i < wakeVortices.length; i++) {
-          wakeVortices[i].x = nextX[i];
-          wakeVortices[i].y = nextY[i];
-          wakeVortices[i].age += subDt;
-        }
-      }
-
-      const downstreamMargin = 0.25 * targetChord;
-      const verticalMargin = 0.20 * targetChord;
-      const maximumAge = Math.max(1.5, 4.0 * targetChord / Math.max(U, 0.2));
-
-      wakeVortices = wakeVortices.filter(vortex => {
-        if (vortex.age > maximumAge) {
-          return false;
-        }
-
+        const lab = bodyToLabPoint({ x, y });
         if (
-          vortex.x > xmax + downstreamMargin ||
-          vortex.x < xmin - downstreamMargin ||
-          vortex.y > ymax + verticalMargin ||
-          vortex.y < ymin - verticalMargin
+          lab.x < xmin - 0.35 || lab.x > xmax + 0.45 ||
+          lab.y < ymin - 0.40 || lab.y > ymax + 0.40 ||
+          age > 4.0
         ) {
-          return false;
+          continue;
         }
 
-        return !pointInsideAirfoil(vortex.x, vortex.y);
-      });
-
-      recalculateWakeCirculation();
-      wakeCountOutput.textContent = String(wakeVortices.length);
-    }
-
-    function updateWake(dt: number) {
-      if (!showWake) {
-        return;
+        next.push({ ...vortex, x, y, age });
       }
 
-      updateWakeShedding(dt);
+      wakeVortices = next;
+    }
+
+    function physicsUpdate(dt: number) {
+      // The unsteady wake modifies only the instantaneous visual velocity
+      // field. Mean Cp, BL, separation, CL and Γ remain tied to the selected
+      // operating point and therefore do not chase individual wake vortices.
       updateWakeVortices(dt);
-    }
+      solvePanelFlow();
 
-    // ==================================================
-    // SCREEN COORDINATES
-    // ==================================================
+      const shed = updateWakeShedding(dt);
+      if (shed) solvePanelFlow();
 
-    function physicalToScreenX(x: number) {
-      return (
-        (x - xmin) /
-        (xmax - xmin) *
-        canvas.clientWidth
-      );
-    }
-
-    function physicalToScreenY(y: number) {
-      return (
-        canvas.clientHeight -
-        (y - ymin) /
-        (ymax - ymin) *
-        canvas.clientHeight
-      );
-    }
-
-    function screenToPhysicalX(x: number) {
-      return xmin + x / canvas.clientWidth * (xmax - xmin);
-    }
-
-    function screenToPhysicalY(y: number) {
-      return ymax - y / canvas.clientHeight * (ymax - ymin);
+      updateDisplayAverages(dt);
+      rebuildVelocityGrid();
+      wakeCountOutput.textContent = String(wakeVortices.length);
+      streamlinesDirty = true;
+      updateOutputs();
     }
 
     // ==================================================
@@ -1752,75 +1992,31 @@
 
     function seedParticle(index: number, anywhere = true) {
       let attempts = 0;
-
       do {
         if (anywhere) {
           particleX[index] = xmin + Math.random() * (xmax - xmin);
           particleY[index] = ymin + Math.random() * (ymax - ymin);
         } else {
-          /*
-            New inlet tracers are distributed over a short x-band.
-            At high U∞, respawning every tracer at one exact x
-            coordinate synchronises them with animation frames and
-            creates artificial vertical particle stripes.
-          */
-          const inletPhaseWidth = Math.min(
-            0.12 * targetChord,
-            Math.max(
-              0.015 * targetChord,
-              0.022 * U
-            )
-          );
-
-          particleX[index] =
-            xmin +
-            Math.random() * inletPhaseWidth;
-
-          particleY[index] =
-            ymin +
-            Math.random() * (ymax - ymin);
+          // A small random inlet strip prevents synchronized vertical
+          // bands at high U while preserving a uniform inlet density.
+          particleX[index] = xmin + Math.random() * 0.025 * (xmax - xmin);
+          particleY[index] = ymin + Math.random() * (ymax - ymin);
         }
-
         attempts++;
-      } while (
-        pointInsideAirfoil(particleX[index], particleY[index]) &&
-        attempts < 30
-      );
+      } while (pointInsideAirfoil(particleX[index], particleY[index]) && attempts < 30);
 
       previousParticleX[index] = particleX[index];
       previousParticleY[index] = particleY[index];
+      particleSpeed[index] = U;
     }
 
     function seedAllParticles() {
-      wakeTracerCursor = 0;
-
-      for (let i = 0; i < activeParticleCount; i++) {
-        seedParticle(i, true);
-      }
-
+      for (let i = 0; i < activeParticleCount; i++) seedParticle(i, true);
       clearTrails();
     }
 
     function updateParticles(dt: number) {
-      /*
-        Use more integration substeps as freestream speed rises.
-        This prevents large visual jumps through the near-airfoil
-        velocity gradients at the 5 m/s setting.
-      */
-      const targetConvectiveStep =
-        0.015 * targetChord;
-
-      const substeps = Math.max(
-        2,
-        Math.min(
-          8,
-          Math.ceil(
-            Math.max(U, 1) * dt /
-            targetConvectiveStep
-          )
-        )
-      );
-
+      const substeps = Math.max(1, Math.min(4, Math.ceil(U / 1.5)));
       const subDt = dt / substeps;
 
       for (let i = 0; i < activeParticleCount; i++) {
@@ -1830,42 +2026,33 @@
         for (let step = 0; step < substeps; step++) {
           const x = particleX[i];
           const y = particleY[i];
-
-          const velocity1 = instantaneousVelocityAt(x, y);
-
-          if (!velocity1) {
+          const v1 = velocityAt(x, y);
+          if (!v1) {
             seedParticle(i, false);
             break;
           }
 
-          const speed1 = Math.hypot(velocity1.u, velocity1.v);
-
-          if (speed1 > Math.max(20, 12 * U)) {
+          const speed1 = Math.hypot(v1.u, v1.v);
+          if (speed1 > Math.max(25, 14 * U)) {
             seedParticle(i, false);
             break;
           }
 
-          const midX = x + 0.5 * velocity1.u * subDt;
-          const midY = y + 0.5 * velocity1.v * subDt;
-
-          const velocity2 = instantaneousVelocityAt(midX, midY);
-
-          if (!velocity2) {
+          const midX = x + 0.5 * subDt * v1.u;
+          const midY = y + 0.5 * subDt * v1.v;
+          const v2 = velocityAt(midX, midY);
+          if (!v2) {
             seedParticle(i, false);
             break;
           }
 
-          particleX[i] = x + velocity2.u * subDt;
-          particleY[i] = y + velocity2.v * subDt;
-
-          const outside =
-            particleX[i] < xmin ||
-            particleX[i] > xmax ||
-            particleY[i] < ymin ||
-            particleY[i] > ymax;
+          particleX[i] = x + subDt * v2.u;
+          particleY[i] = y + subDt * v2.v;
+          particleSpeed[i] = Math.hypot(v2.u, v2.v);
 
           if (
-            outside ||
+            particleX[i] < xmin || particleX[i] > xmax ||
+            particleY[i] < ymin || particleY[i] > ymax ||
             pointInsideAirfoil(particleX[i], particleY[i])
           ) {
             seedParticle(i, false);
@@ -1890,11 +2077,9 @@
 
     function speedBin(speed: number) {
       const reference = Math.max(2, 2.5 * U);
-      const normalized = Math.min(speed / reference, 1);
-
       return Math.min(
         speedColours.length - 1,
-        Math.floor(normalized * speedColours.length)
+        Math.floor(Math.min(speed / reference, 1) * speedColours.length)
       );
     }
 
@@ -1916,9 +2101,7 @@
     }
 
     function drawNewTrailSegments() {
-      if (!showTrails) {
-        return;
-      }
+      if (!showTrails) return;
 
       for (let bin = 0; bin < speedColours.length; bin++) {
         trailCtx.beginPath();
@@ -1929,39 +2112,11 @@
           const y0 = previousParticleY[i];
           const x1 = particleX[i];
           const y1 = particleY[i];
+          if (Math.abs(x1 - x0) > 0.18 || Math.abs(y1 - y0) > 0.18) continue;
+          if (speedBin(particleSpeed[i]) !== bin) continue;
 
-          if (
-            Math.abs(x1 - x0) > 0.18 ||
-            Math.abs(y1 - y0) > 0.18
-          ) {
-            continue;
-          }
-
-          const mx = 0.5 * (x0 + x1);
-          const my = 0.5 * (y0 + y1);
-
-          const velocity = instantaneousVelocityAt(mx, my);
-
-          if (!velocity) {
-            continue;
-          }
-
-          const speed = Math.hypot(velocity.u, velocity.v);
-
-          if (speedBin(speed) !== bin) {
-            continue;
-          }
-
-          trailCtx.moveTo(
-            physicalToScreenX(x0),
-            physicalToScreenY(y0)
-          );
-
-          trailCtx.lineTo(
-            physicalToScreenX(x1),
-            physicalToScreenY(y1)
-          );
-
+          trailCtx.moveTo(physicalToScreenX(x0), physicalToScreenY(y0));
+          trailCtx.lineTo(physicalToScreenX(x1), physicalToScreenY(y1));
           hasSegments = true;
         }
 
@@ -1974,582 +2129,148 @@
     }
 
     // ==================================================
-    // STREAMLINES
+    // COORDINATES / STREAMLINES
     // ==================================================
 
-    function normalizedDirection(x: number, y: number) {
-      const velocity = outerVelocityAt(x, y);
+    function physicalToScreenX(x: number) {
+      return (x - xmin) / (xmax - xmin) * canvas.clientWidth;
+    }
 
-      if (!velocity) {
-        return null;
-      }
+    function physicalToScreenY(y: number) {
+      return canvas.clientHeight - (y - ymin) / (ymax - ymin) * canvas.clientHeight;
+    }
 
-      const magnitude = Math.hypot(velocity.u, velocity.v);
+    function screenToPhysicalX(x: number) {
+      return xmin + x / canvas.clientWidth * (xmax - xmin);
+    }
 
-      if (magnitude < 1e-9) {
-        return null;
-      }
-
-      return {
-        x: velocity.u / magnitude,
-        y: velocity.v / magnitude
-      };
+    function screenToPhysicalY(y: number) {
+      return ymax - y / canvas.clientHeight * (ymax - ymin);
     }
 
     function traceStreamline(seedX: number, seedY: number) {
       const points: Point[] = [];
-
       let x = seedX;
       let y = seedY;
+      const ds = 0.0065;
 
-      const stepSize = 0.0065;
-      const maxSteps = 700;
-
-      for (let i = 0; i < maxSteps; i++) {
-        if (
-          x < xmin ||
-          x > xmax ||
-          y < ymin ||
-          y > ymax
-        ) {
-          break;
-        }
-
-        if (pointInsideAirfoil(x, y)) {
-          break;
-        }
-
+      for (let i = 0; i < 550; i++) {
+        if (x < xmin || x > xmax || y < ymin || y > ymax) break;
+        if (pointInsideAirfoil(x, y)) break;
         points.push({ x, y });
 
-        const d1 = normalizedDirection(x, y);
+        const v1 = velocityAt(x, y);
+        if (!v1) break;
+        const m1 = Math.hypot(v1.u, v1.v);
+        if (m1 < 1e-8) break;
 
-        if (!d1) {
-          break;
-        }
+        const mx = x + 0.5 * ds * v1.u / m1;
+        const my = y + 0.5 * ds * v1.v / m1;
+        const v2 = velocityAt(mx, my);
+        if (!v2) break;
+        const m2 = Math.hypot(v2.u, v2.v);
+        if (m2 < 1e-8) break;
 
-        const midX = x + 0.5 * stepSize * d1.x;
-        const midY = y + 0.5 * stepSize * d1.y;
-
-        const d2 = normalizedDirection(midX, midY);
-
-        if (!d2) {
-          break;
-        }
-
-        x += stepSize * d2.x;
-        y += stepSize * d2.y;
+        x += ds * v2.u / m2;
+        y += ds * v2.v / m2;
       }
-
       return points;
     }
 
     function rebuildStreamlines() {
       cachedStreamlines = [];
-
-      const count = 25;
-
+      const count = 23;
       for (let i = 0; i < count; i++) {
-        const y =
-          ymin +
-          (i + 0.5) /
-          count *
-          (ymax - ymin);
-
-        const streamline = traceStreamline(
-          xmin + 0.005,
-          y
-        );
-
-        if (streamline.length > 2) {
-          cachedStreamlines.push(streamline);
-        }
+        const y = ymin + (i + 0.5) / count * (ymax - ymin);
+        const line = traceStreamline(xmin + 0.004, y);
+        if (line.length > 2) cachedStreamlines.push(line);
       }
-
       streamlinesDirty = false;
     }
 
-    function drawStreamlines() {
-      if (!showStreamlines) {
-        return;
-      }
-
-      if (streamlinesDirty) {
-        rebuildStreamlines();
-      }
-
-      ctx.save();
-      ctx.strokeStyle = "rgba(190,222,240,0.21)";
-      ctx.lineWidth = 0.8;
-
-      for (const streamline of cachedStreamlines) {
-        if (streamline.length < 2) {
-          continue;
-        }
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-          physicalToScreenX(streamline[0].x),
-          physicalToScreenY(streamline[0].y)
-        );
-
-        for (let i = 1; i < streamline.length; i++) {
-          ctx.lineTo(
-            physicalToScreenX(streamline[i].x),
-            physicalToScreenY(streamline[i].y)
-          );
-        }
-
-        ctx.stroke();
-      }
-
-      ctx.restore();
-    }
-
     // ==================================================
-    // VECTOR FIELD
-    // ==================================================
-
-    function drawArrow(
-      x: number,
-      y: number,
-      dx: number,
-      dy: number,
-      opacity: number
-    ) {
-      const endX = x + dx;
-      const endY = y + dy;
-      const angle = Math.atan2(dy, dx);
-      const head = 4.5;
-
-      ctx.strokeStyle = `rgba(210,235,248,${opacity})`;
-      ctx.fillStyle = `rgba(210,235,248,${opacity})`;
-      ctx.lineWidth = 0.8;
-
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(endX, endY);
-
-      ctx.lineTo(
-        endX - head * Math.cos(angle - Math.PI / 6),
-        endY - head * Math.sin(angle - Math.PI / 6)
-      );
-
-      ctx.lineTo(
-        endX - head * Math.cos(angle + Math.PI / 6),
-        endY - head * Math.sin(angle + Math.PI / 6)
-      );
-
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    function drawVectorField() {
-      if (!showVectors) {
-        return;
-      }
-
-      const nx = Math.max(10, Math.floor(canvas.clientWidth / 70));
-      const ny = Math.max(6, Math.floor(canvas.clientHeight / 70));
-
-      for (let iy = 0; iy < ny; iy++) {
-        for (let ix = 0; ix < nx; ix++) {
-          const x =
-            xmin +
-            (ix + 0.5) /
-            nx *
-            (xmax - xmin);
-
-          const y =
-            ymin +
-            (iy + 0.5) /
-            ny *
-            (ymax - ymin);
-
-          const velocity = instantaneousVelocityAt(x, y);
-
-          if (!velocity) {
-            continue;
-          }
-
-          const magnitude = Math.hypot(velocity.u, velocity.v);
-
-          if (magnitude < 1e-8) {
-            continue;
-          }
-
-          const relative = Math.min(
-            magnitude / Math.max(2, 2.4 * U),
-            1
-          );
-
-          const length = 7 + 15 * relative;
-
-          drawArrow(
-            physicalToScreenX(x),
-            physicalToScreenY(y),
-            velocity.u / magnitude * length,
-            -velocity.v / magnitude * length,
-            0.14 + 0.3 * relative
-          );
-        }
-      }
-    }
-
-    // ==================================================
-    // BACKGROUND
+    // DRAWING
     // ==================================================
 
     function drawBackground() {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
       gradient.addColorStop(0, "#091018");
       gradient.addColorStop(1, "#06090d");
-
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, w, h);
 
       ctx.strokeStyle = "rgba(255,255,255,0.035)";
       ctx.lineWidth = 1;
+      for (let x = 0; x <= w; x += 50) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y <= h; y += 50) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+    }
 
-      const spacing = 50;
-
-      for (let x = 0; x <= width; x += spacing) {
+    function drawStreamlines() {
+      if (!showStreamlines) return;
+      if (streamlinesDirty) rebuildStreamlines();
+      ctx.save();
+      ctx.strokeStyle = "rgba(190,222,240,0.20)";
+      ctx.lineWidth = 0.8;
+      for (const line of cachedStreamlines) {
+        if (line.length < 2) continue;
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
+        ctx.moveTo(physicalToScreenX(line[0].x), physicalToScreenY(line[0].y));
+        for (let i = 1; i < line.length; i++) {
+          ctx.lineTo(physicalToScreenX(line[i].x), physicalToScreenY(line[i].y));
+        }
         ctx.stroke();
       }
-
-      for (let y = 0; y <= height; y += spacing) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-    }
-
-    // ==================================================
-    // AIRFOIL
-    // ==================================================
-
-    function drawAirfoil() {
-      if (geometryPoints.length < 3) {
-        return;
-      }
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        physicalToScreenX(geometryPoints[0].x),
-        physicalToScreenY(geometryPoints[0].y)
-      );
-
-      for (let i = 1; i < geometryPoints.length; i++) {
-        ctx.lineTo(
-          physicalToScreenX(geometryPoints[i].x),
-          physicalToScreenY(geometryPoints[i].y)
-        );
-      }
-
-      ctx.closePath();
-
-      const bodyGradient = ctx.createLinearGradient(
-        0,
-        physicalToScreenY(0.2),
-        0,
-        physicalToScreenY(-0.2)
-      );
-
-      bodyGradient.addColorStop(0, "#1a2732");
-      bodyGradient.addColorStop(1, "#0b1117");
-
-      ctx.fillStyle = bodyGradient;
-      ctx.fill();
-
-      ctx.strokeStyle = "rgba(220,237,246,0.62)";
-      ctx.lineWidth = 1.4;
-      ctx.stroke();
-    }
-
-    // ==================================================
-    // BOUNDARY-LAYER VISUALISATION
-    // ==================================================
-
-    function outwardNormal(
-      points: BoundaryLayerPoint[],
-      index: number
-    ) {
-      const previous = points[Math.max(0, index - 1)];
-      const next = points[Math.min(points.length - 1, index + 1)];
-      const current = points[index];
-
-      const tx = next.x - previous.x;
-      const ty = next.y - previous.y;
-      const length = Math.hypot(tx, ty);
-
-      if (length < 1e-12) {
-        return { x: 0, y: 0 };
-      }
-
-      let nx = -ty / length;
-      let ny = tx / length;
-
-      const radialX = current.x - airfoilCentroid.x;
-      const radialY = current.y - airfoilCentroid.y;
-
-      if (nx * radialX + ny * radialY < 0) {
-        nx *= -1;
-        ny *= -1;
-      }
-
-      return { x: nx, y: ny };
-    }
-
-    function drawBoundaryLayerBand(
-      result: BoundaryLayerResult,
-      fillColour: string,
-      lineColour: string
-    ) {
-      const points = result.points;
-
-      if (points.length < 3) {
-        return;
-      }
-
-      const envelope: Point[] = [];
-
-      for (let i = 0; i < points.length; i++) {
-        const point = points[i];
-        const normal = outwardNormal(points, i);
-
-        /*
-          Physical δ99 is used directly. The visual
-          thickness is only clipped to prevent a failed
-          correlation near separation from filling the
-          whole canvas.
-        */
-        const displayedThickness = Math.min(
-          point.delta99,
-          0.08 * targetChord
-        );
-
-        envelope.push({
-          x: point.x + normal.x * displayedThickness,
-          y: point.y + normal.y * displayedThickness
-        });
-      }
-
-      ctx.save();
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        physicalToScreenX(points[0].x),
-        physicalToScreenY(points[0].y)
-      );
-
-      for (let i = 1; i < points.length; i++) {
-        ctx.lineTo(
-          physicalToScreenX(points[i].x),
-          physicalToScreenY(points[i].y)
-        );
-      }
-
-      for (let i = envelope.length - 1; i >= 0; i--) {
-        ctx.lineTo(
-          physicalToScreenX(envelope[i].x),
-          physicalToScreenY(envelope[i].y)
-        );
-      }
-
-      ctx.closePath();
-      ctx.fillStyle = fillColour;
-      ctx.fill();
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        physicalToScreenX(envelope[0].x),
-        physicalToScreenY(envelope[0].y)
-      );
-
-      for (let i = 1; i < envelope.length; i++) {
-        ctx.lineTo(
-          physicalToScreenX(envelope[i].x),
-          physicalToScreenY(envelope[i].y)
-        );
-      }
-
-      ctx.strokeStyle = lineColour;
-      ctx.lineWidth = 1.1;
-      ctx.stroke();
-
       ctx.restore();
     }
 
-    function drawSeparationMarker(
-      separation: BoundaryLayerPoint | null,
-      label: string,
-      colour: string
-    ) {
-      if (!separation) {
-        return;
-      }
-
-      const px = physicalToScreenX(separation.x);
-      const py = physicalToScreenY(separation.y);
-
-      ctx.save();
-
+    function drawArrow(x: number, y: number, dx: number, dy: number, opacity: number) {
+      const ex = x + dx;
+      const ey = y + dy;
+      const angle = Math.atan2(dy, dx);
+      const head = 4.5;
+      ctx.strokeStyle = `rgba(210,235,248,${opacity})`;
+      ctx.fillStyle = `rgba(210,235,248,${opacity})`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(ex, ey); ctx.stroke();
       ctx.beginPath();
-      ctx.arc(px, py, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = colour;
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(px, py, 9, 0, 2 * Math.PI);
-      ctx.strokeStyle = colour;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.font = "600 10px system-ui, sans-serif";
-      ctx.fillStyle = colour;
-      ctx.fillText(
-        `${label} sep  x/c=${separation.xOverC.toFixed(2)}`,
-        px + 11,
-        py - 8
-      );
-
-      ctx.restore();
+      ctx.moveTo(ex, ey);
+      ctx.lineTo(ex - head * Math.cos(angle - Math.PI / 6), ey - head * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(ex - head * Math.cos(angle + Math.PI / 6), ey - head * Math.sin(angle + Math.PI / 6));
+      ctx.closePath(); ctx.fill();
     }
 
-    function drawBoundaryLayers() {
-      if (!showBoundaryLayer) {
-        return;
+    function drawVectorField() {
+      if (!showVectors) return;
+      const nx = Math.max(10, Math.floor(canvas.clientWidth / 74));
+      const ny = Math.max(6, Math.floor(canvas.clientHeight / 74));
+
+      for (let iy = 0; iy < ny; iy++) {
+        for (let ix = 0; ix < nx; ix++) {
+          const x = xmin + (ix + 0.5) / nx * (xmax - xmin);
+          const y = ymin + (iy + 0.5) / ny * (ymax - ymin);
+          const velocity = velocityAt(x, y);
+          if (!velocity) continue;
+          const m = Math.hypot(velocity.u, velocity.v);
+          if (m < 1e-8) continue;
+          const r = Math.min(m / Math.max(2, 2.4 * U), 1);
+          const length = 7 + 15 * r;
+          drawArrow(
+            physicalToScreenX(x), physicalToScreenY(y),
+            velocity.u / m * length, -velocity.v / m * length,
+            0.14 + 0.3 * r
+          );
+        }
       }
-
-      drawBoundaryLayerBand(
-        upperBoundaryLayer,
-        "rgba(103,207,255,0.095)",
-        "rgba(103,207,255,0.72)"
-      );
-
-      drawBoundaryLayerBand(
-        lowerBoundaryLayer,
-        "rgba(241,184,106,0.075)",
-        "rgba(241,184,106,0.64)"
-      );
     }
-
-    function drawSeparationMarkers() {
-      drawSeparationMarker(
-        upperBoundaryLayer.separation,
-        "U",
-        "#67cfff"
-      );
-
-      drawSeparationMarker(
-        lowerBoundaryLayer.separation,
-        "L",
-        "#f1b86a"
-      );
-    }
-
-
-    // ==================================================
-    // WAKE VISUALISATION
-    // ==================================================
-
-    function drawWakeVortices() {
-      if (!showWake || !showWakeMarkers || wakeVortices.length === 0) {
-        return;
-      }
-
-      ctx.save();
-
-      for (const vortex of wakeVortices) {
-        const px = physicalToScreenX(vortex.x);
-        const py = physicalToScreenY(vortex.y);
-        const core = wakeCoreRadius(vortex);
-
-        const radiusPixels = Math.max(
-          3,
-          core /
-          (xmax - xmin) *
-          canvas.clientWidth
-        );
-
-        const colour = vortex.source === "upper"
-          ? "103,207,255"
-          : "241,184,106";
-
-        const ageFade = Math.max(
-          0.18,
-          Math.min(0.75, 0.75 - 0.08 * vortex.age)
-        );
-
-        const halo = ctx.createRadialGradient(
-          px,
-          py,
-          0,
-          px,
-          py,
-          radiusPixels * 3.2
-        );
-
-        halo.addColorStop(
-          0,
-          `rgba(${colour},${0.24 * ageFade})`
-        );
-
-        halo.addColorStop(
-          1,
-          `rgba(${colour},0)`
-        );
-
-        ctx.fillStyle = halo;
-        ctx.beginPath();
-        ctx.arc(
-          px,
-          py,
-          radiusPixels * 3.2,
-          0,
-          2 * Math.PI
-        );
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(
-          px,
-          py,
-          Math.max(1.4, radiusPixels * 0.55),
-          0,
-          2 * Math.PI
-        );
-
-        ctx.fillStyle = `rgba(${colour},${ageFade})`;
-        ctx.fill();
-      }
-
-      ctx.restore();
-    }
-
-    // ==================================================
-    // PARTICLE / TRAIL DRAWING
-    // ==================================================
 
     function drawTrailCanvas() {
-      if (!showTrails) {
-        return;
-      }
-
+      if (!showTrails) return;
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.drawImage(trailCanvas, 0, 0);
@@ -2557,286 +2278,235 @@
     }
 
     function drawParticles() {
-      if (!showParticles) {
-        return;
-      }
-
+      if (!showParticles) return;
       ctx.fillStyle = "rgba(220,243,255,0.68)";
-
-      for (let i = 0; i < activeParticleCount; i++) {
-        if (pointInsideAirfoil(particleX[i], particleY[i])) {
-          continue;
-        }
-
+      for (let i = 0; i < activeParticleCount; i += 2) {
+        if (pointInsideAirfoil(particleX[i], particleY[i])) continue;
         ctx.fillRect(
           physicalToScreenX(particleX[i]),
           physicalToScreenY(particleY[i]),
-          1.5,
-          1.5
+          1.5, 1.5
         );
       }
     }
 
-    // ==================================================
-    // FREESTREAM INDICATOR
-    // ==================================================
+    function drawAirfoil() {
+      if (geometryPoints.length < 3) return;
+      ctx.beginPath();
+      ctx.moveTo(physicalToScreenX(geometryPoints[0].x), physicalToScreenY(geometryPoints[0].y));
+      for (let i = 1; i < geometryPoints.length; i++) {
+        ctx.lineTo(physicalToScreenX(geometryPoints[i].x), physicalToScreenY(geometryPoints[i].y));
+      }
+      ctx.closePath();
+      const gradient = ctx.createLinearGradient(0, physicalToScreenY(0.2), 0, physicalToScreenY(-0.2));
+      gradient.addColorStop(0, "#1a2732");
+      gradient.addColorStop(1, "#0b1117");
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(220,237,246,0.58)";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+
+    function surfaceBodyPointAtXOverC(
+      source: "upper" | "lower",
+      xOverC: number
+    ): Point | null {
+      const surface = source === "upper" ? upperSurface : lowerSurface;
+      if (surface.length === 0) return null;
+
+      const x = Math.max(0, Math.min(1, xOverC));
+      if (x <= surface[0].x) {
+        return { x: (x - 0.5) * targetChord, y: surface[0].y };
+      }
+
+      for (let i = 1; i < surface.length; i++) {
+        if (x <= surface[i].x) {
+          const a = surface[i - 1];
+          const b = surface[i];
+          const fraction = (x - a.x) / Math.max(b.x - a.x, 1e-12);
+          return {
+            x: (x - 0.5) * targetChord,
+            y: a.y + fraction * (b.y - a.y)
+          };
+        }
+      }
+
+      const last = surface[surface.length - 1];
+      return { x: (x - 0.5) * targetChord, y: last.y };
+    }
+
+    function drawSeparationMarker(
+      state: DisplaySeparationState,
+      source: "upper" | "lower",
+      colour: string
+    ) {
+      if (!state.visible || !state.initialized) return;
+      const body = surfaceBodyPointAtXOverC(source, state.xOverC);
+      if (!body) return;
+      const lab = bodyToLabPoint(body);
+      const px = physicalToScreenX(lab.x);
+      const py = physicalToScreenY(lab.y);
+      ctx.save();
+      ctx.fillStyle = colour;
+      ctx.strokeStyle = "rgba(255,255,255,0.8)";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(px, py, 4.5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawWakeMarkers() {
+      if (!showWake || !showWakeMarkers) return;
+      for (const vortex of wakeVortices) {
+        const lab = bodyToLabPoint({ x: vortex.x, y: vortex.y });
+        const px = physicalToScreenX(lab.x);
+        const py = physicalToScreenY(lab.y);
+        const core = Math.sqrt(wakeCore0 * wakeCore0 + 4 * nu * vortex.age);
+        const radius = Math.max(2.2, Math.min(7, core / (xmax - xmin) * canvas.clientWidth));
+        const colour = vortex.source === "upper"
+          ? "rgba(104,199,255,0.62)"
+          : vortex.source === "lower"
+            ? "rgba(241,184,106,0.62)"
+            : "rgba(190,170,255,0.48)";
+        ctx.fillStyle = colour;
+        ctx.beginPath(); ctx.arc(px, py, radius, 0, 2 * Math.PI); ctx.fill();
+      }
+    }
 
     function drawFreestreamArrow() {
       const x = 28;
       const y = 35;
       const length = 58;
-      const endX = x + length;
-      const endY = y;
-
       ctx.strokeStyle = "rgba(255,255,255,0.62)";
       ctx.fillStyle = "rgba(255,255,255,0.72)";
       ctx.lineWidth = 1.6;
-
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + length, y); ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(endX, endY);
-      ctx.lineTo(endX - 7, endY - 4);
-      ctx.lineTo(endX - 7, endY + 4);
-      ctx.closePath();
-      ctx.fill();
-
+      ctx.moveTo(x + length, y);
+      ctx.lineTo(x + length - 7, y - 4);
+      ctx.lineTo(x + length - 7, y + 4);
+      ctx.closePath(); ctx.fill();
       ctx.font = "12px system-ui, sans-serif";
       ctx.fillText("U∞", x, y - 10);
     }
 
-    // ==================================================
-    // PROBE
-    // ==================================================
-
-    function updateProbe() {
-      if (!probeActive) {
-        probePanel.hidden = true;
-        return;
-      }
-
-      probePanel.hidden = false;
-
-      probeXOutput.textContent = `${probeX.toFixed(3)} m`;
-      probeYOutput.textContent = `${probeY.toFixed(3)} m`;
-
-      const velocity = instantaneousVelocityAt(probeX, probeY);
-
-      if (!velocity) {
-        probeUOutput.textContent = "—";
-        probeVOutput.textContent = "—";
-        probeSpeedOutput.textContent = "airfoil";
-        return;
-      }
-
-      probeUOutput.textContent = `${velocity.u.toFixed(2)} m/s`;
-      probeVOutput.textContent = `${velocity.v.toFixed(2)} m/s`;
-      probeSpeedOutput.textContent = `${Math.hypot(velocity.u, velocity.v).toFixed(2)} m/s`;
-    }
-
     function drawProbeMarker() {
-      if (!probeActive) {
-        return;
-      }
-
+      if (!probeActive) return;
       const x = physicalToScreenX(probeX);
       const y = physicalToScreenY(probeY);
-
       ctx.save();
       ctx.strokeStyle = "rgba(255,255,255,0.48)";
       ctx.lineWidth = 1;
-
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, 2 * Math.PI); ctx.stroke();
       ctx.beginPath();
-      ctx.arc(x, y, 4, 0, 2 * Math.PI);
-      ctx.stroke();
+      ctx.moveTo(x - 7, y); ctx.lineTo(x + 7, y);
+      ctx.moveTo(x, y - 7); ctx.lineTo(x, y + 7);
+      ctx.stroke(); ctx.restore();
+    }
 
-      ctx.beginPath();
-      ctx.moveTo(x - 7, y);
-      ctx.lineTo(x + 7, y);
-      ctx.moveTo(x, y - 7);
-      ctx.lineTo(x, y + 7);
-      ctx.stroke();
-
-      ctx.restore();
+    function draw() {
+      drawBackground();
+      drawStreamlines();
+      drawVectorField();
+      drawTrailCanvas();
+      drawParticles();
+      drawWakeMarkers();
+      drawAirfoil();
+      drawSeparationMarker(displayUpperSeparation, "upper", "#67cfff");
+      drawSeparationMarker(displayLowerSeparation, "lower", "#f1b86a");
+      drawFreestreamArrow();
+      drawProbeMarker();
     }
 
     // ==================================================
-    // CP PLOT
+    // PRESSURE PLOT
     // ==================================================
 
     function drawCpPlot() {
       const width = cpCanvas.clientWidth;
       const height = cpCanvas.clientHeight;
-
       cpCtx.fillStyle = "#090e14";
       cpCtx.fillRect(0, 0, width, height);
 
-      const allCp = [
-        ...upperSurface.map(point => point.cp),
-        ...lowerSurface.map(point => point.cp)
-      ].filter(Number.isFinite);
+      const plottedUpper = displayUpperSurface.length > 0 ? displayUpperSurface : upperSurface;
+      const plottedLower = displayLowerSurface.length > 0 ? displayLowerSurface : lowerSurface;
 
-      if (allCp.length === 0) {
-        return;
-      }
+      const allCp = [...plottedUpper, ...plottedLower]
+        .map(p => p.cp)
+        .filter(Number.isFinite);
+      if (allCp.length === 0) return;
 
       let cpMin = Math.max(-8, Math.min(...allCp));
       let cpMax = Math.min(2, Math.max(1.1, ...allCp));
-
       cpMin = Math.min(cpMin, -0.5);
 
       const left = 54;
       const right = 18;
       const top = 20;
       const bottom = 48;
-
       const plotWidth = width - left - right;
       const plotHeight = height - top - bottom;
-
-      function plotX(xOverC: number) {
-        return left + xOverC * plotWidth;
-      }
-
-      function plotY(cp: number) {
-        return (
-          top +
-          (cp - cpMin) /
-          (cpMax - cpMin) *
-          plotHeight
-        );
-      }
+      const plotX = (x: number) => left + x * plotWidth;
+      const plotY = (cp: number) => top + (cp - cpMin) / (cpMax - cpMin) * plotHeight;
 
       cpCtx.strokeStyle = "rgba(255,255,255,0.08)";
       cpCtx.lineWidth = 1;
-
       for (let i = 0; i <= 4; i++) {
         const x = left + i / 4 * plotWidth;
-
-        cpCtx.beginPath();
-        cpCtx.moveTo(x, top);
-        cpCtx.lineTo(x, top + plotHeight);
-        cpCtx.stroke();
-      }
-
-      for (let i = 0; i <= 4; i++) {
+        cpCtx.beginPath(); cpCtx.moveTo(x, top); cpCtx.lineTo(x, top + plotHeight); cpCtx.stroke();
         const y = top + i / 4 * plotHeight;
-
-        cpCtx.beginPath();
-        cpCtx.moveTo(left, y);
-        cpCtx.lineTo(left + plotWidth, y);
-        cpCtx.stroke();
+        cpCtx.beginPath(); cpCtx.moveTo(left, y); cpCtx.lineTo(left + plotWidth, y); cpCtx.stroke();
       }
 
       if (cpMin <= 0 && cpMax >= 0) {
         cpCtx.strokeStyle = "rgba(255,255,255,0.22)";
-
-        cpCtx.beginPath();
-        cpCtx.moveTo(left, plotY(0));
-        cpCtx.lineTo(left + plotWidth, plotY(0));
-        cpCtx.stroke();
+        cpCtx.beginPath(); cpCtx.moveTo(left, plotY(0)); cpCtx.lineTo(left + plotWidth, plotY(0)); cpCtx.stroke();
       }
 
-      function drawSurfaceCurve(surface: SurfacePoint[], colour: string) {
-        if (surface.length < 2) {
-          return;
-        }
-
+      function drawCurve(surface: SurfacePoint[], colour: string) {
+        if (surface.length < 2) return;
         cpCtx.beginPath();
         let started = false;
-
         for (const point of surface) {
-          if (!Number.isFinite(point.cp)) {
-            continue;
-          }
-
-          const clampedCp = Math.max(
-            cpMin,
-            Math.min(cpMax, point.cp)
-          );
-
+          if (!Number.isFinite(point.cp)) continue;
           const x = plotX(point.x);
-          const y = plotY(clampedCp);
-
-          if (!started) {
-            cpCtx.moveTo(x, y);
-            started = true;
-          } else {
-            cpCtx.lineTo(x, y);
-          }
+          const y = plotY(Math.max(cpMin, Math.min(cpMax, point.cp)));
+          if (!started) { cpCtx.moveTo(x, y); started = true; }
+          else cpCtx.lineTo(x, y);
         }
-
         cpCtx.strokeStyle = colour;
         cpCtx.lineWidth = 1.7;
         cpCtx.stroke();
       }
 
-      drawSurfaceCurve(upperSurface, "#67cfff");
-      drawSurfaceCurve(lowerSurface, "#f1b86a");
+      drawCurve(plottedUpper, "#67cfff");
+      drawCurve(plottedLower, "#f1b86a");
 
-      function drawSeparationLine(
-        separation: BoundaryLayerPoint | null,
-        colour: string
-      ) {
-        if (!separation) {
-          return;
-        }
-
-        const x = plotX(separation.xOverC);
-
-        cpCtx.save();
-        cpCtx.setLineDash([5, 4]);
+      cpCtx.save();
+      cpCtx.setLineDash([4, 4]);
+      for (const [state, colour] of [
+        [displayUpperSeparation, "rgba(103,207,255,0.75)"],
+        [displayLowerSeparation, "rgba(241,184,106,0.75)"]
+      ] as [DisplaySeparationState, string][]) {
+        if (!state.visible || !state.initialized) continue;
+        const x = plotX(state.xOverC);
         cpCtx.strokeStyle = colour;
-        cpCtx.lineWidth = 1;
-
-        cpCtx.beginPath();
-        cpCtx.moveTo(x, top);
-        cpCtx.lineTo(x, top + plotHeight);
-        cpCtx.stroke();
-
-        cpCtx.restore();
+        cpCtx.beginPath(); cpCtx.moveTo(x, top); cpCtx.lineTo(x, top + plotHeight); cpCtx.stroke();
       }
-
-      drawSeparationLine(
-        upperBoundaryLayer.separation,
-        "rgba(103,207,255,0.72)"
-      );
-
-      drawSeparationLine(
-        lowerBoundaryLayer.separation,
-        "rgba(241,184,106,0.68)"
-      );
+      cpCtx.restore();
 
       cpCtx.fillStyle = "rgba(255,255,255,0.48)";
       cpCtx.font = "11px system-ui, sans-serif";
       cpCtx.textAlign = "center";
       cpCtx.textBaseline = "alphabetic";
-
       for (let i = 0; i <= 4; i++) {
         const value = i / 4;
-
-        cpCtx.fillText(
-          value.toFixed(2),
-          plotX(value),
-          top + plotHeight + 17
-        );
+        cpCtx.fillText(value.toFixed(2), plotX(value), top + plotHeight + 17);
       }
 
       cpCtx.textAlign = "right";
-
-      cpCtx.fillText(
-        cpMin.toFixed(1),
-        left - 8,
-        top + 4
-      );
-
-      cpCtx.fillText(
-        cpMax.toFixed(1),
-        left - 8,
-        top + plotHeight
-      );
+      cpCtx.fillText(cpMin.toFixed(1), left - 8, top + 4);
+      cpCtx.fillText(cpMax.toFixed(1), left - 8, top + plotHeight);
 
       cpCtx.save();
       cpCtx.translate(15, top + plotHeight / 2);
@@ -2848,128 +2518,80 @@
 
       cpCtx.textAlign = "center";
       cpCtx.textBaseline = "alphabetic";
-
-      cpCtx.fillText(
-        "x/c",
-        left + plotWidth / 2,
-        height - 7
-      );
+      cpCtx.fillText("x/c", left + plotWidth / 2, height - 7);
     }
 
     // ==================================================
-    // OUTPUTS
+    // OUTPUTS / PROBE
     // ==================================================
-
-    function superscriptExponent(exponent: number) {
-      const map: Record<string, string> = {
-        "-": "⁻",
-        "0": "⁰",
-        "1": "¹",
-        "2": "²",
-        "3": "³",
-        "4": "⁴",
-        "5": "⁵",
-        "6": "⁶",
-        "7": "⁷",
-        "8": "⁸",
-        "9": "⁹"
-      };
-
-      return String(exponent)
-        .split("")
-        .map(character => map[character] ?? character)
-        .join("");
-    }
 
     function formatScientific(value: number) {
-      if (!Number.isFinite(value) || value === 0) {
-        return "0";
-      }
-
-      const exponent = Math.floor(Math.log10(Math.abs(value)));
+      if (!Number.isFinite(value)) return "—";
+      const exponent = Math.floor(Math.log10(Math.abs(value || 1)));
       const mantissa = value / Math.pow(10, exponent);
-
-      return `${mantissa.toFixed(2)}×10${superscriptExponent(exponent)}`;
+      return `${mantissa.toFixed(2)}×10^${exponent}`;
     }
 
-    function separationText(result: BoundaryLayerResult) {
-      if (!result.separation) {
-        return "Attached to TE";
+    function boundaryLayerStatus(
+      result: BoundaryLayerResult,
+      displaySeparation: DisplaySeparationState
+    ) {
+      if (displaySeparation.visible && displaySeparation.initialized) {
+        return `Turb. sep  x/c = ${displaySeparation.xOverC.toFixed(3)}`;
       }
-
-      return `x/c = ${result.separation.xOverC.toFixed(3)}`;
+      if (result.laminarSeparation) {
+        return `LSB model  x/c = ${result.laminarSeparation.xOverC.toFixed(3)} → attached`;
+      }
+      if (result.transition) {
+        return `Transition  x/c = ${result.transition.xOverC.toFixed(3)} · attached`;
+      }
+      return "Laminar · attached to TE";
     }
 
     function updateOutputs() {
       speedOutput.value = `${U.toFixed(1)} m/s`;
-
-      alphaOutput.value = `${(
-        alpha * 180 / Math.PI
-      ).toFixed(1)}°`;
-
+      alphaOutput.value = `${(alpha * 180 / Math.PI).toFixed(1)}°`;
       thicknessOutput.value = epsilon.toFixed(3);
       camberOutput.value = eta.toFixed(3);
       viscosityOutput.value = `${formatScientific(nu)} m²/s`;
       particleDensityOutput.value = `${activeParticleCount.toLocaleString()} tracers`;
-
-      const reynolds = U * targetChord / nu;
-
-      reOutput.textContent = formatScientific(reynolds);
-      gammaOutput.textContent = `${physicalCirculation.toFixed(3)} m²/s`;
-      clOutput.textContent = liftCoefficient.toFixed(3);
+      reOutput.textContent = formatScientific(U * targetChord / nu);
+      gammaOutput.textContent = `${displayBoundCirculation.toFixed(3)} m²/s`;
+      clOutput.textContent = displayLiftCoefficient.toFixed(3);
       chordOutput.textContent = `${targetChord.toFixed(3)} m`;
-
-      upperSeparationOutput.textContent = separationText(upperBoundaryLayer);
-      lowerSeparationOutput.textContent = separationText(lowerBoundaryLayer);
+      upperSeparationOutput.textContent = boundaryLayerStatus(
+        upperBoundaryLayer,
+        displayUpperSeparation
+      );
+      lowerSeparationOutput.textContent = boundaryLayerStatus(
+        lowerBoundaryLayer,
+        displayLowerSeparation
+      );
+      wakeCountOutput.textContent = String(wakeVortices.length);
     }
 
-    // ==================================================
-    // FULL FRAME
-    // ==================================================
-
-    function draw() {
-      drawBackground();
-      drawStreamlines();
-      drawVectorField();
-      drawTrailCanvas();
-      drawWakeVortices();
-      drawParticles();
-      drawAirfoil();
-      drawSeparationMarkers();
-      drawFreestreamArrow();
-      drawProbeMarker();
-    }
-
-    // ==================================================
-    // ANIMATION
-    // ==================================================
-
-    function animate(now: number) {
-      const rawDt = (now - previousTime) / 1000;
-      previousTime = now;
-
-      const dt = Math.min(rawDt, 0.03);
-
-      if (running) {
-        updateWake(dt);
-        updateParticles(dt);
-
-        if (showTrails) {
-          fadeTrails();
-          drawNewTrailSegments();
-        } else {
-          clearTrails();
-        }
+    function updateProbe() {
+      if (!probeActive) {
+        probePanel.hidden = true;
+        return;
       }
-
-      updateProbe();
-      draw();
-
-      requestAnimationFrame(animate);
+      probePanel.hidden = false;
+      probeXOutput.textContent = `${probeX.toFixed(2)} m`;
+      probeYOutput.textContent = `${probeY.toFixed(2)} m`;
+      const velocity = velocityAt(probeX, probeY);
+      if (!velocity) {
+        probeUOutput.textContent = "—";
+        probeVOutput.textContent = "—";
+        probeSpeedOutput.textContent = "airfoil";
+        return;
+      }
+      probeUOutput.textContent = `${velocity.u.toFixed(2)} m/s`;
+      probeVOutput.textContent = `${velocity.v.toFixed(2)} m/s`;
+      probeSpeedOutput.textContent = `${Math.hypot(velocity.u, velocity.v).toFixed(2)} m/s`;
     }
 
     // ==================================================
-    // CONTROLS
+    // MODEL REBUILD / CONTROLS
     // ==================================================
 
     function readControls() {
@@ -2978,11 +2600,7 @@
       epsilon = Number(thicknessSlider.value);
       eta = Number(camberSlider.value);
       nu = Math.pow(10, Number(viscositySlider.value));
-      activeParticleCount = Math.min(
-        maxParticleCount,
-        Math.max(200, Number(particleDensitySlider.value))
-      );
-
+      activeParticleCount = Math.max(600, Math.min(maxParticles, Number(particleDensitySlider.value)));
       showParticles = particlesToggle.checked;
       showTrails = trailsToggle.checked;
       showStreamlines = streamlinesToggle.checked;
@@ -2991,65 +2609,68 @@
       showWakeMarkers = wakeMarkersToggle.checked;
     }
 
-    function modelChanged() {
+    function rebuildAerodynamicState(geometryChanged: boolean, reseed = true) {
       readControls();
       clearWake();
-      rebuildGeometry();
-      seedAllParticles();
+      if (geometryChanged || panels.length === 0) rebuildBodyGeometry();
+      else updateLabGeometry();
+      // Build the stable mean aerodynamic state first. It is recomputed only
+      // when the operating point or geometry changes.
+      solveMeanPanelFlow();
+      rebuildMeanSurfaceAerodynamics();
+      rebuildBoundaryLayers();
+      applyMeanSeparatedPressureCorrection();
+
+      // Separately initialise the instantaneous wake-coupled panel field used
+      // by particles, streamlines and wake-vortex convection.
+      solvePanelFlow();
+
+      resetDisplayAverages();
+      rebuildVelocityGrid();
+      streamlinesDirty = true;
+      clearTrails();
+      if (reseed) seedAllParticles();
+      updateOutputs();
+      drawCpPlot();
     }
 
-    speedSlider.addEventListener("input", modelChanged);
-    alphaSlider.addEventListener("input", modelChanged);
-    thicknessSlider.addEventListener("input", modelChanged);
-    camberSlider.addEventListener("input", modelChanged);
-    viscositySlider.addEventListener("input", modelChanged);
+    speedSlider.addEventListener("input", () => rebuildAerodynamicState(false));
+    alphaSlider.addEventListener("input", () => rebuildAerodynamicState(false));
+    viscositySlider.addEventListener("input", () => rebuildAerodynamicState(false));
+    thicknessSlider.addEventListener("input", () => rebuildAerodynamicState(true));
+    camberSlider.addEventListener("input", () => rebuildAerodynamicState(true));
 
     particleDensitySlider.addEventListener("input", () => {
-      activeParticleCount = Math.min(
-        maxParticleCount,
-        Math.max(200, Number(particleDensitySlider.value))
-      );
-
-      particleDensityOutput.value =
-        `${activeParticleCount.toLocaleString()} tracers`;
-
-      seedAllParticles();
+      const previous = activeParticleCount;
+      activeParticleCount = Math.max(600, Math.min(maxParticles, Number(particleDensitySlider.value)));
+      if (activeParticleCount > previous) {
+        for (let i = previous; i < activeParticleCount; i++) seedParticle(i, true);
+      }
+      particleDensityOutput.value = `${activeParticleCount.toLocaleString()} tracers`;
+      clearTrails();
     });
 
-    particlesToggle.addEventListener("change", () => {
-      showParticles = particlesToggle.checked;
-    });
-
+    particlesToggle.addEventListener("change", () => { showParticles = particlesToggle.checked; });
     trailsToggle.addEventListener("change", () => {
       showTrails = trailsToggle.checked;
-
-      if (!showTrails) {
-        clearTrails();
-      }
+      if (!showTrails) clearTrails();
     });
-
     streamlinesToggle.addEventListener("change", () => {
       showStreamlines = streamlinesToggle.checked;
+      streamlinesDirty = true;
     });
-
-    vectorsToggle.addEventListener("change", () => {
-      showVectors = vectorsToggle.checked;
-    });
-
+    vectorsToggle.addEventListener("change", () => { showVectors = vectorsToggle.checked; });
+    wakeMarkersToggle.addEventListener("change", () => { showWakeMarkers = wakeMarkersToggle.checked; });
     wakeToggle.addEventListener("change", () => {
       showWake = wakeToggle.checked;
       clearWake();
-      clearTrails();
-      seedAllParticles();
+      solvePanelFlow();
+      resetDisplayAverages();
+      rebuildVelocityGrid();
+      streamlinesDirty = true;
+      updateOutputs();
+      drawCpPlot();
     });
-
-    wakeMarkersToggle.addEventListener("change", () => {
-      showWakeMarkers = wakeMarkersToggle.checked;
-    });
-
-    // ==================================================
-    // PAUSE / RESET
-    // ==================================================
 
     pauseButton.addEventListener("click", () => {
       running = !running;
@@ -3058,52 +2679,32 @@
 
     resetButton.addEventListener("click", () => {
       speedSlider.value = "1.5";
-      alphaSlider.value = "4";
+      alphaSlider.value = "0";
       thicknessSlider.value = "0.12";
-      camberSlider.value = "0.06";
+      camberSlider.value = "0";
       viscositySlider.value = "-4.8239";
-      particleDensitySlider.value = "1400";
-
+      particleDensitySlider.value = "600";
       particlesToggle.checked = true;
-      trailsToggle.checked = true;
-      streamlinesToggle.checked = true;
+      trailsToggle.checked = false;
+      streamlinesToggle.checked = false;
       vectorsToggle.checked = false;
       wakeToggle.checked = true;
-      wakeMarkersToggle.checked = true;
-
+      wakeMarkersToggle.checked = false;
       running = true;
       pauseButton.textContent = "Pause";
       probeActive = false;
-
-      readControls();
-      clearWake();
-      rebuildGeometry();
-      seedAllParticles();
+      physicsAccumulator = 0;
+      rebuildAerodynamicState(true);
     });
 
     // ==================================================
-    // POINTER PROBE
+    // POINTER
     // ==================================================
 
     function updateProbeFromPointer(event: PointerEvent) {
       const rect = canvas.getBoundingClientRect();
-
-      const px = Math.max(
-        0,
-        Math.min(
-          rect.width,
-          event.clientX - rect.left
-        )
-      );
-
-      const py = Math.max(
-        0,
-        Math.min(
-          rect.height,
-          event.clientY - rect.top
-        )
-      );
-
+      const px = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+      const py = Math.max(0, Math.min(rect.height, event.clientY - rect.top));
       probeX = screenToPhysicalX(px);
       probeY = screenToPhysicalY(py);
     }
@@ -3112,15 +2713,11 @@
       probeActive = true;
       updateProbeFromPointer(event);
     });
-
     canvas.addEventListener("pointermove", event => {
       probeActive = true;
       updateProbeFromPointer(event);
     });
-
-    canvas.addEventListener("pointerleave", () => {
-      probeActive = false;
-    });
+    canvas.addEventListener("pointerleave", () => { probeActive = false; });
 
     // ==================================================
     // RESIZE
@@ -3132,82 +2729,30 @@
     ) {
       const rect = targetCanvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      const width = Math.max(
-        1,
-        Math.round(rect.width * dpr)
-      );
-
-      const height = Math.max(
-        1,
-        Math.round(rect.height * dpr)
-      );
-
-      if (
-        targetCanvas.width === width &&
-        targetCanvas.height === height
-      ) {
-        return false;
-      }
-
+      const width = Math.max(1, Math.round(rect.width * dpr));
+      const height = Math.max(1, Math.round(rect.height * dpr));
+      if (targetCanvas.width === width && targetCanvas.height === height) return false;
       targetCanvas.width = width;
       targetCanvas.height = height;
-
-      targetContext.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-      );
-
+      targetContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       return true;
     }
 
     function resizeAll() {
       const mainChanged = resizeCanvasElement(canvas, ctx);
       const cpChanged = resizeCanvasElement(cpCanvas, cpCtx);
-
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      const trailWidth = Math.max(
-        1,
-        Math.round(rect.width * dpr)
-      );
-
-      const trailHeight = Math.max(
-        1,
-        Math.round(rect.height * dpr)
-      );
-
-      if (
-        trailCanvas.width !== trailWidth ||
-        trailCanvas.height !== trailHeight
-      ) {
+      const trailWidth = Math.max(1, Math.round(rect.width * dpr));
+      const trailHeight = Math.max(1, Math.round(rect.height * dpr));
+      if (trailCanvas.width !== trailWidth || trailCanvas.height !== trailHeight) {
         trailCanvas.width = trailWidth;
         trailCanvas.height = trailHeight;
-
-        trailCtx.setTransform(
-          dpr,
-          0,
-          0,
-          dpr,
-          0,
-          0
-        );
-
+        trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         clearTrails();
       }
-
-      if (mainChanged) {
-        streamlinesDirty = true;
-      }
-
-      if (cpChanged) {
-        drawCpPlot();
-      }
+      if (mainChanged) streamlinesDirty = true;
+      if (cpChanged) drawCpPlot();
     }
 
     if (typeof ResizeObserver !== "undefined") {
@@ -3219,15 +2764,55 @@
     }
 
     // ==================================================
+    // ANIMATION
+    // ==================================================
+
+    function animate(now: number) {
+      const rawDt = (now - previousTime) / 1000;
+      previousTime = now;
+      const dt = Math.min(rawDt, 0.035);
+
+      if (running) {
+        physicsAccumulator += dt;
+        let physicsIterations = 0;
+        while (physicsAccumulator >= physicsStep && physicsIterations < 2) {
+          physicsUpdate(physicsStep);
+          physicsAccumulator -= physicsStep;
+          physicsIterations++;
+        }
+
+        updateParticles(dt);
+        if (showTrails) {
+          fadeTrails();
+          drawNewTrailSegments();
+        } else {
+          clearTrails();
+        }
+
+        cpAccumulator += dt;
+        streamlineAccumulator += dt;
+        if (cpAccumulator > 0.12) {
+          drawCpPlot();
+          cpAccumulator = 0;
+        }
+        if (showStreamlines && streamlineAccumulator > 0.18) {
+          streamlinesDirty = true;
+          streamlineAccumulator = 0;
+        }
+      }
+
+      updateProbe();
+      draw();
+      requestAnimationFrame(animate);
+    }
+
+    // ==================================================
     // START
     // ==================================================
 
     resizeAll();
     readControls();
-    clearWake();
-    rebuildGeometry();
-    seedAllParticles();
-
+    rebuildAerodynamicState(true);
     requestAnimationFrame(animate);
   }
 </script>

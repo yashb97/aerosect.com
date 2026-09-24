@@ -1,0 +1,2357 @@
+<section class="acoustic-lab" data-acoustic-lab>
+  <div class="visual-wrap">
+    <canvas
+      data-wave-canvas
+      aria-label="Animated acoustic pressure field from monopole, dipole and quadrupole sources"
+    ></canvas>
+
+    <div class="canvas-label">
+      Hover to probe pressure · Far-field directivity updates live
+    </div>
+
+    <div class="pressure-legend" aria-hidden="true">
+      <span>Instantaneous pressure</span>
+      <div class="pressure-gradient"></div>
+      <div class="pressure-labels">
+        <span>−</span>
+        <span>0</span>
+        <span>+</span>
+      </div>
+    </div>
+
+    <div class="polar-panel">
+      <div class="polar-header">
+        <span>Far-field directivity</span>
+        <strong data-polar-label>Monopole</strong>
+      </div>
+      <canvas
+        data-polar-canvas
+        aria-label="Polar plot of normalised acoustic directivity"
+      ></canvas>
+    </div>
+
+    <div class="probe-panel" data-probe-panel hidden>
+      <div class="probe-title">Pressure probe</div>
+      <div class="probe-grid">
+        <span>x</span><strong data-probe-x>—</strong>
+        <span>y</span><strong data-probe-y>—</strong>
+        <span>p̂</span><strong data-probe-p>—</strong>
+        <span>|p̂| env.</span><strong data-probe-a>—</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="source-control">
+      <div class="control-heading">
+        <span>Source multipole</span>
+        <small>
+          At Δφ = 180°, the compact-source limit recovers the canonical patterns.
+        </small>
+      </div>
+
+      <div class="segmented" role="group" aria-label="Acoustic source type">
+        <button
+          class="source-button is-active"
+          type="button"
+          data-source-type="monopole"
+          aria-pressed="true"
+        >
+          Monopole
+        </button>
+        <button
+          class="source-button"
+          type="button"
+          data-source-type="dipole"
+          aria-pressed="false"
+        >
+          Dipole
+        </button>
+        <button
+          class="source-button"
+          type="button"
+          data-source-type="quadrupole"
+          aria-pressed="false"
+        >
+          Quadrupole
+        </button>
+      </div>
+    </div>
+
+    <label class="control-row">
+      <span>Frequency f</span>
+      <output data-frequency-output>400 Hz</output>
+      <input
+        data-frequency
+        type="range"
+        min="80"
+        max="1400"
+        step="10"
+        value="400"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Relative phase Δφ</span>
+      <output data-phase-output>—</output>
+      <input
+        data-phase
+        type="range"
+        min="0"
+        max="360"
+        step="1"
+        value="180"
+        disabled
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Source spacing d</span>
+      <output data-spacing-output>0.35 m</output>
+      <input
+        data-spacing
+        type="range"
+        min="0.05"
+        max="1.20"
+        step="0.01"
+        value="0.35"
+      />
+    </label>
+
+    <div class="derived-values">
+      <div>
+        <span>Wavelength λ</span>
+        <strong data-wavelength-output>—</strong>
+      </div>
+      <div>
+        <span>Spacing ratio d/λ</span>
+        <strong data-ratio-output>—</strong>
+      </div>
+      <div>
+        <span>Acoustic phase kd</span>
+        <strong data-kd-output>—</strong>
+      </div>
+    </div>
+
+    <div class="visual-controls">
+      <div class="visual-title">Visual layers</div>
+
+      <div class="toggle-grid">
+        <label class="toggle">
+          <input data-grid-toggle type="checkbox" checked />
+          <span>Engineering grid</span>
+        </label>
+
+        <label class="toggle">
+          <input data-source-toggle type="checkbox" checked />
+          <span>Source markers</span>
+        </label>
+
+        <label class="toggle">
+          <input data-envelope-toggle type="checkbox" />
+          <span>Pressure envelope</span>
+        </label>
+      </div>
+    </div>
+
+    <details class="model-details">
+      <summary>Model assumptions & equations</summary>
+
+      <div class="model-content">
+        <p>
+          The animation superposes equal-strength coherent point sources in a
+          homogeneous, lossless medium. The displayed field is a two-dimensional
+          slice through the three-dimensional pressure field.
+        </p>
+
+        <div class="equation">
+          p(x,t) ∝ Re&#123; Σₙ Qₙ exp[i(k rₙ − ωt + φₙ)] / rₙ &#125;
+        </div>
+
+        <div class="equation">
+          D(θ) =
+          |Σₙ Qₙ exp(iφₙ) exp[−ik(xₙ cosθ + yₙ sinθ)]|
+          / maxθ(·)
+        </div>
+
+        <p>
+          Here k = 2πf/c and c = 343 m/s. For the dipole, two sources are
+          separated by d along the x-axis. For the quadrupole, four sources sit
+          on the corners of a square of side d with opposite diagonal pairs.
+        </p>
+
+        <ul>
+          <li>Linear acoustics; coherent harmonic sources</li>
+          <li>No reflections, mean flow, absorption or boundaries</li>
+          <li>Equal source magnitudes</li>
+          <li>Δφ = 180° gives opposite source polarity</li>
+          <li>Near-source 1/r singularities are regularised only for display</li>
+          <li>The polar plot is the normalised far-field array factor</li>
+          <li>Animation time is slowed uniformly for display; wavelength and directivity are not rescaled</li>
+        </ul>
+
+        <p class="model-note">
+          In the compact limit kd ≪ 1 and Δφ = 180°, the dipole tends toward
+          |cosθ| and this square quadrupole tends toward |sin2θ|. At larger kd,
+          finite source spacing produces additional interference lobes.
+        </p>
+      </div>
+    </details>
+
+    <div class="bottom-row">
+      <div class="model-info">
+        <strong>Model:</strong>
+        coherent point-source superposition · far-field array factor
+      </div>
+
+      <div class="buttons">
+        <button data-pause type="button">Pause</button>
+        <button data-reset type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const acousticLabs =
+    document.querySelectorAll<HTMLElement>("[data-acoustic-lab]");
+
+  for (const root of acousticLabs) {
+    const waveCanvas =
+      root.querySelector<HTMLCanvasElement>("[data-wave-canvas]")!;
+
+    const polarCanvas =
+      root.querySelector<HTMLCanvasElement>("[data-polar-canvas]")!;
+
+    const frequencySlider =
+      root.querySelector<HTMLInputElement>("[data-frequency]")!;
+
+    const phaseSlider =
+      root.querySelector<HTMLInputElement>("[data-phase]")!;
+
+    const spacingSlider =
+      root.querySelector<HTMLInputElement>("[data-spacing]")!;
+
+    const frequencyOutput =
+      root.querySelector<HTMLOutputElement>("[data-frequency-output]")!;
+
+    const phaseOutput =
+      root.querySelector<HTMLOutputElement>("[data-phase-output]")!;
+
+    const spacingOutput =
+      root.querySelector<HTMLOutputElement>("[data-spacing-output]")!;
+
+    const wavelengthOutput =
+      root.querySelector<HTMLElement>("[data-wavelength-output]")!;
+
+    const ratioOutput =
+      root.querySelector<HTMLElement>("[data-ratio-output]")!;
+
+    const kdOutput =
+      root.querySelector<HTMLElement>("[data-kd-output]")!;
+
+    const polarLabel =
+      root.querySelector<HTMLElement>("[data-polar-label]")!;
+
+    const gridToggle =
+      root.querySelector<HTMLInputElement>("[data-grid-toggle]")!;
+
+    const sourceToggle =
+      root.querySelector<HTMLInputElement>("[data-source-toggle]")!;
+
+    const envelopeToggle =
+      root.querySelector<HTMLInputElement>("[data-envelope-toggle]")!;
+
+    const pauseButton =
+      root.querySelector<HTMLButtonElement>("[data-pause]")!;
+
+    const resetButton =
+      root.querySelector<HTMLButtonElement>("[data-reset]")!;
+
+    const probePanel =
+      root.querySelector<HTMLElement>("[data-probe-panel]")!;
+
+    const probeXOutput =
+      root.querySelector<HTMLElement>("[data-probe-x]")!;
+
+    const probeYOutput =
+      root.querySelector<HTMLElement>("[data-probe-y]")!;
+
+    const probePOutput =
+      root.querySelector<HTMLElement>("[data-probe-p]")!;
+
+    const probeAOutput =
+      root.querySelector<HTMLElement>("[data-probe-a]")!;
+
+    const sourceButtons =
+      root.querySelectorAll<HTMLButtonElement>("[data-source-type]");
+
+    if (
+      !waveCanvas ||
+      !polarCanvas ||
+      !frequencySlider ||
+      !phaseSlider ||
+      !spacingSlider ||
+      !frequencyOutput ||
+      !phaseOutput ||
+      !spacingOutput ||
+      !wavelengthOutput ||
+      !ratioOutput ||
+      !kdOutput ||
+      !polarLabel ||
+      !gridToggle ||
+      !sourceToggle ||
+      !envelopeToggle ||
+      !pauseButton ||
+      !resetButton ||
+      !probePanel ||
+      !probeXOutput ||
+      !probeYOutput ||
+      !probePOutput ||
+      !probeAOutput ||
+      sourceButtons.length === 0
+    ) {
+      continue;
+    }
+
+    const ctx = waveCanvas.getContext("2d")!;
+    const polarCtx = polarCanvas.getContext("2d")!;
+
+    if (!ctx || !polarCtx) {
+      continue;
+    }
+
+    // ==================================================
+    // CONSTANTS / PHYSICAL DOMAIN
+    // ==================================================
+
+    const soundSpeed = 343;
+
+    const xmin = -3.2;
+    const xmax = 3.2;
+    const ymin = -1.8;
+    const ymax = 1.8;
+
+    const fieldCanvas = document.createElement("canvas");
+    const fieldCtx = fieldCanvas.getContext("2d")!;
+
+    if (!fieldCtx) {
+      continue;
+    }
+
+    // ==================================================
+    // MODEL STATE
+    // ==================================================
+
+    type SourceType = "monopole" | "dipole" | "quadrupole";
+
+    type AcousticSource = {
+      x: number;
+      y: number;
+      phase: number;
+      signLabel: string;
+    };
+
+    let sourceType: SourceType = "monopole";
+
+    let targetFrequency = 400;
+    let targetPhaseDeg = 180;
+    let targetSpacing = 0.35;
+
+    let frequency = targetFrequency;
+    let phaseDeg = targetPhaseDeg;
+    let spacing = targetSpacing;
+
+    let showGrid = true;
+    let showSources = true;
+    let showEnvelope = false;
+
+    let running = true;
+
+    // Physical acoustic frequencies are far above display refresh rates.
+    // Time is therefore slowed uniformly for the animation only; the
+    // spatial wavelength and far-field directivity remain physical.
+    const visualTimeScale = 0.0015;
+    let acousticPhase = 0;
+
+    let previousTime = performance.now();
+
+    let probeActive = false;
+    let probeX = 0;
+    let probeY = 0;
+
+    // ==================================================
+    // COORDINATE CONVERSION
+    // ==================================================
+
+    function physicalToScreenX(x: number) {
+      return (
+        ((x - xmin) / (xmax - xmin)) *
+        waveCanvas.clientWidth
+      );
+    }
+
+    function physicalToScreenY(y: number) {
+      return (
+        waveCanvas.clientHeight -
+        ((y - ymin) / (ymax - ymin)) *
+        waveCanvas.clientHeight
+      );
+    }
+
+    function screenToPhysicalX(px: number) {
+      return (
+        xmin +
+        (px / waveCanvas.clientWidth) *
+        (xmax - xmin)
+      );
+    }
+
+    function screenToPhysicalY(py: number) {
+      return (
+        ymax -
+        (py / waveCanvas.clientHeight) *
+        (ymax - ymin)
+      );
+    }
+
+    // ==================================================
+    // SOURCE GEOMETRY
+    // ==================================================
+
+    function phaseRadians() {
+      return phaseDeg * Math.PI / 180;
+    }
+
+    function sourcesForCurrentState(): AcousticSource[] {
+      const phi = phaseRadians();
+
+      if (sourceType === "monopole") {
+        return [
+          {
+            x: 0,
+            y: 0,
+            phase: 0,
+            signLabel: "+"
+          }
+        ];
+      }
+
+      if (sourceType === "dipole") {
+        return [
+          {
+            x: -0.5 * spacing,
+            y: 0,
+            phase: 0,
+            signLabel: "+"
+          },
+          {
+            x: 0.5 * spacing,
+            y: 0,
+            phase: phi,
+            signLabel: "Δφ"
+          }
+        ];
+      }
+
+      const h = 0.5 * spacing;
+
+      return [
+        {
+          x: h,
+          y: h,
+          phase: 0,
+          signLabel: "+"
+        },
+        {
+          x: -h,
+          y: -h,
+          phase: 0,
+          signLabel: "+"
+        },
+        {
+          x: -h,
+          y: h,
+          phase: phi,
+          signLabel: "Δφ"
+        },
+        {
+          x: h,
+          y: -h,
+          phase: phi,
+          signLabel: "Δφ"
+        }
+      ];
+    }
+
+    // ==================================================
+    // ACOUSTIC PHYSICS
+    // ==================================================
+
+    function wavenumber() {
+      return 2 * Math.PI * frequency / soundSpeed;
+    }
+
+    function angularFrequency() {
+      return 2 * Math.PI * frequency;
+    }
+
+    function complexPressureAt(
+      x: number,
+      y: number
+    ) {
+      const sources = sourcesForCurrentState();
+      const k = wavenumber();
+
+      let real = 0;
+      let imag = 0;
+
+      for (const source of sources) {
+        const dx = x - source.x;
+        const dy = y - source.y;
+
+        const r = Math.sqrt(
+          dx * dx +
+          dy * dy +
+          0.035 * 0.035
+        );
+
+        const phase =
+          k * r +
+          source.phase;
+
+        const amplitude =
+          1 / r;
+
+        real +=
+          amplitude *
+          Math.cos(phase);
+
+        imag +=
+          amplitude *
+          Math.sin(phase);
+      }
+
+      return {
+        real,
+        imag
+      };
+    }
+
+    function instantaneousPressureAt(
+      x: number,
+      y: number
+    ) {
+      const complex =
+        complexPressureAt(x, y);
+
+      return (
+        complex.real *
+        Math.cos(acousticPhase) +
+        complex.imag *
+        Math.sin(acousticPhase)
+      );
+    }
+
+    function pressureEnvelopeAt(
+      x: number,
+      y: number
+    ) {
+      const complex =
+        complexPressureAt(x, y);
+
+      return Math.hypot(
+        complex.real,
+        complex.imag
+      );
+    }
+
+    function farFieldAmplitude(
+      theta: number
+    ) {
+      const sources = sourcesForCurrentState();
+      const k = wavenumber();
+
+      const c = Math.cos(theta);
+      const s = Math.sin(theta);
+
+      let real = 0;
+      let imag = 0;
+
+      for (const source of sources) {
+        const propagationPhase =
+          -k *
+          (
+            source.x * c +
+            source.y * s
+          );
+
+        const totalPhase =
+          source.phase +
+          propagationPhase;
+
+        real += Math.cos(totalPhase);
+        imag += Math.sin(totalPhase);
+      }
+
+      return Math.hypot(real, imag);
+    }
+
+    function directivitySamples() {
+      const sampleCount = 360;
+      const values =
+        new Float32Array(sampleCount);
+
+      let maximum = 1e-12;
+
+      for (
+        let i = 0;
+        i < sampleCount;
+        i++
+      ) {
+        const theta =
+          i /
+          sampleCount *
+          Math.PI *
+          2;
+
+        const value =
+          farFieldAmplitude(theta);
+
+        values[i] = value;
+
+        if (value > maximum) {
+          maximum = value;
+        }
+      }
+
+      for (
+        let i = 0;
+        i < sampleCount;
+        i++
+      ) {
+        values[i] /= maximum;
+      }
+
+      return values;
+    }
+
+    // ==================================================
+    // SMOOTH CONTROL TRANSITIONS
+    // ==================================================
+
+    function smoothModelState(dt: number) {
+      const tau = 0.10;
+
+      const response =
+        1 -
+        Math.exp(-dt / tau);
+
+      frequency +=
+        (targetFrequency - frequency) *
+        response;
+
+      phaseDeg +=
+        (targetPhaseDeg - phaseDeg) *
+        response;
+
+      spacing +=
+        (targetSpacing - spacing) *
+        response;
+    }
+
+    // ==================================================
+    // PRESSURE FIELD COLOUR
+    // ==================================================
+
+    function lerp(
+      a: number,
+      b: number,
+      t: number
+    ) {
+      return a + (b - a) * t;
+    }
+
+    function colourForValue(
+      value: number
+    ) {
+      const neutral = [8, 13, 19];
+      const negative = [62, 146, 220];
+      const positive = [255, 177, 92];
+
+      const amount =
+        Math.min(
+          1,
+          Math.abs(value)
+        );
+
+      const target =
+        value >= 0
+          ? positive
+          : negative;
+
+      return [
+        Math.round(
+          lerp(
+            neutral[0],
+            target[0],
+            amount
+          )
+        ),
+        Math.round(
+          lerp(
+            neutral[1],
+            target[1],
+            amount
+          )
+        ),
+        Math.round(
+          lerp(
+            neutral[2],
+            target[2],
+            amount
+          )
+        )
+      ];
+    }
+
+    // ==================================================
+    // FIELD RENDERING
+    // ==================================================
+
+    function resizeFieldCanvas() {
+      const width =
+        Math.max(
+          180,
+          Math.min(
+            300,
+            Math.round(
+              waveCanvas.clientWidth /
+              3.2
+            )
+          )
+        );
+
+      const aspect =
+        waveCanvas.clientHeight /
+        Math.max(
+          1,
+          waveCanvas.clientWidth
+        );
+
+      const height =
+        Math.max(
+          100,
+          Math.round(
+            width * aspect
+          )
+        );
+
+      if (
+        fieldCanvas.width !== width ||
+        fieldCanvas.height !== height
+      ) {
+        fieldCanvas.width = width;
+        fieldCanvas.height = height;
+      }
+    }
+
+    function renderPressureField() {
+      resizeFieldCanvas();
+
+      const width = fieldCanvas.width;
+      const height = fieldCanvas.height;
+
+      const image =
+        fieldCtx.createImageData(
+          width,
+          height
+        );
+
+      const data = image.data;
+
+      const gain =
+        sourceType === "monopole"
+          ? 0.33
+          : sourceType === "dipole"
+            ? 0.55
+            : 0.80;
+
+      let index = 0;
+
+      for (
+        let j = 0;
+        j < height;
+        j++
+      ) {
+        const y =
+          ymax -
+          (j + 0.5) /
+          height *
+          (ymax - ymin);
+
+        for (
+          let i = 0;
+          i < width;
+          i++
+        ) {
+          const x =
+            xmin +
+            (i + 0.5) /
+            width *
+            (xmax - xmin);
+
+          let pressure: number;
+
+          if (showEnvelope) {
+            pressure =
+              pressureEnvelopeAt(x, y);
+
+            pressure =
+              1 -
+              Math.exp(
+                -gain *
+                pressure
+              );
+          } else {
+            const raw =
+              instantaneousPressureAt(
+                x,
+                y
+              );
+
+            pressure =
+              Math.tanh(
+                gain *
+                raw
+              );
+          }
+
+          const colour =
+            colourForValue(pressure);
+
+          data[index] =
+            colour[0];
+
+          data[index + 1] =
+            colour[1];
+
+          data[index + 2] =
+            colour[2];
+
+          data[index + 3] =
+            255;
+
+          index += 4;
+        }
+      }
+
+      fieldCtx.putImageData(
+        image,
+        0,
+        0
+      );
+    }
+
+    // ==================================================
+    // ENGINEERING GRID
+    // ==================================================
+
+    function drawGrid() {
+      if (!showGrid) {
+        return;
+      }
+
+      const width =
+        waveCanvas.clientWidth;
+
+      const height =
+        waveCanvas.clientHeight;
+
+      ctx.save();
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.050)";
+
+      const minor = 0.5;
+
+      for (
+        let x =
+          Math.ceil(xmin / minor) *
+          minor;
+        x <= xmax;
+        x += minor
+      ) {
+        const px =
+          physicalToScreenX(x);
+
+        ctx.beginPath();
+        ctx.moveTo(px, 0);
+        ctx.lineTo(px, height);
+        ctx.stroke();
+      }
+
+      for (
+        let y =
+          Math.ceil(ymin / minor) *
+          minor;
+        y <= ymax;
+        y += minor
+      ) {
+        const py =
+          physicalToScreenY(y);
+
+        ctx.beginPath();
+        ctx.moveTo(0, py);
+        ctx.lineTo(width, py);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.11)";
+
+      const xAxis =
+        physicalToScreenY(0);
+
+      const yAxis =
+        physicalToScreenX(0);
+
+      ctx.beginPath();
+      ctx.moveTo(0, xAxis);
+      ctx.lineTo(width, xAxis);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(yAxis, 0);
+      ctx.lineTo(yAxis, height);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // ==================================================
+    // SOURCE MARKERS
+    // ==================================================
+
+    function drawSources() {
+      if (!showSources) {
+        return;
+      }
+
+      const sources =
+        sourcesForCurrentState();
+
+      const wt =
+        acousticPhase;
+
+      ctx.save();
+
+      for (const source of sources) {
+        const px =
+          physicalToScreenX(
+            source.x
+          );
+
+        const py =
+          physicalToScreenY(
+            source.y
+          );
+
+        const oscillation =
+          Math.cos(
+            wt -
+            source.phase
+          );
+
+        const radius =
+          8 +
+          2.5 *
+          Math.abs(
+            oscillation
+          );
+
+        const warm =
+          oscillation >= 0;
+
+        const colour =
+          warm
+            ? "rgba(255,190,108,0.95)"
+            : "rgba(103,190,255,0.95)";
+
+        const haloColour =
+          warm
+            ? "rgba(255,190,108,0.20)"
+            : "rgba(103,190,255,0.20)";
+
+        const halo =
+          ctx.createRadialGradient(
+            px,
+            py,
+            0,
+            px,
+            py,
+            24
+          );
+
+        halo.addColorStop(
+          0,
+          haloColour
+        );
+
+        halo.addColorStop(
+          1,
+          "rgba(0,0,0,0)"
+        );
+
+        ctx.fillStyle = halo;
+
+        ctx.beginPath();
+        ctx.arc(
+          px,
+          py,
+          24,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(
+          px,
+          py,
+          radius,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fillStyle =
+          "rgba(6,10,14,0.82)";
+        ctx.fill();
+
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(
+          px,
+          py,
+          2.8,
+          0,
+          Math.PI * 2
+        );
+        ctx.fillStyle = colour;
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // ==================================================
+    // PROBE
+    // ==================================================
+
+    function drawProbe() {
+      if (!probeActive) {
+        return;
+      }
+
+      const px =
+        physicalToScreenX(
+          probeX
+        );
+
+      const py =
+        physicalToScreenY(
+          probeY
+        );
+
+      ctx.save();
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.68)";
+
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.arc(
+        px,
+        py,
+        4,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(px - 8, py);
+      ctx.lineTo(px + 8, py);
+      ctx.moveTo(px, py - 8);
+      ctx.lineTo(px, py + 8);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function updateProbeOutputs() {
+      if (!probeActive) {
+        probePanel.hidden = true;
+        return;
+      }
+
+      probePanel.hidden = false;
+
+      const p =
+        instantaneousPressureAt(
+          probeX,
+          probeY
+        );
+
+      const envelope =
+        pressureEnvelopeAt(
+          probeX,
+          probeY
+        );
+
+      const scale =
+        sourceType === "monopole"
+          ? 0.33
+          : sourceType === "dipole"
+            ? 0.55
+            : 0.80;
+
+      probeXOutput.textContent =
+        `${probeX.toFixed(2)} m`;
+
+      probeYOutput.textContent =
+        `${probeY.toFixed(2)} m`;
+
+      probePOutput.textContent =
+        `${Math.tanh(scale * p).toFixed(3)}`;
+
+      probeAOutput.textContent =
+        `${Math.tanh(scale * envelope).toFixed(3)}`;
+    }
+
+    // ==================================================
+    // POLAR DIRECTIVITY
+    // ==================================================
+
+    function drawPolarPlot() {
+      const width =
+        polarCanvas.clientWidth;
+
+      const height =
+        polarCanvas.clientHeight;
+
+      const cx = width / 2;
+      const cy = height / 2;
+
+      const radius =
+        Math.min(
+          width,
+          height
+        ) *
+        0.39;
+
+      polarCtx.clearRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+      polarCtx.save();
+
+      // Polar grid
+      polarCtx.strokeStyle =
+        "rgba(255,255,255,0.11)";
+      polarCtx.lineWidth = 1;
+
+      for (
+        const fraction of
+        [0.25, 0.5, 0.75, 1]
+      ) {
+        polarCtx.beginPath();
+        polarCtx.arc(
+          cx,
+          cy,
+          radius * fraction,
+          0,
+          Math.PI * 2
+        );
+        polarCtx.stroke();
+      }
+
+      for (
+        let angle = 0;
+        angle < 360;
+        angle += 45
+      ) {
+        const theta =
+          angle *
+          Math.PI /
+          180;
+
+        polarCtx.beginPath();
+        polarCtx.moveTo(cx, cy);
+        polarCtx.lineTo(
+          cx +
+          radius *
+          Math.cos(theta),
+          cy -
+          radius *
+          Math.sin(theta)
+        );
+        polarCtx.stroke();
+      }
+
+      polarCtx.font =
+        "10px system-ui, sans-serif";
+
+      polarCtx.fillStyle =
+        "rgba(255,255,255,0.42)";
+
+      polarCtx.textAlign = "center";
+      polarCtx.textBaseline = "middle";
+
+      polarCtx.fillText(
+        "0°",
+        cx + radius + 13,
+        cy
+      );
+
+      polarCtx.fillText(
+        "90°",
+        cx,
+        cy - radius - 11
+      );
+
+      polarCtx.fillText(
+        "180°",
+        cx - radius - 17,
+        cy
+      );
+
+      polarCtx.fillText(
+        "270°",
+        cx,
+        cy + radius + 12
+      );
+
+      const values =
+        directivitySamples();
+
+      // Filled lobe
+      polarCtx.beginPath();
+
+      for (
+        let i = 0;
+        i < values.length;
+        i++
+      ) {
+        const theta =
+          i /
+          values.length *
+          Math.PI *
+          2;
+
+        const r =
+          radius *
+          values[i];
+
+        const x =
+          cx +
+          r *
+          Math.cos(theta);
+
+        const y =
+          cy -
+          r *
+          Math.sin(theta);
+
+        if (i === 0) {
+          polarCtx.moveTo(x, y);
+        } else {
+          polarCtx.lineTo(x, y);
+        }
+      }
+
+      polarCtx.closePath();
+
+      const fill =
+        polarCtx.createRadialGradient(
+          cx,
+          cy,
+          0,
+          cx,
+          cy,
+          radius
+        );
+
+      fill.addColorStop(
+        0,
+        "rgba(103,199,255,0.05)"
+      );
+
+      fill.addColorStop(
+        1,
+        "rgba(103,199,255,0.19)"
+      );
+
+      polarCtx.fillStyle = fill;
+      polarCtx.fill();
+
+      polarCtx.strokeStyle =
+        "rgba(134,216,255,0.92)";
+
+      polarCtx.lineWidth = 1.7;
+      polarCtx.stroke();
+
+      polarCtx.restore();
+    }
+
+    // ==================================================
+    // FRAME
+    // ==================================================
+
+    function draw() {
+      renderPressureField();
+
+      ctx.save();
+
+      ctx.imageSmoothingEnabled = true;
+
+      ctx.drawImage(
+        fieldCanvas,
+        0,
+        0,
+        waveCanvas.clientWidth,
+        waveCanvas.clientHeight
+      );
+
+      ctx.restore();
+
+      drawGrid();
+      drawSources();
+      drawProbe();
+      drawPolarPlot();
+    }
+
+    // ==================================================
+    // ANIMATION LOOP
+    // ==================================================
+
+    function animate(now: number) {
+      const rawDt =
+        (
+          now -
+          previousTime
+        ) /
+        1000;
+
+      previousTime = now;
+
+      const dt =
+        Math.min(
+          rawDt,
+          0.035
+        );
+
+      smoothModelState(dt);
+
+      if (running) {
+        acousticPhase +=
+          angularFrequency() *
+          dt *
+          visualTimeScale;
+
+        acousticPhase %=
+          Math.PI * 2;
+      }
+
+      updateProbeOutputs();
+      draw();
+
+      requestAnimationFrame(
+        animate
+      );
+    }
+
+    // ==================================================
+    // RESIZING
+    // ==================================================
+
+    function resizeCanvasToDisplaySize(
+      canvas: HTMLCanvasElement,
+      context: CanvasRenderingContext2D
+    ) {
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const dpr =
+        Math.min(
+          window.devicePixelRatio || 1,
+          2
+        );
+
+      const width =
+        Math.max(
+          1,
+          Math.round(
+            rect.width * dpr
+          )
+        );
+
+      const height =
+        Math.max(
+          1,
+          Math.round(
+            rect.height * dpr
+          )
+        );
+
+      if (
+        canvas.width === width &&
+        canvas.height === height
+      ) {
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      context.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+    }
+
+    function resizeAll() {
+      resizeCanvasToDisplaySize(
+        waveCanvas,
+        ctx
+      );
+
+      resizeCanvasToDisplaySize(
+        polarCanvas,
+        polarCtx
+      );
+
+      resizeFieldCanvas();
+    }
+
+    // ==================================================
+    // UI STATE
+    // ==================================================
+
+    function readTargetsFromControls() {
+      targetFrequency =
+        Number(
+          frequencySlider.value
+        );
+
+      targetPhaseDeg =
+        Number(
+          phaseSlider.value
+        );
+
+      targetSpacing =
+        Number(
+          spacingSlider.value
+        );
+
+      showGrid =
+        gridToggle.checked;
+
+      showSources =
+        sourceToggle.checked;
+
+      showEnvelope =
+        envelopeToggle.checked;
+    }
+
+    function sourceTitle() {
+      if (sourceType === "monopole") {
+        return "Monopole";
+      }
+
+      if (sourceType === "dipole") {
+        return "Dipole";
+      }
+
+      return "Quadrupole";
+    }
+
+    function updateOutputs() {
+      readTargetsFromControls();
+
+      const wavelength =
+        soundSpeed /
+        targetFrequency;
+
+      const ratio =
+        targetSpacing /
+        wavelength;
+
+      const kd =
+        2 *
+        Math.PI *
+        ratio;
+
+      frequencyOutput.value =
+        `${targetFrequency.toFixed(0)} Hz`;
+
+      wavelengthOutput.textContent =
+        `${wavelength.toFixed(3)} m`;
+
+      polarLabel.textContent =
+        sourceTitle();
+
+      const multipoleControlsRelevant =
+        sourceType !== "monopole";
+
+      phaseSlider.disabled =
+        !multipoleControlsRelevant;
+
+      spacingSlider.disabled =
+        !multipoleControlsRelevant;
+
+      phaseOutput.value =
+        multipoleControlsRelevant
+          ? `${targetPhaseDeg.toFixed(0)}°`
+          : "—";
+
+      spacingOutput.value =
+        multipoleControlsRelevant
+          ? `${targetSpacing.toFixed(2)} m`
+          : "—";
+
+      ratioOutput.textContent =
+        multipoleControlsRelevant
+          ? ratio.toFixed(3)
+          : "—";
+
+      kdOutput.textContent =
+        multipoleControlsRelevant
+          ? `${kd.toFixed(2)} rad`
+          : "—";
+
+      sourceButtons.forEach(
+        button => {
+          const active =
+            button.dataset.sourceType ===
+            sourceType;
+
+          button.classList.toggle(
+            "is-active",
+            active
+          );
+
+          button.setAttribute(
+            "aria-pressed",
+            active
+              ? "true"
+              : "false"
+          );
+        }
+      );
+    }
+
+    function modelChanged() {
+      updateOutputs();
+    }
+
+    frequencySlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+    phaseSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+    spacingSlider.addEventListener(
+      "input",
+      modelChanged
+    );
+
+    gridToggle.addEventListener(
+      "change",
+      updateOutputs
+    );
+
+    sourceToggle.addEventListener(
+      "change",
+      updateOutputs
+    );
+
+    envelopeToggle.addEventListener(
+      "change",
+      updateOutputs
+    );
+
+    sourceButtons.forEach(
+      button => {
+        button.addEventListener(
+          "click",
+          () => {
+            const nextType =
+              button.dataset.sourceType;
+
+            if (
+              nextType === "monopole" ||
+              nextType === "dipole" ||
+              nextType === "quadrupole"
+            ) {
+              sourceType = nextType;
+              updateOutputs();
+            }
+          }
+        );
+      }
+    );
+
+    // ==================================================
+    // PAUSE / RESET
+    // ==================================================
+
+    pauseButton.addEventListener(
+      "click",
+      () => {
+        running = !running;
+
+        pauseButton.textContent =
+          running
+            ? "Pause"
+            : "Play";
+      }
+    );
+
+    resetButton.addEventListener(
+      "click",
+      () => {
+        sourceType = "monopole";
+
+        frequencySlider.value =
+          "400";
+
+        phaseSlider.value =
+          "180";
+
+        spacingSlider.value =
+          "0.35";
+
+        gridToggle.checked =
+          true;
+
+        sourceToggle.checked =
+          true;
+
+        envelopeToggle.checked =
+          false;
+
+        targetFrequency = 400;
+        targetPhaseDeg = 180;
+        targetSpacing = 0.35;
+
+        frequency =
+          targetFrequency;
+
+        phaseDeg =
+          targetPhaseDeg;
+
+        spacing =
+          targetSpacing;
+
+        acousticPhase = 0;
+        running = true;
+
+        probeActive = false;
+
+        pauseButton.textContent =
+          "Pause";
+
+        updateOutputs();
+      }
+    );
+
+    // ==================================================
+    // POINTER / PRESSURE PROBE
+    // ==================================================
+
+    function updatePointerPosition(
+      event: PointerEvent
+    ) {
+      const rect =
+        waveCanvas.getBoundingClientRect();
+
+      const px =
+        Math.max(
+          0,
+          Math.min(
+            rect.width,
+            event.clientX -
+            rect.left
+          )
+        );
+
+      const py =
+        Math.max(
+          0,
+          Math.min(
+            rect.height,
+            event.clientY -
+            rect.top
+          )
+        );
+
+      probeX =
+        screenToPhysicalX(px);
+
+      probeY =
+        screenToPhysicalY(py);
+    }
+
+    waveCanvas.addEventListener(
+      "pointerenter",
+      event => {
+        probeActive = true;
+        updatePointerPosition(event);
+      }
+    );
+
+    waveCanvas.addEventListener(
+      "pointermove",
+      event => {
+        probeActive = true;
+        updatePointerPosition(event);
+      }
+    );
+
+    waveCanvas.addEventListener(
+      "pointerleave",
+      () => {
+        probeActive = false;
+      }
+    );
+
+    // ==================================================
+    // RESPONSIVE RESIZING
+    // ==================================================
+
+    if (
+      typeof ResizeObserver !== "undefined"
+    ) {
+      const resizeObserver =
+        new ResizeObserver(
+          resizeAll
+        );
+
+      resizeObserver.observe(
+        waveCanvas
+      );
+
+      resizeObserver.observe(
+        polarCanvas
+      );
+    } else {
+      window.addEventListener(
+        "resize",
+        resizeAll
+      );
+    }
+
+    // ==================================================
+    // START
+    // ==================================================
+
+    resizeAll();
+    readTargetsFromControls();
+    updateOutputs();
+
+    requestAnimationFrame(
+      animate
+    );
+  }
+</script>
+
+<style>
+  .acoustic-lab {
+    max-width: 950px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    background: #080c11;
+    color: #f5f7fa;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  /* ================================================
+     VISUAL AREA
+     ================================================ */
+
+  .visual-wrap {
+    position: relative;
+    background: #080c11;
+  }
+
+  [data-wave-canvas] {
+    display: block;
+    width: 100%;
+    height: 470px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .canvas-label {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    padding: 0.42rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    background: rgba(3, 7, 11, 0.55);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.50);
+    font-size: 0.72rem;
+    pointer-events: none;
+  }
+
+  /* ================================================
+     PRESSURE LEGEND
+     ================================================ */
+
+  .pressure-legend {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    width: 135px;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    background: rgba(3, 7, 11, 0.52);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.66rem;
+    pointer-events: none;
+  }
+
+  .pressure-gradient {
+    height: 4px;
+    margin: 0.35rem 0 0.22rem;
+    border-radius: 999px;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(62, 146, 220),
+        rgb(8, 13, 19),
+        rgb(255, 177, 92)
+      );
+  }
+
+  .pressure-labels {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  /* ================================================
+     POLAR PLOT
+     ================================================ */
+
+  .polar-panel {
+    position: absolute;
+    right: 16px;
+    top: 14px;
+    width: 245px;
+    padding: 0.72rem 0.75rem 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    background: rgba(3, 7, 11, 0.66);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .polar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.15rem;
+    color: rgba(255, 255, 255, 0.46);
+    font-size: 0.67rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .polar-header strong {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.67rem;
+    font-weight: 600;
+  }
+
+  [data-polar-canvas] {
+    display: block;
+    width: 100%;
+    height: 210px;
+  }
+
+  /* ================================================
+     PROBE
+     ================================================ */
+
+  .probe-panel {
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+    width: 150px;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    background: rgba(3, 7, 11, 0.68);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .probe-title {
+    margin-bottom: 0.45rem;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .probe-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.18rem 0.6rem;
+    font-size: 0.69rem;
+  }
+
+  .probe-grid span {
+    color: rgba(255, 255, 255, 0.40);
+  }
+
+  .probe-grid strong {
+    text-align: right;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================================================
+     CONTROLS
+     ================================================ */
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+    padding: 1.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    background:
+      linear-gradient(
+        180deg,
+        #0d131a,
+        #090d12
+      );
+  }
+
+  .source-control {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .control-heading {
+    display: grid;
+    gap: 0.18rem;
+    color: #c4ced8;
+    font-size: 0.88rem;
+  }
+
+  .control-heading small {
+    color: #6f7c88;
+    font-size: 0.70rem;
+    line-height: 1.45;
+  }
+
+  .segmented {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .source-button {
+    min-height: 34px;
+    padding: 0.46rem 0.72rem;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #7f8b96;
+    font-size: 0.76rem;
+    cursor: pointer;
+    transition:
+      color 120ms ease,
+      background 120ms ease,
+      box-shadow 120ms ease;
+  }
+
+  .source-button:hover {
+    color: #d4dce4;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .source-button.is-active {
+    color: #e7f5ff;
+    background: rgba(101, 199, 255, 0.13);
+    box-shadow:
+      inset 0 0 0 1px rgba(101, 199, 255, 0.20);
+  }
+
+  .control-row {
+    display: grid;
+    grid-template-columns: 180px 135px 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  output {
+    color: #9ca9b5;
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  input[type="range"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.34;
+  }
+
+  /* ================================================
+     DERIVED VALUES
+     ================================================ */
+
+  .derived-values {
+    display: grid;
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+    gap: 0.75rem;
+    margin-top: 0.1rem;
+  }
+
+  .derived-values > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.72rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+    color: #7f8b96;
+    font-size: 0.78rem;
+  }
+
+  .derived-values strong {
+    color: #d6dee7;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================================================
+     VISUAL CONTROLS
+     ================================================ */
+
+  .visual-controls {
+    padding: 0.8rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  }
+
+  .visual-title {
+    margin-bottom: 0.65rem;
+    color: #798692;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .toggle-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+    gap: 0.7rem;
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    color: #a1abb5;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .toggle input {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  /* ================================================
+     MODEL DETAILS
+     ================================================ */
+
+  .model-details {
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .model-details summary {
+    padding: 0.72rem 0.9rem;
+    cursor: pointer;
+    color: #9ca7b2;
+    font-size: 0.8rem;
+    user-select: none;
+  }
+
+  .model-details summary:hover {
+    color: #d7dee6;
+  }
+
+  .model-content {
+    padding: 0 0.9rem 0.9rem;
+    color: #8d99a4;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .model-content p {
+    margin: 0.2rem 0 0.7rem;
+  }
+
+  .model-content ul {
+    margin: 0.65rem 0;
+    padding-left: 1.2rem;
+  }
+
+  .equation {
+    margin: 0.45rem 0;
+    padding: 0.55rem 0.7rem;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #c7d1db;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .model-note {
+    color: #74808c;
+  }
+
+  /* ================================================
+     BOTTOM ROW
+     ================================================ */
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.1rem;
+  }
+
+  .model-info {
+    color: #7f8b96;
+    font-size: 0.79rem;
+  }
+
+  .model-info strong {
+    color: #aeb8c2;
+    font-weight: 500;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .buttons button {
+    min-height: 38px;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.055);
+    color: rgba(255, 255, 255, 0.84);
+    cursor: pointer;
+    transition:
+      background 120ms ease,
+      border-color 120ms ease,
+      transform 120ms ease;
+  }
+
+  .buttons button:hover {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  .buttons button:active {
+    transform: translateY(1px);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid rgba(101, 199, 255, 0.8);
+    outline-offset: 3px;
+  }
+
+  /* ================================================
+     MOBILE
+     ================================================ */
+
+  @media (max-width: 760px) {
+    [data-wave-canvas] {
+      height: 410px;
+    }
+
+    .polar-panel {
+      width: 190px;
+    }
+
+    [data-polar-canvas] {
+      height: 165px;
+    }
+
+    .source-control {
+      grid-template-columns: 1fr;
+    }
+
+    .segmented {
+      width: 100%;
+    }
+
+    .source-button {
+      flex: 1 1 0;
+    }
+
+    .control-row {
+      grid-template-columns: 1fr auto;
+    }
+
+    .control-row input[type="range"] {
+      grid-column: 1 / -1;
+    }
+
+    .derived-values {
+      grid-template-columns: 1fr;
+    }
+
+    .toggle-grid {
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+    }
+
+    .bottom-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 520px) {
+    [data-wave-canvas] {
+      height: 390px;
+    }
+
+    .canvas-label {
+      display: none;
+    }
+
+    .polar-panel {
+      right: 10px;
+      top: 10px;
+      width: 158px;
+      padding: 0.55rem;
+    }
+
+    .polar-header {
+      font-size: 0.58rem;
+    }
+
+    .polar-header strong {
+      font-size: 0.58rem;
+    }
+
+    [data-polar-canvas] {
+      height: 138px;
+    }
+
+    .pressure-legend {
+      left: 10px;
+      bottom: 10px;
+      width: 112px;
+    }
+
+    .probe-panel {
+      right: 10px;
+      bottom: 10px;
+      width: 132px;
+    }
+
+    .controls {
+      padding: 1.1rem;
+    }
+
+    .toggle-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .source-button {
+      padding-inline: 0.45rem;
+      font-size: 0.70rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      transition: none;
+    }
+  }
+</style>
