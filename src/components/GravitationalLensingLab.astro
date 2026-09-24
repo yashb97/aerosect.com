@@ -1,0 +1,2810 @@
+<section class="lensing-lab" data-lensing-lab>
+  <div class="visual-wrap">
+    <canvas
+      data-lensing-canvas
+      aria-label="Interactive gravitational lensing visualisation showing a lensed galaxy or the lens geometry"
+    ></canvas>
+
+    <div class="canvas-label" data-canvas-label>
+      Drag the lens across the sky · Double images, arcs and rings emerge from the lens equation
+    </div>
+
+    <div class="mode-badge" aria-hidden="true">
+      <span data-mode-badge>Telescope view</span>
+    </div>
+
+    <div class="metric-panel">
+      <div class="metric-header">
+        <span>Live lens solution</span>
+        <strong data-regime-label>Strong lensing</strong>
+      </div>
+      <div class="metric-grid">
+        <span>Einstein angle θ<sub>E</sub></span><strong data-einstein-live>—</strong>
+        <span>Alignment u = β/θ<sub>E</sub></span><strong data-alignment-live>—</strong>
+        <span>Total magnification</span><strong data-magnification-live>—</strong>
+        <span>Image separation</span><strong data-separation-live>—</strong>
+      </div>
+    </div>
+
+    <div class="sky-legend" aria-hidden="true">
+      <div><i class="legend-dot lens-dot"></i><span>Lens</span></div>
+      <div><i class="legend-dot source-dot"></i><span>Unlensed source</span></div>
+      <div><i class="legend-ring"></i><span>Critical curve θ<sub>E</sub></span></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="view-control">
+      <div class="control-heading">
+        <span>What are we looking at?</span>
+        <small>
+          The telescope and geometry views use the same point-mass lens solution.
+        </small>
+      </div>
+
+      <div class="segmented" role="group" aria-label="Lensing view">
+        <button
+          class="mode-button is-active"
+          type="button"
+          data-view-mode="telescope"
+          aria-pressed="true"
+        >
+          What the telescope sees
+        </button>
+        <button
+          class="mode-button"
+          type="button"
+          data-view-mode="geometry"
+          aria-pressed="false"
+        >
+          Show the geometry
+        </button>
+      </div>
+    </div>
+
+    <label class="control-row">
+      <span>Lens mass M</span>
+      <output data-mass-output>3.0 × 10¹¹ M☉</output>
+      <input
+        data-mass
+        type="range"
+        min="30"
+        max="1500"
+        step="10"
+        value="300"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Lens distance D<sub>l</sub></span>
+      <output data-lens-distance-output>1.00 Gpc</output>
+      <input
+        data-lens-distance
+        type="range"
+        min="0.20"
+        max="2.40"
+        step="0.02"
+        value="1.00"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Source distance D<sub>s</sub></span>
+      <output data-source-distance-output>2.00 Gpc</output>
+      <input
+        data-source-distance
+        type="range"
+        min="0.50"
+        max="5.00"
+        step="0.02"
+        value="2.00"
+      />
+    </label>
+
+    <label class="control-row">
+      <span>Alignment u = β/θ<sub>E</sub></span>
+      <output data-alignment-output>0.65</output>
+      <input
+        data-alignment
+        type="range"
+        min="0"
+        max="3.5"
+        step="0.01"
+        value="0.65"
+      />
+    </label>
+
+    <div class="derived-values">
+      <div>
+        <span>Einstein angle θ<sub>E</sub></span>
+        <strong data-einstein-output>—</strong>
+      </div>
+      <div>
+        <span>Image positions θ<sub>±</sub></span>
+        <strong data-images-output>—</strong>
+      </div>
+      <div>
+        <span>Total magnification μ</span>
+        <strong data-magnification-output>—</strong>
+      </div>
+      <div>
+        <span>Image separation Δθ</span>
+        <strong data-separation-output>—</strong>
+      </div>
+    </div>
+
+    <div class="visual-controls">
+      <div class="visual-title">Visual layers</div>
+
+      <div class="toggle-grid">
+        <label class="toggle">
+          <input data-grid-toggle type="checkbox" checked />
+          <span>Angular grid</span>
+        </label>
+
+        <label class="toggle">
+          <input data-critical-toggle type="checkbox" checked />
+          <span>Einstein critical curve</span>
+        </label>
+
+        <label class="toggle">
+          <input data-marker-toggle type="checkbox" checked />
+          <span>Lens / source markers</span>
+        </label>
+
+        <label class="toggle">
+          <input data-ray-toggle type="checkbox" checked />
+          <span>Light-ray paths</span>
+        </label>
+      </div>
+    </div>
+
+    <details class="model-details">
+      <summary>Model assumptions & equations</summary>
+
+      <div class="model-content">
+        <p>
+          This visualisation uses the thin-lens, point-mass approximation in the
+          weak-field and small-angle limit. The telescope view is rendered by
+          backwards ray-shooting every image-plane pixel through the lens equation.
+        </p>
+
+        <div class="equation">
+          θ<sub>E</sub> = sqrt[(4GM/c²) D<sub>ls</sub> / (D<sub>l</sub>D<sub>s</sub>)]
+        </div>
+
+        <div class="equation">
+          β⃗ = θ⃗ − θ<sub>E</sub>² (θ⃗ − θ⃗<sub>L</sub>) / |θ⃗ − θ⃗<sub>L</sub>|²
+        </div>
+
+        <div class="equation">
+          θ<sub>±</sub> / θ<sub>E</sub> = ½ [u ± sqrt(u² + 4)]
+        </div>
+
+        <div class="equation">
+          μ<sub>tot</sub> = (u² + 2) / [u sqrt(u² + 4)]
+        </div>
+
+        <ul>
+          <li>Single isolated point-mass lens; no external shear or convergence</li>
+          <li>Thin-lens approximation and geometric optics</li>
+          <li>Lens and source distances are treated as angular-diameter-like distances</li>
+          <li>D<sub>ls</sub> is approximated as D<sub>s</sub> − D<sub>l</sub> for this interactive model</li>
+          <li>Surface brightness is conserved by the ray mapping</li>
+          <li>The finite galaxy is for visualisation; the analytic μ value is for a point source</li>
+          <li>The glowing lens marker is illustrative and does not represent the physical size of the lens</li>
+        </ul>
+
+        <p class="model-note">
+          Perfect alignment (u → 0) maps an extended source into an Einstein ring.
+          Small offsets produce arcs, while larger offsets resolve into the familiar
+          two-image point-lens configuration. The ideal point-source magnification
+          diverges at u = 0, so the displayed value is reported as ∞ there.
+        </p>
+      </div>
+    </details>
+
+    <div class="bottom-row">
+      <div class="model-info">
+        <strong>Model:</strong>
+        point-mass thin lens · inverse ray shooting · geometric optics
+      </div>
+
+      <div class="buttons">
+        <button data-perfect type="button">Perfect alignment</button>
+        <button data-reset type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const lensingLabs =
+    document.querySelectorAll<HTMLElement>("[data-lensing-lab]");
+
+  for (const root of lensingLabs) {
+    const canvas =
+      root.querySelector<HTMLCanvasElement>("[data-lensing-canvas]")!;
+
+    const massSlider =
+      root.querySelector<HTMLInputElement>("[data-mass]")!;
+
+    const lensDistanceSlider =
+      root.querySelector<HTMLInputElement>("[data-lens-distance]")!;
+
+    const sourceDistanceSlider =
+      root.querySelector<HTMLInputElement>("[data-source-distance]")!;
+
+    const alignmentSlider =
+      root.querySelector<HTMLInputElement>("[data-alignment]")!;
+
+    const massOutput =
+      root.querySelector<HTMLOutputElement>("[data-mass-output]")!;
+
+    const lensDistanceOutput =
+      root.querySelector<HTMLOutputElement>("[data-lens-distance-output]")!;
+
+    const sourceDistanceOutput =
+      root.querySelector<HTMLOutputElement>("[data-source-distance-output]")!;
+
+    const alignmentOutput =
+      root.querySelector<HTMLOutputElement>("[data-alignment-output]")!;
+
+    const einsteinOutput =
+      root.querySelector<HTMLElement>("[data-einstein-output]")!;
+
+    const imagesOutput =
+      root.querySelector<HTMLElement>("[data-images-output]")!;
+
+    const magnificationOutput =
+      root.querySelector<HTMLElement>("[data-magnification-output]")!;
+
+    const separationOutput =
+      root.querySelector<HTMLElement>("[data-separation-output]")!;
+
+    const einsteinLive =
+      root.querySelector<HTMLElement>("[data-einstein-live]")!;
+
+    const alignmentLive =
+      root.querySelector<HTMLElement>("[data-alignment-live]")!;
+
+    const magnificationLive =
+      root.querySelector<HTMLElement>("[data-magnification-live]")!;
+
+    const separationLive =
+      root.querySelector<HTMLElement>("[data-separation-live]")!;
+
+    const regimeLabel =
+      root.querySelector<HTMLElement>("[data-regime-label]")!;
+
+    const canvasLabel =
+      root.querySelector<HTMLElement>("[data-canvas-label]")!;
+
+    const modeBadge =
+      root.querySelector<HTMLElement>("[data-mode-badge]")!;
+
+    const gridToggle =
+      root.querySelector<HTMLInputElement>("[data-grid-toggle]")!;
+
+    const criticalToggle =
+      root.querySelector<HTMLInputElement>("[data-critical-toggle]")!;
+
+    const markerToggle =
+      root.querySelector<HTMLInputElement>("[data-marker-toggle]")!;
+
+    const rayToggle =
+      root.querySelector<HTMLInputElement>("[data-ray-toggle]")!;
+
+    const modeButtons =
+      root.querySelectorAll<HTMLButtonElement>("[data-view-mode]");
+
+    const perfectButton =
+      root.querySelector<HTMLButtonElement>("[data-perfect]")!;
+
+    const resetButton =
+      root.querySelector<HTMLButtonElement>("[data-reset]")!;
+
+    if (
+      !canvas ||
+      !massSlider ||
+      !lensDistanceSlider ||
+      !sourceDistanceSlider ||
+      !alignmentSlider ||
+      !massOutput ||
+      !lensDistanceOutput ||
+      !sourceDistanceOutput ||
+      !alignmentOutput ||
+      !einsteinOutput ||
+      !imagesOutput ||
+      !magnificationOutput ||
+      !separationOutput ||
+      !einsteinLive ||
+      !alignmentLive ||
+      !magnificationLive ||
+      !separationLive ||
+      !regimeLabel ||
+      !canvasLabel ||
+      !modeBadge ||
+      !gridToggle ||
+      !criticalToggle ||
+      !markerToggle ||
+      !rayToggle ||
+      modeButtons.length === 0 ||
+      !perfectButton ||
+      !resetButton
+    ) {
+      continue;
+    }
+
+    const ctx = canvas.getContext("2d")!;
+
+    if (!ctx) {
+      continue;
+    }
+
+    // ==================================================
+    // PHYSICAL CONSTANTS
+    // ==================================================
+
+    const G = 6.67430e-11;
+    const C = 299792458;
+    const SOLAR_MASS = 1.98847e30;
+    const PARSEC = 3.085677581491367e16;
+    const GPC = 1e9 * PARSEC;
+    const RAD_TO_ARCSEC = 206264.806247;
+
+    // Telescope field of view. This is intentionally fixed in angular units,
+    // so changing M, Dl and Ds changes the apparent Einstein-ring radius.
+    const fovXArcsec = 10.0;
+    const sourceFieldScale = 1.65;
+
+    // ==================================================
+    // OFFSCREEN CANVASES
+    // ==================================================
+
+    const sourceCanvas = document.createElement("canvas");
+    const sourceCtx = sourceCanvas.getContext("2d", {
+      willReadFrequently: true
+    })!;
+
+    const lensedCanvas = document.createElement("canvas");
+    const lensedCtx = lensedCanvas.getContext("2d")!;
+
+    if (!sourceCtx || !lensedCtx) {
+      continue;
+    }
+
+    let sourcePixels: Uint8ClampedArray | null = null;
+    let sourceWidth = 0;
+    let sourceHeight = 0;
+    let sourceFovYArcsec = 0;
+
+    // ==================================================
+    // MODEL STATE
+    // ==================================================
+
+    type ViewMode = "telescope" | "geometry";
+
+    let viewMode: ViewMode = "telescope";
+    let targetModeBlend = 0;
+    let modeBlend = 0;
+
+    let targetMassBillions = 300;
+    let targetLensDistanceGpc = 1.00;
+    let targetSourceDistanceGpc = 2.00;
+
+    let massBillions = targetMassBillions;
+    let lensDistanceGpc = targetLensDistanceGpc;
+    let sourceDistanceGpc = targetSourceDistanceGpc;
+
+    // Lens position in telescope angular coordinates. The unlensed galaxy
+    // source remains fixed at beta = (0, 0), making the lens freely draggable.
+    let lensXArcsec = 0;
+    let lensYArcsec = 0;
+
+    let showGrid = true;
+    let showCritical = true;
+    let showMarkers = true;
+    let showRays = true;
+
+    let draggingLens = false;
+    let activePointerId: number | null = null;
+
+    let previousTime = performance.now();
+    let fieldDirty = true;
+    let sourceDirty = true;
+
+    // Deterministic background stars in source-plane angular coordinates.
+    type Star = {
+      x: number;
+      y: number;
+      radius: number;
+      brightness: number;
+      warmth: number;
+    };
+
+    const stars: Star[] = [];
+
+    // ==================================================
+    // DETERMINISTIC STAR FIELD
+    // ==================================================
+
+    let randomState = 0x2f6e2b1;
+
+    function random01() {
+      randomState =
+        (Math.imul(randomState, 1664525) + 1013904223) >>> 0;
+
+      return randomState / 4294967296;
+    }
+
+    for (let i = 0; i < 265; i++) {
+      const x =
+        (random01() - 0.5) *
+        fovXArcsec *
+        sourceFieldScale;
+
+      const y =
+        (random01() - 0.5) *
+        fovXArcsec *
+        sourceFieldScale *
+        0.72;
+
+      const brightness =
+        0.32 +
+        0.68 *
+        Math.pow(random01(), 2.2);
+
+      const radius =
+        0.45 +
+        1.55 *
+        Math.pow(random01(), 3.0);
+
+      stars.push({
+        x,
+        y,
+        radius,
+        brightness,
+        warmth: random01()
+      });
+    }
+
+    // ==================================================
+    // LENS PHYSICS
+    // ==================================================
+
+    function safeSourceDistance() {
+      return Math.max(
+        sourceDistanceGpc,
+        lensDistanceGpc + 0.02
+      );
+    }
+
+    function einsteinAngleArcsec(
+      massBillionSolar = massBillions,
+      dlGpc = lensDistanceGpc,
+      dsGpc = safeSourceDistance()
+    ) {
+      const mass =
+        massBillionSolar *
+        1e9 *
+        SOLAR_MASS;
+
+      const dl = dlGpc * GPC;
+      const ds = dsGpc * GPC;
+      const dls = Math.max(0.001 * GPC, ds - dl);
+
+      const thetaE = Math.sqrt(
+        (4 * G * mass / (C * C)) *
+        (dls / (dl * ds))
+      );
+
+      return thetaE * RAD_TO_ARCSEC;
+    }
+
+    function alignmentU() {
+      const thetaE =
+        Math.max(1e-6, einsteinAngleArcsec());
+
+      return Math.hypot(
+        lensXArcsec,
+        lensYArcsec
+      ) / thetaE;
+    }
+
+    function pointLensSolution(u = alignmentU()) {
+      const thetaE = einsteinAngleArcsec();
+      const root = Math.sqrt(u * u + 4);
+      const plus = 0.5 * (u + root) * thetaE;
+      const minus = 0.5 * (u - root) * thetaE;
+
+      const magnification =
+        u < 1e-5
+          ? Number.POSITIVE_INFINITY
+          : (u * u + 2) /
+            (u * root);
+
+      return {
+        thetaE,
+        plus,
+        minus,
+        separation: root * thetaE,
+        magnification
+      };
+    }
+
+    function sourceToLensDirection() {
+      const r = Math.hypot(lensXArcsec, lensYArcsec);
+
+      if (r < 1e-8) {
+        return { x: 1, y: 0 };
+      }
+
+      return {
+        x: lensXArcsec / r,
+        y: lensYArcsec / r
+      };
+    }
+
+    function setAlignmentU(u: number) {
+      const thetaE = einsteinAngleArcsec(
+        targetMassBillions,
+        targetLensDistanceGpc,
+        targetSourceDistanceGpc
+      );
+
+      const direction = sourceToLensDirection();
+
+      lensXArcsec =
+        direction.x *
+        u *
+        thetaE;
+
+      lensYArcsec =
+        direction.y *
+        u *
+        thetaE;
+
+      fieldDirty = true;
+    }
+
+    function regimeText(u: number) {
+      if (u < 0.08) {
+        return "Einstein ring";
+      }
+
+      if (u < 0.65) {
+        return "Arc / near-ring";
+      }
+
+      if (u < 1.8) {
+        return "Strong lensing";
+      }
+
+      return "Two-image lens";
+    }
+
+    // ==================================================
+    // CANVAS / ANGULAR COORDINATES
+    // ==================================================
+
+    function fovYArcsec() {
+      const width = Math.max(1, canvas.clientWidth);
+      const height = Math.max(1, canvas.clientHeight);
+
+      return fovXArcsec * height / width;
+    }
+
+    function angularToScreen(
+      xArcsec: number,
+      yArcsec: number
+    ) {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const fy = fovYArcsec();
+
+      return {
+        x: width * (0.5 + xArcsec / fovXArcsec),
+        y: height * (0.5 - yArcsec / fy)
+      };
+    }
+
+    function screenToAngular(
+      px: number,
+      py: number
+    ) {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const fy = fovYArcsec();
+
+      return {
+        x:
+          (px / width - 0.5) *
+          fovXArcsec,
+        y:
+          (0.5 - py / height) *
+          fy
+      };
+    }
+
+    function arcsecToPixels(value: number) {
+      return value / fovXArcsec * canvas.clientWidth;
+    }
+
+    // ==================================================
+    // SOURCE-PLANE TEXTURE
+    // ==================================================
+
+    function resizeOffscreenCanvases() {
+      const displayWidth = Math.max(1, canvas.clientWidth);
+      const displayHeight = Math.max(1, canvas.clientHeight);
+      const aspect = displayHeight / displayWidth;
+
+      const lensWidth = Math.max(
+        280,
+        Math.min(
+          430,
+          Math.round(displayWidth / 2.15)
+        )
+      );
+
+      const lensHeight = Math.max(
+        150,
+        Math.round(lensWidth * aspect)
+      );
+
+      if (
+        lensedCanvas.width !== lensWidth ||
+        lensedCanvas.height !== lensHeight
+      ) {
+        lensedCanvas.width = lensWidth;
+        lensedCanvas.height = lensHeight;
+        fieldDirty = true;
+      }
+
+      const nextSourceWidth = Math.max(620, lensWidth * 2);
+      const nextSourceHeight = Math.max(
+        340,
+        Math.round(nextSourceWidth * aspect)
+      );
+
+      if (
+        sourceCanvas.width !== nextSourceWidth ||
+        sourceCanvas.height !== nextSourceHeight
+      ) {
+        sourceCanvas.width = nextSourceWidth;
+        sourceCanvas.height = nextSourceHeight;
+        sourceDirty = true;
+      }
+    }
+
+    function sourceCoordinateForPixel(
+      x: number,
+      y: number
+    ) {
+      const fx = fovXArcsec * sourceFieldScale;
+      const fy = sourceFovYArcsec * sourceFieldScale;
+
+      return {
+        x:
+          (x / sourceCanvas.width - 0.5) *
+          fx,
+        y:
+          (0.5 - y / sourceCanvas.height) *
+          fy
+      };
+    }
+
+    function sourcePixelForCoordinate(
+      xArcsec: number,
+      yArcsec: number
+    ) {
+      const fx = fovXArcsec * sourceFieldScale;
+      const fy = sourceFovYArcsec * sourceFieldScale;
+
+      return {
+        x:
+          (0.5 + xArcsec / fx) *
+          sourceCanvas.width,
+        y:
+          (0.5 - yArcsec / fy) *
+          sourceCanvas.height
+      };
+    }
+
+    function buildSourceField() {
+      sourceFovYArcsec = fovYArcsec();
+
+      const width = sourceCanvas.width;
+      const height = sourceCanvas.height;
+      const image = sourceCtx.createImageData(width, height);
+      const data = image.data;
+
+      let index = 0;
+
+      for (let j = 0; j < height; j++) {
+        for (let i = 0; i < width; i++) {
+          const coord = sourceCoordinateForPixel(i + 0.5, j + 0.5);
+
+          // Deep sky base with a subtle vignette / dust texture.
+          const skyNoise =
+            0.5 +
+            0.5 * Math.sin(
+              coord.x * 2.9 +
+              Math.sin(coord.y * 3.7)
+            );
+
+          let r = 5 + 2 * skyNoise;
+          let g = 9 + 3 * skyNoise;
+          let b = 15 + 5 * skyNoise;
+
+          // Extended source galaxy centred at beta = 0.
+          // A compact elliptical core plus two logarithmic spiral-like arms
+          // gives the lens something with enough structure to produce arcs.
+          const angle = -0.36;
+          const ca = Math.cos(angle);
+          const sa = Math.sin(angle);
+
+          const gx =
+            coord.x * ca -
+            coord.y * sa;
+
+          const gy =
+            coord.x * sa +
+            coord.y * ca;
+
+          const ex = gx / 1.00;
+          const ey = gy / 0.54;
+          const radius = Math.hypot(ex, ey);
+          const phi = Math.atan2(ey, ex);
+
+          const core =
+            Math.exp(-3.4 * radius);
+
+          const armPhase =
+            2 * phi -
+            4.2 * Math.log(radius + 0.13);
+
+          const arms =
+            Math.exp(-1.7 * radius) *
+            Math.pow(
+              0.5 +
+              0.5 * Math.cos(armPhase),
+              4.5
+            );
+
+          const dust =
+            0.78 +
+            0.22 * Math.sin(
+              8 * radius +
+              2.6 * phi
+            );
+
+          const galaxy =
+            Math.min(
+              1.7,
+              (1.15 * core + 0.72 * arms) * dust
+            );
+
+          r += 158 * galaxy;
+          g += 188 * galaxy;
+          b += 232 * galaxy;
+
+          // Warm compact nucleus.
+          const nucleus = Math.exp(-17 * radius);
+          r += 105 * nucleus;
+          g += 76 * nucleus;
+          b += 36 * nucleus;
+
+          // A faint blue companion creates an asymmetric feature that makes
+          // parity reversal in the lensed images visually obvious.
+          const companionR = Math.hypot(
+            (coord.x + 1.45) / 0.34,
+            (coord.y - 0.64) / 0.24
+          );
+
+          const companion = Math.exp(-4.6 * companionR);
+
+          r += 55 * companion;
+          g += 128 * companion;
+          b += 220 * companion;
+
+          data[index] = Math.min(255, r);
+          data[index + 1] = Math.min(255, g);
+          data[index + 2] = Math.min(255, b);
+          data[index + 3] = 255;
+
+          index += 4;
+        }
+      }
+
+      sourceCtx.putImageData(image, 0, 0);
+
+      // Stars are drawn after the continuous galaxy texture so they remain
+      // compact and become clean multiple images under ray shooting.
+      sourceCtx.save();
+      sourceCtx.globalCompositeOperation = "screen";
+
+      for (const star of stars) {
+        const point = sourcePixelForCoordinate(star.x, star.y);
+
+        if (
+          point.x < -8 ||
+          point.x > width + 8 ||
+          point.y < -8 ||
+          point.y > height + 8
+        ) {
+          continue;
+        }
+
+        const radius =
+          star.radius *
+          Math.max(0.8, width / 820);
+
+        const halo = sourceCtx.createRadialGradient(
+          point.x,
+          point.y,
+          0,
+          point.x,
+          point.y,
+          radius * 4.2
+        );
+
+        const warm = star.warmth > 0.63;
+
+        const rgb = warm
+          ? "255,218,170"
+          : "184,220,255";
+
+        halo.addColorStop(
+          0,
+          `rgba(${rgb},${0.90 * star.brightness})`
+        );
+
+        halo.addColorStop(
+          0.18,
+          `rgba(${rgb},${0.55 * star.brightness})`
+        );
+
+        halo.addColorStop(
+          1,
+          `rgba(${rgb},0)`
+        );
+
+        sourceCtx.fillStyle = halo;
+        sourceCtx.beginPath();
+        sourceCtx.arc(
+          point.x,
+          point.y,
+          radius * 4.2,
+          0,
+          Math.PI * 2
+        );
+        sourceCtx.fill();
+      }
+
+      sourceCtx.restore();
+
+      const sourceImage = sourceCtx.getImageData(0, 0, width, height);
+      sourcePixels = sourceImage.data;
+      sourceWidth = width;
+      sourceHeight = height;
+
+      sourceDirty = false;
+      fieldDirty = true;
+    }
+
+    function sampleSourceBilinear(
+      xArcsec: number,
+      yArcsec: number
+    ) {
+      if (!sourcePixels) {
+        return [0, 0, 0] as const;
+      }
+
+      const point = sourcePixelForCoordinate(xArcsec, yArcsec);
+      const x = point.x;
+      const y = point.y;
+
+      if (
+        x < 0 ||
+        x >= sourceWidth - 1 ||
+        y < 0 ||
+        y >= sourceHeight - 1
+      ) {
+        return [3, 6, 11] as const;
+      }
+
+      const x0 = Math.floor(x);
+      const y0 = Math.floor(y);
+      const tx = x - x0;
+      const ty = y - y0;
+
+      const i00 = (y0 * sourceWidth + x0) * 4;
+      const i10 = i00 + 4;
+      const i01 = i00 + sourceWidth * 4;
+      const i11 = i01 + 4;
+
+      const w00 = (1 - tx) * (1 - ty);
+      const w10 = tx * (1 - ty);
+      const w01 = (1 - tx) * ty;
+      const w11 = tx * ty;
+
+      return [
+        sourcePixels[i00] * w00 +
+          sourcePixels[i10] * w10 +
+          sourcePixels[i01] * w01 +
+          sourcePixels[i11] * w11,
+        sourcePixels[i00 + 1] * w00 +
+          sourcePixels[i10 + 1] * w10 +
+          sourcePixels[i01 + 1] * w01 +
+          sourcePixels[i11 + 1] * w11,
+        sourcePixels[i00 + 2] * w00 +
+          sourcePixels[i10 + 2] * w10 +
+          sourcePixels[i01 + 2] * w01 +
+          sourcePixels[i11 + 2] * w11
+      ] as const;
+    }
+
+    // ==================================================
+    // INVERSE RAY SHOOTING
+    // ==================================================
+
+    function renderLensedField() {
+      if (sourceDirty || !sourcePixels) {
+        buildSourceField();
+      }
+
+      const width = lensedCanvas.width;
+      const height = lensedCanvas.height;
+      const fy = fovYArcsec();
+      const thetaE = einsteinAngleArcsec();
+      const thetaE2 = thetaE * thetaE;
+
+      const image = lensedCtx.createImageData(width, height);
+      const data = image.data;
+
+      let index = 0;
+
+      for (let j = 0; j < height; j++) {
+        const thetaY =
+          (0.5 - (j + 0.5) / height) *
+          fy;
+
+        for (let i = 0; i < width; i++) {
+          const thetaX =
+            ((i + 0.5) / width - 0.5) *
+            fovXArcsec;
+
+          const dx = thetaX - lensXArcsec;
+          const dy = thetaY - lensYArcsec;
+
+          // Regularise only the exact mathematical singularity at the lens.
+          const r2 = Math.max(
+            1e-6,
+            dx * dx + dy * dy
+          );
+
+          const scale = thetaE2 / r2;
+
+          const betaX =
+            thetaX -
+            scale * dx;
+
+          const betaY =
+            thetaY -
+            scale * dy;
+
+          const sample = sampleSourceBilinear(betaX, betaY);
+
+          // A mild display transfer keeps bright arcs visible without changing
+          // the geometric mapping itself.
+          data[index] = Math.min(255, sample[0] * 1.08);
+          data[index + 1] = Math.min(255, sample[1] * 1.08);
+          data[index + 2] = Math.min(255, sample[2] * 1.10);
+          data[index + 3] = 255;
+
+          index += 4;
+        }
+      }
+
+      lensedCtx.putImageData(image, 0, 0);
+      fieldDirty = false;
+    }
+
+    // ==================================================
+    // TELESCOPE OVERLAYS
+    // ==================================================
+
+    function drawAngularGrid(alpha = 1) {
+      if (!showGrid) {
+        return;
+      }
+
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const fy = fovYArcsec();
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(255,255,255,0.050)";
+
+      for (
+        let x = Math.ceil(-fovXArcsec / 2);
+        x <= fovXArcsec / 2;
+        x += 1
+      ) {
+        const p = angularToScreen(x, 0);
+        ctx.beginPath();
+        ctx.moveTo(p.x, 0);
+        ctx.lineTo(p.x, height);
+        ctx.stroke();
+      }
+
+      for (
+        let y = Math.ceil(-fy / 2);
+        y <= fy / 2;
+        y += 1
+      ) {
+        const p = angularToScreen(0, y);
+        ctx.beginPath();
+        ctx.moveTo(0, p.y);
+        ctx.lineTo(width, p.y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = "rgba(255,255,255,0.095)";
+
+      const xAxis = angularToScreen(0, 0).y;
+      const yAxis = angularToScreen(0, 0).x;
+
+      ctx.beginPath();
+      ctx.moveTo(0, xAxis);
+      ctx.lineTo(width, xAxis);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(yAxis, 0);
+      ctx.lineTo(yAxis, height);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,0.28)";
+      ctx.font = "10px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+
+      ctx.fillText(
+        "1 arcsec grid",
+        14,
+        height - 28
+      );
+
+      ctx.restore();
+    }
+
+    function drawEinsteinCriticalCurve(alpha = 1) {
+      if (!showCritical) {
+        return;
+      }
+
+      const center = angularToScreen(
+        lensXArcsec,
+        lensYArcsec
+      );
+
+      const radius = arcsecToPixels(
+        einsteinAngleArcsec()
+      );
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = "rgba(118,206,255,0.78)";
+      ctx.lineWidth = 1.25;
+
+      ctx.beginPath();
+      ctx.arc(
+        center.x,
+        center.y,
+        radius,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(156,222,255,0.72)";
+      ctx.font = "10px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(
+        "θE",
+        center.x + radius + 6,
+        center.y
+      );
+
+      ctx.restore();
+    }
+
+    function drawSourceMarker(alpha = 1) {
+      if (!showMarkers) {
+        return;
+      }
+
+      const source = angularToScreen(0, 0);
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+
+      ctx.strokeStyle = "rgba(184,220,255,0.82)";
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 4]);
+
+      ctx.beginPath();
+      ctx.arc(
+        source.x,
+        source.y,
+        7,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(205,231,255,0.72)";
+      ctx.font = "10px system-ui, sans-serif";
+      ctx.fillText(
+        "source β",
+        source.x + 10,
+        source.y - 8
+      );
+
+      ctx.restore();
+    }
+
+    function drawPredictedImageMarkers(alpha = 1) {
+      if (!showMarkers) {
+        return;
+      }
+
+      const u = alignmentU();
+      const solution = pointLensSolution(u);
+      const lensR = Math.hypot(lensXArcsec, lensYArcsec);
+
+      let dx = 1;
+      let dy = 0;
+
+      if (lensR > 1e-7) {
+        // Unit vector from lens toward source (beta = 0).
+        dx = -lensXArcsec / lensR;
+        dy = -lensYArcsec / lensR;
+      }
+
+      const plusPos = angularToScreen(
+        lensXArcsec + dx * solution.plus,
+        lensYArcsec + dy * solution.plus
+      );
+
+      const minusPos = angularToScreen(
+        lensXArcsec + dx * solution.minus,
+        lensYArcsec + dy * solution.minus
+      );
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+      ctx.strokeStyle = "rgba(255,214,144,0.78)";
+      ctx.lineWidth = 1.1;
+
+      for (const point of [plusPos, minusPos]) {
+        ctx.beginPath();
+        ctx.arc(
+          point.x,
+          point.y,
+          5,
+          0,
+          Math.PI * 2
+        );
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawLensMarker(alpha = 1) {
+      if (!showMarkers) {
+        return;
+      }
+
+      const p = angularToScreen(
+        lensXArcsec,
+        lensYArcsec
+      );
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+
+      const halo = ctx.createRadialGradient(
+        p.x,
+        p.y,
+        0,
+        p.x,
+        p.y,
+        44
+      );
+
+      halo.addColorStop(0, "rgba(255,197,111,0.30)");
+      halo.addColorStop(0.30, "rgba(255,176,80,0.12)");
+      halo.addColorStop(1, "rgba(255,176,80,0)");
+
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(
+        p.x,
+        p.y,
+        44,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(3,5,8,0.95)";
+      ctx.beginPath();
+      ctx.arc(
+        p.x,
+        p.y,
+        draggingLens ? 11.5 : 10,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.strokeStyle = draggingLens
+        ? "rgba(255,225,171,0.98)"
+        : "rgba(255,198,112,0.92)";
+
+      ctx.lineWidth = draggingLens ? 2.1 : 1.6;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(
+        p.x,
+        p.y,
+        3.0,
+        0,
+        Math.PI * 2
+      );
+      ctx.fillStyle = "rgba(255,208,135,0.94)";
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(255,225,180,0.78)";
+      ctx.font = "10px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(
+        draggingLens ? "dragging lens" : "lens",
+        p.x + 16,
+        p.y
+      );
+
+      ctx.restore();
+    }
+
+    function drawTelescope(alpha = 1) {
+      if (fieldDirty) {
+        renderLensedField();
+      }
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+      ctx.imageSmoothingEnabled = true;
+
+      ctx.drawImage(
+        lensedCanvas,
+        0,
+        0,
+        canvas.clientWidth,
+        canvas.clientHeight
+      );
+
+      ctx.restore();
+
+      drawAngularGrid(alpha);
+      drawEinsteinCriticalCurve(alpha);
+      drawPredictedImageMarkers(alpha);
+      drawSourceMarker(alpha);
+      drawLensMarker(alpha);
+    }
+
+    // ==================================================
+    // GEOMETRY VIEW
+    // ==================================================
+
+    function drawGeometryGrid(alpha = 1) {
+      if (!showGrid) {
+        return;
+      }
+
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+      ctx.strokeStyle = "rgba(255,255,255,0.045)";
+      ctx.lineWidth = 1;
+
+      const spacing = 44;
+
+      for (let x = 0; x <= width; x += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y <= height; y += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawGeometry(alpha = 1) {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const centerY = height * 0.53;
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+
+      const background = ctx.createLinearGradient(0, 0, width, 0);
+      background.addColorStop(0, "#06090e");
+      background.addColorStop(0.52, "#09101a");
+      background.addColorStop(1, "#070a10");
+
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.restore();
+
+      drawGeometryGrid(alpha);
+
+      const xObserver = width * 0.10;
+      const xSource = width * 0.90;
+
+      const distanceRatio =
+        lensDistanceGpc /
+        safeSourceDistance();
+
+      const xLens =
+        xObserver +
+        (xSource - xObserver) *
+        distanceRatio;
+
+      const u = alignmentU();
+      const solution = pointLensSolution(u);
+
+      // Geometry is displayed in dimensionless Einstein-radius units vertically.
+      // Distances along the optical axis retain their relative Dl/Ds placement,
+      // while the tiny physical angles are exaggerated for readability.
+      const verticalScale = Math.min(58, height * 0.115);
+
+      const sourceY =
+        centerY -
+        Math.min(3.2, u) *
+        verticalScale;
+
+      const plusNorm = solution.plus / solution.thetaE;
+      const minusNorm = solution.minus / solution.thetaE;
+
+      // Transverse coordinates are scaled by theta_E * Ds. Therefore the
+      // lens-plane ray height is (theta/theta_E) * Dl/Ds, while the source
+      // height is beta/theta_E = u. This keeps the drawn ray geometry
+      // consistent with the displayed Dl/Ds placement.
+      const plusLensY =
+        centerY -
+        plusNorm *
+        distanceRatio *
+        verticalScale;
+
+      const minusLensY =
+        centerY -
+        minusNorm *
+        distanceRatio *
+        verticalScale;
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+
+      // Optical axis.
+      ctx.strokeStyle = "rgba(255,255,255,0.16)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([6, 7]);
+      ctx.beginPath();
+      ctx.moveTo(xObserver, centerY);
+      ctx.lineTo(xSource, centerY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Planes.
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+
+      for (const x of [xLens, xSource]) {
+        ctx.beginPath();
+        ctx.moveTo(x, height * 0.12);
+        ctx.lineTo(x, height * 0.88);
+        ctx.stroke();
+      }
+
+      // Distance brackets.
+      const bracketY = height * 0.86;
+      ctx.strokeStyle = "rgba(255,255,255,0.24)";
+      ctx.fillStyle = "rgba(255,255,255,0.46)";
+      ctx.font = "10px system-ui, sans-serif";
+      ctx.textAlign = "center";
+
+      function bracket(
+        x0: number,
+        x1: number,
+        label: string
+      ) {
+        ctx.beginPath();
+        ctx.moveTo(x0, bracketY);
+        ctx.lineTo(x1, bracketY);
+        ctx.moveTo(x0, bracketY - 5);
+        ctx.lineTo(x0, bracketY + 5);
+        ctx.moveTo(x1, bracketY - 5);
+        ctx.lineTo(x1, bracketY + 5);
+        ctx.stroke();
+
+        ctx.fillText(
+          label,
+          0.5 * (x0 + x1),
+          bracketY + 18
+        );
+      }
+
+      bracket(
+        xObserver,
+        xLens,
+        `Dl = ${lensDistanceGpc.toFixed(2)} Gpc`
+      );
+
+      bracket(
+        xLens,
+        xSource,
+        `Dls = ${(safeSourceDistance() - lensDistanceGpc).toFixed(2)} Gpc`
+      );
+
+      // Light rays. Each broken path corresponds to one image solution.
+      if (showRays) {
+        const rayGradient = ctx.createLinearGradient(
+          xObserver,
+          0,
+          xSource,
+          0
+        );
+
+        rayGradient.addColorStop(0, "rgba(119,207,255,0.58)");
+        rayGradient.addColorStop(0.52, "rgba(151,220,255,0.95)");
+        rayGradient.addColorStop(1, "rgba(255,220,163,0.86)");
+
+        ctx.strokeStyle = rayGradient;
+        ctx.lineWidth = 1.65;
+
+        for (const lensY of [plusLensY, minusLensY]) {
+          ctx.beginPath();
+          ctx.moveTo(xObserver, centerY);
+          ctx.lineTo(xLens, lensY);
+          ctx.lineTo(xSource, sourceY);
+          ctx.stroke();
+        }
+      }
+
+      // Observer / telescope.
+      ctx.strokeStyle = "rgba(191,222,245,0.82)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(
+        xObserver,
+        centerY,
+        10,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(xObserver - 17, centerY - 13);
+      ctx.lineTo(xObserver - 4, centerY);
+      ctx.lineTo(xObserver - 17, centerY + 13);
+      ctx.stroke();
+
+      // Lens.
+      const lensGlow = ctx.createRadialGradient(
+        xLens,
+        centerY,
+        0,
+        xLens,
+        centerY,
+        36
+      );
+
+      lensGlow.addColorStop(0, "rgba(255,190,100,0.30)");
+      lensGlow.addColorStop(1, "rgba(255,190,100,0)");
+
+      ctx.fillStyle = lensGlow;
+      ctx.beginPath();
+      ctx.arc(
+        xLens,
+        centerY,
+        36,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(2,4,7,0.98)";
+      ctx.strokeStyle = "rgba(255,195,109,0.92)";
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.arc(
+        xLens,
+        centerY,
+        12,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      ctx.stroke();
+
+      // Source galaxy.
+      const sourceGlow = ctx.createRadialGradient(
+        xSource,
+        sourceY,
+        0,
+        xSource,
+        sourceY,
+        26
+      );
+
+      sourceGlow.addColorStop(0, "rgba(188,220,255,0.90)");
+      sourceGlow.addColorStop(0.28, "rgba(135,186,244,0.42)");
+      sourceGlow.addColorStop(1, "rgba(100,150,230,0)");
+
+      ctx.fillStyle = sourceGlow;
+      ctx.beginPath();
+      ctx.ellipse(
+        xSource,
+        sourceY,
+        28,
+        13,
+        -0.35,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(206,229,255,0.68)";
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.ellipse(
+        xSource,
+        sourceY,
+        17,
+        7,
+        -0.35,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+
+      // Ray impact / image-angle markers at lens plane.
+      if (showMarkers) {
+        ctx.fillStyle = "rgba(131,214,255,0.94)";
+
+        for (const lensY of [plusLensY, minusLensY]) {
+          ctx.beginPath();
+          ctx.arc(
+            xLens,
+            lensY,
+            3.4,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        }
+      }
+
+      // Labels.
+      ctx.fillStyle = "rgba(255,255,255,0.66)";
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+
+      ctx.fillText(
+        "Observer",
+        xObserver,
+        centerY - 22
+      );
+
+      ctx.fillText(
+        "Lens plane",
+        xLens,
+        height * 0.105
+      );
+
+      ctx.fillText(
+        "Source plane",
+        xSource,
+        height * 0.105
+      );
+
+      ctx.fillStyle = "rgba(150,218,255,0.80)";
+      ctx.font = "10px ui-monospace, SFMono-Regular, Menlo, monospace";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(
+        `θ+ = ${(solution.plus / solution.thetaE).toFixed(2)} θE`,
+        xLens + 10,
+        plusLensY
+      );
+
+      ctx.fillText(
+        `θ− = ${(solution.minus / solution.thetaE).toFixed(2)} θE`,
+        xLens + 10,
+        minusLensY
+      );
+
+      ctx.fillStyle = "rgba(255,224,174,0.75)";
+      ctx.fillText(
+        `β = ${u.toFixed(2)} θE`,
+        xSource - 92,
+        sourceY - 14
+      );
+
+      ctx.restore();
+    }
+
+    // ==================================================
+    // FRAME / SMOOTH TRANSITIONS
+    // ==================================================
+
+    function smoothState(dt: number) {
+      const tau = 0.11;
+      const response = 1 - Math.exp(-dt / tau);
+
+      const oldMass = massBillions;
+      const oldDl = lensDistanceGpc;
+      const oldDs = sourceDistanceGpc;
+
+      massBillions +=
+        (targetMassBillions - massBillions) *
+        response;
+
+      lensDistanceGpc +=
+        (targetLensDistanceGpc - lensDistanceGpc) *
+        response;
+
+      sourceDistanceGpc +=
+        (targetSourceDistanceGpc - sourceDistanceGpc) *
+        response;
+
+      const modeResponse =
+        1 - Math.exp(-dt / 0.16);
+
+      modeBlend +=
+        (targetModeBlend - modeBlend) *
+        modeResponse;
+
+      if (
+        Math.abs(massBillions - oldMass) > 1e-5 ||
+        Math.abs(lensDistanceGpc - oldDl) > 1e-7 ||
+        Math.abs(sourceDistanceGpc - oldDs) > 1e-7
+      ) {
+        fieldDirty = true;
+      }
+    }
+
+    function updateLiveMetrics() {
+      const u = alignmentU();
+      const solution = pointLensSolution(u);
+
+      einsteinLive.textContent =
+        `${solution.thetaE.toFixed(2)}″`;
+
+      alignmentLive.textContent =
+        u.toFixed(2);
+
+      magnificationLive.textContent =
+        Number.isFinite(solution.magnification)
+          ? `${solution.magnification.toFixed(2)}×`
+          : "∞";
+
+      separationLive.textContent =
+        `${solution.separation.toFixed(2)}″`;
+
+      regimeLabel.textContent =
+        regimeText(u);
+    }
+
+    function draw() {
+      ctx.clearRect(
+        0,
+        0,
+        canvas.clientWidth,
+        canvas.clientHeight
+      );
+
+      const telescopeAlpha =
+        Math.max(0, 1 - modeBlend);
+
+      const geometryAlpha =
+        Math.max(0, modeBlend);
+
+      if (telescopeAlpha > 0.002) {
+        drawTelescope(telescopeAlpha);
+      }
+
+      if (geometryAlpha > 0.002) {
+        drawGeometry(geometryAlpha);
+      }
+    }
+
+    function animate(now: number) {
+      const rawDt = (now - previousTime) / 1000;
+      previousTime = now;
+
+      const dt = Math.min(rawDt, 0.035);
+
+      smoothState(dt);
+      updateLiveMetrics();
+      draw();
+
+      requestAnimationFrame(animate);
+    }
+
+    // ==================================================
+    // OUTPUTS / CONTROLS
+    // ==================================================
+
+    function formatMass(valueBillions: number) {
+      if (valueBillions >= 1000) {
+        return `${(valueBillions / 1000).toFixed(2)} × 10¹² M☉`;
+      }
+
+      return `${(valueBillions / 100).toFixed(1)} × 10¹¹ M☉`;
+    }
+
+    function enforceDistanceOrdering() {
+      const dl = Number(lensDistanceSlider.value);
+      const minimumSource = Math.min(4.98, dl + 0.10);
+
+      sourceDistanceSlider.min =
+        minimumSource.toFixed(2);
+
+      if (
+        Number(sourceDistanceSlider.value) <
+        minimumSource
+      ) {
+        sourceDistanceSlider.value =
+          minimumSource.toFixed(2);
+      }
+    }
+
+    function readTargetsFromControls() {
+      enforceDistanceOrdering();
+
+      targetMassBillions = Number(massSlider.value);
+      targetLensDistanceGpc = Number(lensDistanceSlider.value);
+      targetSourceDistanceGpc = Number(sourceDistanceSlider.value);
+
+      showGrid = gridToggle.checked;
+      showCritical = criticalToggle.checked;
+      showMarkers = markerToggle.checked;
+      showRays = rayToggle.checked;
+    }
+
+    function updateOutputs(
+      preserveLensDirection = true
+    ) {
+      const oldThetaE = einsteinAngleArcsec(
+        targetMassBillions,
+        targetLensDistanceGpc,
+        targetSourceDistanceGpc
+      );
+
+      const oldU =
+        Math.hypot(lensXArcsec, lensYArcsec) /
+        Math.max(1e-6, oldThetaE);
+
+      readTargetsFromControls();
+
+      const targetU = Number(alignmentSlider.value);
+
+      if (!draggingLens) {
+        if (preserveLensDirection) {
+          setAlignmentU(targetU);
+        } else if (Number.isFinite(oldU)) {
+          setAlignmentU(targetU);
+        }
+      }
+
+      const targetSolution = pointLensSolutionForTargets(targetU);
+
+      massOutput.value =
+        formatMass(targetMassBillions);
+
+      lensDistanceOutput.value =
+        `${targetLensDistanceGpc.toFixed(2)} Gpc`;
+
+      sourceDistanceOutput.value =
+        `${targetSourceDistanceGpc.toFixed(2)} Gpc`;
+
+      alignmentOutput.value =
+        targetU.toFixed(2);
+
+      einsteinOutput.textContent =
+        `${targetSolution.thetaE.toFixed(3)} arcsec`;
+
+      imagesOutput.textContent =
+        `${targetSolution.plus.toFixed(2)}″, ${targetSolution.minus.toFixed(2)}″`;
+
+      magnificationOutput.textContent =
+        Number.isFinite(targetSolution.magnification)
+          ? `${targetSolution.magnification.toFixed(2)}×`
+          : "∞";
+
+      separationOutput.textContent =
+        `${targetSolution.separation.toFixed(2)} arcsec`;
+
+      fieldDirty = true;
+    }
+
+    function pointLensSolutionForTargets(u: number) {
+      const thetaE = einsteinAngleArcsec(
+        targetMassBillions,
+        targetLensDistanceGpc,
+        targetSourceDistanceGpc
+      );
+
+      const root = Math.sqrt(u * u + 4);
+
+      return {
+        thetaE,
+        plus: 0.5 * (u + root) * thetaE,
+        minus: 0.5 * (u - root) * thetaE,
+        separation: root * thetaE,
+        magnification:
+          u < 1e-5
+            ? Number.POSITIVE_INFINITY
+            : (u * u + 2) /
+              (u * root)
+      };
+    }
+
+    function setViewMode(nextMode: ViewMode) {
+      viewMode = nextMode;
+      targetModeBlend =
+        viewMode === "geometry"
+          ? 1
+          : 0;
+
+      modeButtons.forEach(button => {
+        const active =
+          button.dataset.viewMode === viewMode;
+
+        button.classList.toggle(
+          "is-active",
+          active
+        );
+
+        button.setAttribute(
+          "aria-pressed",
+          active ? "true" : "false"
+        );
+      });
+
+      if (viewMode === "telescope") {
+        modeBadge.textContent = "Telescope view";
+        canvasLabel.textContent =
+          "Drag the lens across the sky · Double images, arcs and rings emerge from the lens equation";
+      } else {
+        modeBadge.textContent = "Geometry view";
+        canvasLabel.textContent =
+          "The two bent ray paths correspond to the two point-lens image solutions";
+      }
+    }
+
+    function updateAlignmentFromDraggedLens() {
+      const u = alignmentU();
+      const clamped = Math.min(3.5, u);
+
+      alignmentSlider.value =
+        clamped.toFixed(2);
+
+      alignmentOutput.value =
+        clamped.toFixed(2);
+
+      const targetSolution = pointLensSolutionForTargets(clamped);
+
+      imagesOutput.textContent =
+        `${targetSolution.plus.toFixed(2)}″, ${targetSolution.minus.toFixed(2)}″`;
+
+      magnificationOutput.textContent =
+        Number.isFinite(targetSolution.magnification)
+          ? `${targetSolution.magnification.toFixed(2)}×`
+          : "∞";
+
+      separationOutput.textContent =
+        `${targetSolution.separation.toFixed(2)} arcsec`;
+    }
+
+    massSlider.addEventListener("input", () => {
+      readTargetsFromControls();
+      setAlignmentU(Number(alignmentSlider.value));
+      updateOutputs();
+    });
+
+    lensDistanceSlider.addEventListener("input", () => {
+      readTargetsFromControls();
+      setAlignmentU(Number(alignmentSlider.value));
+      updateOutputs();
+    });
+
+    sourceDistanceSlider.addEventListener("input", () => {
+      readTargetsFromControls();
+      setAlignmentU(Number(alignmentSlider.value));
+      updateOutputs();
+    });
+
+    alignmentSlider.addEventListener("input", () => {
+      readTargetsFromControls();
+      setAlignmentU(Number(alignmentSlider.value));
+      updateOutputs();
+    });
+
+    for (const toggle of [
+      gridToggle,
+      criticalToggle,
+      markerToggle,
+      rayToggle
+    ]) {
+      toggle.addEventListener("change", () => {
+        readTargetsFromControls();
+        fieldDirty = true;
+      });
+    }
+
+    modeButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const nextMode = button.dataset.viewMode;
+
+        if (
+          nextMode === "telescope" ||
+          nextMode === "geometry"
+        ) {
+          setViewMode(nextMode);
+        }
+      });
+    });
+
+    perfectButton.addEventListener("click", () => {
+      alignmentSlider.value = "0";
+      lensXArcsec = 0;
+      lensYArcsec = 0;
+      fieldDirty = true;
+      updateOutputs();
+      setViewMode("telescope");
+    });
+
+    resetButton.addEventListener("click", () => {
+      massSlider.value = "300";
+      lensDistanceSlider.value = "1.00";
+      sourceDistanceSlider.value = "2.00";
+      alignmentSlider.value = "0.65";
+
+      gridToggle.checked = true;
+      criticalToggle.checked = true;
+      markerToggle.checked = true;
+      rayToggle.checked = true;
+
+      targetMassBillions = 300;
+      targetLensDistanceGpc = 1.00;
+      targetSourceDistanceGpc = 2.00;
+
+      massBillions = targetMassBillions;
+      lensDistanceGpc = targetLensDistanceGpc;
+      sourceDistanceGpc = targetSourceDistanceGpc;
+
+      lensXArcsec = 0;
+      lensYArcsec = 0;
+      setAlignmentU(0.65);
+
+      draggingLens = false;
+      activePointerId = null;
+
+      sourceDirty = true;
+      fieldDirty = true;
+
+      setViewMode("telescope");
+      updateOutputs();
+    });
+
+    // ==================================================
+    // POINTER DRAGGING
+    // ==================================================
+
+    function pointerPosition(event: PointerEvent) {
+      const rect = canvas.getBoundingClientRect();
+
+      return {
+        x:
+          Math.max(
+            0,
+            Math.min(
+              rect.width,
+              event.clientX - rect.left
+            )
+          ),
+        y:
+          Math.max(
+            0,
+            Math.min(
+              rect.height,
+              event.clientY - rect.top
+            )
+          )
+      };
+    }
+
+    function isNearLens(
+      px: number,
+      py: number
+    ) {
+      const lens = angularToScreen(
+        lensXArcsec,
+        lensYArcsec
+      );
+
+      return Math.hypot(
+        px - lens.x,
+        py - lens.y
+      ) < 34;
+    }
+
+    canvas.addEventListener("pointerdown", event => {
+      if (
+        viewMode !== "telescope" ||
+        modeBlend > 0.45
+      ) {
+        return;
+      }
+
+      const p = pointerPosition(event);
+
+      if (!isNearLens(p.x, p.y)) {
+        return;
+      }
+
+      draggingLens = true;
+      activePointerId = event.pointerId;
+      canvas.setPointerCapture(event.pointerId);
+      canvas.classList.add("is-dragging");
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("pointermove", event => {
+      if (
+        !draggingLens ||
+        activePointerId !== event.pointerId
+      ) {
+        return;
+      }
+
+      const p = pointerPosition(event);
+      const angle = screenToAngular(p.x, p.y);
+      const fy = fovYArcsec();
+      const edge = 0.25;
+
+      lensXArcsec = Math.max(
+        -fovXArcsec / 2 + edge,
+        Math.min(
+          fovXArcsec / 2 - edge,
+          angle.x
+        )
+      );
+
+      lensYArcsec = Math.max(
+        -fy / 2 + edge,
+        Math.min(
+          fy / 2 - edge,
+          angle.y
+        )
+      );
+
+      fieldDirty = true;
+      updateAlignmentFromDraggedLens();
+      event.preventDefault();
+    });
+
+    function finishDrag(event: PointerEvent) {
+      if (
+        !draggingLens ||
+        activePointerId !== event.pointerId
+      ) {
+        return;
+      }
+
+      draggingLens = false;
+      activePointerId = null;
+      canvas.classList.remove("is-dragging");
+
+      if (canvas.hasPointerCapture(event.pointerId)) {
+        canvas.releasePointerCapture(event.pointerId);
+      }
+
+      fieldDirty = true;
+    }
+
+    canvas.addEventListener("pointerup", finishDrag);
+    canvas.addEventListener("pointercancel", finishDrag);
+
+    // ==================================================
+    // RESPONSIVE RESIZING
+    // ==================================================
+
+    function resizeCanvasToDisplaySize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      const width = Math.max(1, Math.round(rect.width * dpr));
+      const height = Math.max(1, Math.round(rect.height * dpr));
+
+      if (
+        canvas.width !== width ||
+        canvas.height !== height
+      ) {
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx.setTransform(
+          dpr,
+          0,
+          0,
+          dpr,
+          0,
+          0
+        );
+
+        resizeOffscreenCanvases();
+        sourceDirty = true;
+        fieldDirty = true;
+      }
+    }
+
+    if (typeof ResizeObserver !== "undefined") {
+      const resizeObserver =
+        new ResizeObserver(() => {
+          resizeCanvasToDisplaySize();
+        });
+
+      resizeObserver.observe(canvas);
+    } else {
+      window.addEventListener(
+        "resize",
+        resizeCanvasToDisplaySize
+      );
+    }
+
+    // ==================================================
+    // START
+    // ==================================================
+
+    resizeCanvasToDisplaySize();
+    readTargetsFromControls();
+    setAlignmentU(Number(alignmentSlider.value));
+    updateOutputs();
+    setViewMode("telescope");
+
+    requestAnimationFrame(animate);
+  }
+</script>
+
+<style>
+  .lensing-lab {
+    max-width: 950px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    background: #070a0f;
+    color: #f5f7fa;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  /* ================================================
+     VISUAL AREA
+     ================================================ */
+
+  .visual-wrap {
+    position: relative;
+    background: #06090e;
+  }
+
+  [data-lensing-canvas] {
+    display: block;
+    width: 100%;
+    height: 500px;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  [data-lensing-canvas].is-dragging {
+    cursor: grabbing;
+  }
+
+  .canvas-label {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    max-width: min(520px, calc(100% - 340px));
+    padding: 0.42rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    background: rgba(3, 7, 11, 0.58);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.72rem;
+    pointer-events: none;
+  }
+
+  .mode-badge {
+    position: absolute;
+    left: 16px;
+    top: 54px;
+    padding: 0.32rem 0.55rem;
+    border: 1px solid rgba(116, 205, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(44, 126, 174, 0.10);
+    color: rgba(166, 222, 255, 0.72);
+    font-size: 0.64rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* ================================================
+     LIVE METRICS
+     ================================================ */
+
+  .metric-panel {
+    position: absolute;
+    right: 16px;
+    top: 14px;
+    width: 260px;
+    padding: 0.72rem 0.78rem;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    background: rgba(3, 7, 11, 0.70);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.55rem;
+    color: rgba(255, 255, 255, 0.43);
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .metric-header strong {
+    color: rgba(137, 214, 255, 0.88);
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.28rem 0.75rem;
+    font-size: 0.70rem;
+  }
+
+  .metric-grid span {
+    color: rgba(255, 255, 255, 0.40);
+  }
+
+  .metric-grid strong {
+    color: rgba(255, 255, 255, 0.80);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================================================
+     LEGEND
+     ================================================ */
+
+  .sky-legend {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    display: grid;
+    gap: 0.34rem;
+    padding: 0.58rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    background: rgba(3, 7, 11, 0.58);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.66rem;
+    pointer-events: none;
+  }
+
+  .sky-legend > div {
+    display: flex;
+    align-items: center;
+    gap: 0.48rem;
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .lens-dot {
+    background: #ffc16e;
+    box-shadow: 0 0 8px rgba(255, 187, 91, 0.48);
+  }
+
+  .source-dot {
+    border: 1px dashed rgba(186, 222, 255, 0.92);
+    background: transparent;
+  }
+
+  .legend-ring {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border: 1px dashed rgba(118, 206, 255, 0.86);
+    border-radius: 50%;
+  }
+
+  /* ================================================
+     CONTROLS
+     ================================================ */
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+    padding: 1.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    background:
+      linear-gradient(
+        180deg,
+        #0d131a,
+        #090d12
+      );
+  }
+
+  .view-control {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .control-heading {
+    display: grid;
+    gap: 0.18rem;
+    color: #c4ced8;
+    font-size: 0.88rem;
+  }
+
+  .control-heading small {
+    color: #6f7c88;
+    font-size: 0.70rem;
+    line-height: 1.45;
+  }
+
+  .segmented {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .mode-button {
+    min-height: 34px;
+    padding: 0.46rem 0.72rem;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #7f8b96;
+    font-size: 0.74rem;
+    cursor: pointer;
+    transition:
+      color 120ms ease,
+      background 120ms ease,
+      box-shadow 120ms ease;
+  }
+
+  .mode-button:hover {
+    color: #d4dce4;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .mode-button.is-active {
+    color: #e7f5ff;
+    background: rgba(101, 199, 255, 0.13);
+    box-shadow:
+      inset 0 0 0 1px rgba(101, 199, 255, 0.20);
+  }
+
+  .control-row {
+    display: grid;
+    grid-template-columns: 190px 155px 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  output {
+    color: #9ca9b5;
+    font-size: 0.84rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  /* ================================================
+     DERIVED VALUES
+     ================================================ */
+
+  .derived-values {
+    display: grid;
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+    gap: 0.75rem;
+    margin-top: 0.1rem;
+  }
+
+  .derived-values > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.72rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+    color: #7f8b96;
+    font-size: 0.76rem;
+  }
+
+  .derived-values strong {
+    color: #d6dee7;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  /* ================================================
+     VISUAL CONTROLS
+     ================================================ */
+
+  .visual-controls {
+    padding: 0.8rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  }
+
+  .visual-title {
+    margin-bottom: 0.65rem;
+    color: #798692;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .toggle-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      );
+    gap: 0.7rem;
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    color: #a1abb5;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+
+  .toggle input {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  /* ================================================
+     MODEL DETAILS
+     ================================================ */
+
+  .model-details {
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .model-details summary {
+    padding: 0.72rem 0.9rem;
+    cursor: pointer;
+    color: #9ca7b2;
+    font-size: 0.8rem;
+    user-select: none;
+  }
+
+  .model-details summary:hover {
+    color: #d7dee6;
+  }
+
+  .model-content {
+    padding: 0 0.9rem 0.9rem;
+    color: #8d99a4;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .model-content p {
+    margin: 0.2rem 0 0.7rem;
+  }
+
+  .model-content ul {
+    margin: 0.65rem 0;
+    padding-left: 1.2rem;
+  }
+
+  .equation {
+    margin: 0.45rem 0;
+    padding: 0.55rem 0.7rem;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #c7d1db;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Consolas,
+      monospace;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .model-note {
+    color: #74808c;
+  }
+
+  /* ================================================
+     BOTTOM ROW
+     ================================================ */
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.1rem;
+  }
+
+  .model-info {
+    color: #7f8b96;
+    font-size: 0.79rem;
+  }
+
+  .model-info strong {
+    color: #aeb8c2;
+    font-weight: 500;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .buttons button {
+    min-height: 38px;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.055);
+    color: rgba(255, 255, 255, 0.84);
+    cursor: pointer;
+    transition:
+      background 120ms ease,
+      border-color 120ms ease,
+      transform 120ms ease;
+  }
+
+  .buttons button:hover {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  .buttons button:active {
+    transform: translateY(1px);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid rgba(101, 199, 255, 0.8);
+    outline-offset: 3px;
+  }
+
+  /* ================================================
+     MOBILE
+     ================================================ */
+
+  @media (max-width: 760px) {
+    [data-lensing-canvas] {
+      height: 430px;
+    }
+
+    .canvas-label {
+      max-width: calc(100% - 32px);
+      padding-right: 0.65rem;
+    }
+
+    .mode-badge {
+      top: 58px;
+    }
+
+    .metric-panel {
+      top: auto;
+      right: 12px;
+      bottom: 12px;
+      width: 225px;
+    }
+
+    .sky-legend {
+      left: 12px;
+      bottom: 12px;
+    }
+
+    .view-control {
+      grid-template-columns: 1fr;
+    }
+
+    .segmented {
+      width: 100%;
+    }
+
+    .mode-button {
+      flex: 1 1 0;
+    }
+
+    .control-row {
+      grid-template-columns: 1fr auto;
+    }
+
+    .control-row input[type="range"] {
+      grid-column: 1 / -1;
+    }
+
+    .derived-values {
+      grid-template-columns: 1fr;
+    }
+
+    .toggle-grid {
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+    }
+
+    .bottom-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 540px) {
+    [data-lensing-canvas] {
+      height: 410px;
+    }
+
+    .canvas-label {
+      display: none;
+    }
+
+    .mode-badge {
+      left: 10px;
+      top: 10px;
+    }
+
+    .metric-panel {
+      right: 10px;
+      top: 10px;
+      bottom: auto;
+      width: 190px;
+      padding: 0.58rem 0.62rem;
+    }
+
+    .metric-header {
+      font-size: 0.57rem;
+    }
+
+    .metric-header strong {
+      font-size: 0.57rem;
+    }
+
+    .metric-grid {
+      font-size: 0.62rem;
+    }
+
+    .sky-legend {
+      left: 10px;
+      bottom: 10px;
+      font-size: 0.60rem;
+    }
+
+    .controls {
+      padding: 1.1rem;
+    }
+
+    .toggle-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .mode-button {
+      padding-inline: 0.45rem;
+      font-size: 0.68rem;
+    }
+
+    .buttons {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .buttons button {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      transition: none;
+    }
+  }
+</style>
