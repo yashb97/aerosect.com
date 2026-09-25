@@ -1,0 +1,2698 @@
+<section class="chladni-lab" data-chladni-lab>
+  <div class="visual-wrap">
+    <canvas
+      class="plate-canvas"
+      data-plate-canvas
+      aria-label="Interactive Chladni plate with simulated sand particles"
+    ></canvas>
+
+    <div class="visual-label">
+      Modal thin-plate response + particle transport to nodal regions
+    </div>
+
+    <div class="plate-readout" aria-live="polite">
+      <div><span>Excitation</span><strong data-excitation-readout>Pure tone</strong></div>
+      <div><span>Dominant mode</span><strong data-mode-readout>—</strong></div>
+      <div><span>Resonance</span><strong data-resonance-readout>—</strong></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="source-section">
+      <div class="section-title">Excitation source</div>
+
+      <div class="source-tabs" role="tablist" aria-label="Excitation source">
+        <button class="source-tab active" data-source-tab="tone" type="button" role="tab" aria-selected="true">
+          Tone
+        </button>
+        <button class="source-tab" data-source-tab="record" type="button" role="tab" aria-selected="false">
+          Record voice
+        </button>
+        <button class="source-tab" data-source-tab="upload" type="button" role="tab" aria-selected="false">
+          Upload audio
+        </button>
+      </div>
+
+      <div class="source-panel" data-source-panel="tone">
+        <label class="control-row">
+          <span>Drive frequency</span>
+          <output data-frequency-output>1.00 kHz</output>
+          <input data-frequency type="range" min="10" max="10000" step="1" value="1000" />
+        </label>
+
+        <label class="control-row">
+          <span>Drive strength</span>
+          <output data-strength-output>65%</output>
+          <input data-strength type="range" min="0" max="1" step="0.01" value="0.65" />
+        </label>
+      </div>
+
+      <div class="source-panel" data-source-panel="record" hidden>
+        <div class="record-grid">
+          <button class="record-button" data-record-button type="button">
+            <span class="record-dot"></span>
+            <span data-record-label>Hold to record</span>
+          </button>
+
+          <div class="record-status">
+            <strong data-record-time>0.0 s</strong>
+            <span data-record-status>Up to 8 seconds · processed locally in your browser</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="source-panel" data-source-panel="upload" hidden>
+        <label class="upload-box">
+          <input data-upload type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.webm,.flac" />
+          <span class="upload-title">Choose an audio file</span>
+          <span class="upload-copy">WAV and MP3 are the safest choices. Other formats depend on browser decoder support.</span>
+        </label>
+      </div>
+
+      <div class="audio-state" data-audio-state hidden>
+        <div class="audio-meta">
+          <div>
+            <span>Loaded signal</span>
+            <strong data-audio-name>—</strong>
+          </div>
+          <div>
+            <span>Duration</span>
+            <strong data-audio-duration>—</strong>
+          </div>
+          <div>
+            <span>Analysis</span>
+            <strong data-analysis-status>—</strong>
+          </div>
+        </div>
+
+        <div class="audio-actions">
+          <button data-play-audio type="button" disabled>Play on plate</button>
+          <button data-stop-audio type="button" disabled>Stop</button>
+        </div>
+      </div>
+
+      <p class="source-note" data-source-note>
+        Pure-tone mode continuously drives the plate. Recorded and uploaded audio are first analysed, then replayed in synchrony with the modal response.
+      </p>
+    </div>
+
+    <div class="plate-section">
+      <div class="section-title">Plate</div>
+
+      <div class="control-grid">
+        <label class="select-row">
+          <span>Material</span>
+          <select data-material>
+            <option value="steel" selected>Steel</option>
+            <option value="aluminium">Aluminium</option>
+            <option value="brass">Brass</option>
+            <option value="glass">Glass</option>
+          </select>
+        </label>
+
+        <label class="control-row compact">
+          <span>Width a</span>
+          <output data-width-output>0.25 m</output>
+          <input data-width type="range" min="0.18" max="0.60" step="0.01" value="0.25" />
+        </label>
+
+        <label class="control-row compact">
+          <span>Aspect ratio a/b</span>
+          <output data-aspect-output>1.00</output>
+          <input data-aspect type="range" min="0.70" max="1.60" step="0.01" value="1.00" />
+        </label>
+
+        <label class="control-row compact">
+          <span>Thickness h</span>
+          <output data-thickness-output>2.0 mm</output>
+          <input data-thickness type="range" min="0.5" max="5.0" step="0.1" value="2.0" />
+        </label>
+
+        <label class="control-row compact">
+          <span>Modal damping ζ</span>
+          <output data-damping-output>0.8%</output>
+          <input data-damping type="range" min="0.002" max="0.040" step="0.001" value="0.04" />
+        </label>
+
+        <label class="control-row compact">
+          <span>Sand mobility</span>
+          <output data-mobility-output>2.50×</output>
+          <input data-mobility type="range" min="0.25" max="2.5" step="0.05" value="2.50" />
+        </label>
+      </div>
+
+      <div class="derived-values">
+        <div><span>Plate height b</span><strong data-height-output>0.25 m</strong></div>
+        <div><span>Flexural rigidity D</span><strong data-rigidity-output>—</strong></div>
+        <div><span>Modes in range</span><strong data-mode-count>—</strong></div>
+        <div><span>Nearest resonance</span><strong data-nearest-mode>—</strong></div>
+      </div>
+    </div>
+
+    <div class="driver-section">
+      <div class="driver-heading">
+        <div>
+          <div class="section-title">Virtual shaker position</div>
+          <p>Drag the marker on the plate or use the sliders. A mode is weakly excited if the shaker lies near one of its nodes.</p>
+        </div>
+        <button data-center-driver type="button">Centre</button>
+      </div>
+
+      <label class="control-row compact">
+        <span>Shaker x/a</span>
+        <output data-drive-x-output>0.50</output>
+        <input data-drive-x type="range" min="0.05" max="0.95" step="0.01" value="0.50" />
+      </label>
+
+      <label class="control-row compact">
+        <span>Shaker y/b</span>
+        <output data-drive-y-output>0.50</output>
+        <input data-drive-y type="range" min="0.05" max="0.95" step="0.01" value="0.50" />
+      </label>
+    </div>
+
+    <div class="analysis-section">
+      <div class="analysis-heading">
+        <div>
+          <div class="section-title">Current modal response</div>
+          <div class="analysis-subtitle">The strongest plate modes at the current instant.</div>
+        </div>
+
+        <div class="visual-toggles">
+          <label class="toggle">
+            <input data-field-toggle type="checkbox" checked />
+            <span>Vibration field</span>
+          </label>
+          <label class="toggle">
+            <input data-nodes-toggle type="checkbox" />
+            <span>Nodal lines</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="mode-bars" data-mode-bars></div>
+
+      <canvas
+        class="spectrum-canvas"
+        data-spectrum-canvas
+        aria-label="Frequency spectrum of the loaded audio and plate resonances"
+      ></canvas>
+    </div>
+
+    <details class="model-details">
+      <summary>Model assumptions and equations</summary>
+      <div class="model-content">
+        <p>
+          The plate is represented as a thin, homogeneous, simply supported rectangular plate. Its transverse displacement is expanded in analytical mode shapes. For a plate of sides a and b,
+          each mode is φmn = sin(mπx/a) sin(nπy/b).
+        </p>
+
+        <div class="equation">
+          D = Eh³ / [12(1 − ν²)]
+        </div>
+
+        <div class="equation">
+          ωmn = π² √(D/ρh) [(m/a)² + (n/b)²]
+        </div>
+
+        <p>
+          A point-like virtual shaker couples into each mode according to the mode amplitude at the shaker location. Each modal coordinate is treated as a damped oscillator. In tone mode the steady-state frequency response is evaluated directly. For recorded or uploaded audio, the waveform drives a bank of damped digital resonators before playback; their slowly varying energies are stored and replayed in synchrony with the original signal.
+        </p>
+
+        <div class="equation">
+          q̈n + 2ζnωn q̇n + ωn²qn = φn(xd,yd) F(t)
+        </div>
+
+        <p>
+          Sand transport is deliberately reduced-order. Grains are agitated more strongly in regions with high time-averaged plate motion and drift down the gradient of modal vibration energy toward low-motion nodal regions. A coarse granular-pressure field approximates finite grain size and collisions. Near a node, most of that pressure and the residual grain agitation are projected along the local nodal tangent, so grains spread into continuous bands and continue to creep after settling instead of collapsing into static point-like clumps. For high-order modes the transport force is spatial-order normalised and a small finite-width granular agitation is added, preventing the increasingly dense nodal network from collapsing into unrealistically thin piles. A narrow soft edge-confinement layer prevents the ideal simply-supported boundary from becoming an unrealistically dominant grain sink. This captures the organising mechanism visually without attempting full grain-contact DEM, air coupling or detailed frictional mechanics.
+        </p>
+
+        <ul>
+          <li>2-D Kirchhoff–Love thin-plate modal model</li>
+          <li>Simply supported rectangular boundaries</li>
+          <li>Up to 96 analytical modes retained between 10 Hz and 10 kHz</li>
+          <li>Point forcing with position-dependent modal participation</li>
+          <li>Damped resonator-bank analysis for recorded/uploaded signals</li>
+          <li>Reduced-order particle migration toward nodal regions</li>
+          <li>Coarse granular-pressure/collision model to prevent artificial clumping</li>
+          <li>No FEM, nonlinear plate dynamics, grain-contact DEM or acoustic radiation model</li>
+        </ul>
+      </div>
+    </details>
+
+    <div class="bottom-row">
+      <div class="model-info">
+        <strong>Model:</strong> analytical thin-plate modes + modal resonators + reduced-order sand transport
+      </div>
+      <div class="buttons">
+        <button data-pause type="button">Pause</button>
+        <button data-reset-sand type="button">Reset sand</button>
+        <button data-reset-all type="button">Reset all</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  type SourceMode = "tone" | "record" | "upload";
+
+  type MaterialKey = "steel" | "aluminium" | "brass" | "glass";
+
+  type Material = {
+    name: string;
+    youngsModulus: number;
+    density: number;
+    poisson: number;
+  };
+
+  type PlateMode = {
+    m: number;
+    n: number;
+    frequency: number;
+    omega: number;
+    coupling: number;
+  };
+
+  type AudioAnalysis = {
+    frameRate: number;
+    duration: number;
+    modalFrames: Float32Array[];
+    spectrum: Float32Array;
+    spectrumMaxFrequency: number;
+    sourceName: string;
+  };
+
+  const labs = document.querySelectorAll<HTMLElement>("[data-chladni-lab]");
+
+  for (const root of labs) {
+    const plateCanvas = root.querySelector<HTMLCanvasElement>("[data-plate-canvas]");
+    const spectrumCanvas = root.querySelector<HTMLCanvasElement>("[data-spectrum-canvas]");
+
+    const sourceTabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-source-tab]"));
+    const sourcePanels = Array.from(root.querySelectorAll<HTMLElement>("[data-source-panel]"));
+
+    const frequencySlider = root.querySelector<HTMLInputElement>("[data-frequency]");
+    const strengthSlider = root.querySelector<HTMLInputElement>("[data-strength]");
+    const frequencyOutput = root.querySelector<HTMLOutputElement>("[data-frequency-output]");
+    const strengthOutput = root.querySelector<HTMLOutputElement>("[data-strength-output]");
+
+    const recordButton = root.querySelector<HTMLButtonElement>("[data-record-button]");
+    const recordLabel = root.querySelector<HTMLElement>("[data-record-label]");
+    const recordTime = root.querySelector<HTMLElement>("[data-record-time]");
+    const recordStatus = root.querySelector<HTMLElement>("[data-record-status]");
+    const uploadInput = root.querySelector<HTMLInputElement>("[data-upload]");
+
+    const audioState = root.querySelector<HTMLElement>("[data-audio-state]");
+    const audioName = root.querySelector<HTMLElement>("[data-audio-name]");
+    const audioDuration = root.querySelector<HTMLElement>("[data-audio-duration]");
+    const analysisStatus = root.querySelector<HTMLElement>("[data-analysis-status]");
+    const playAudioButton = root.querySelector<HTMLButtonElement>("[data-play-audio]");
+    const stopAudioButton = root.querySelector<HTMLButtonElement>("[data-stop-audio]");
+    const sourceNote = root.querySelector<HTMLElement>("[data-source-note]");
+
+    const materialSelect = root.querySelector<HTMLSelectElement>("[data-material]");
+    const widthSlider = root.querySelector<HTMLInputElement>("[data-width]");
+    const aspectSlider = root.querySelector<HTMLInputElement>("[data-aspect]");
+    const thicknessSlider = root.querySelector<HTMLInputElement>("[data-thickness]");
+    const dampingSlider = root.querySelector<HTMLInputElement>("[data-damping]");
+    const mobilitySlider = root.querySelector<HTMLInputElement>("[data-mobility]");
+
+    const widthOutput = root.querySelector<HTMLOutputElement>("[data-width-output]");
+    const aspectOutput = root.querySelector<HTMLOutputElement>("[data-aspect-output]");
+    const thicknessOutput = root.querySelector<HTMLOutputElement>("[data-thickness-output]");
+    const dampingOutput = root.querySelector<HTMLOutputElement>("[data-damping-output]");
+    const mobilityOutput = root.querySelector<HTMLOutputElement>("[data-mobility-output]");
+
+    const heightOutput = root.querySelector<HTMLElement>("[data-height-output]");
+    const rigidityOutput = root.querySelector<HTMLElement>("[data-rigidity-output]");
+    const modeCountOutput = root.querySelector<HTMLElement>("[data-mode-count]");
+    const nearestModeOutput = root.querySelector<HTMLElement>("[data-nearest-mode]");
+
+    const driveXSlider = root.querySelector<HTMLInputElement>("[data-drive-x]");
+    const driveYSlider = root.querySelector<HTMLInputElement>("[data-drive-y]");
+    const driveXOutput = root.querySelector<HTMLOutputElement>("[data-drive-x-output]");
+    const driveYOutput = root.querySelector<HTMLOutputElement>("[data-drive-y-output]");
+    const centerDriverButton = root.querySelector<HTMLButtonElement>("[data-center-driver]");
+
+    const fieldToggle = root.querySelector<HTMLInputElement>("[data-field-toggle]");
+    const nodesToggle = root.querySelector<HTMLInputElement>("[data-nodes-toggle]");
+    const modeBars = root.querySelector<HTMLElement>("[data-mode-bars]");
+
+    const excitationReadout = root.querySelector<HTMLElement>("[data-excitation-readout]");
+    const modeReadout = root.querySelector<HTMLElement>("[data-mode-readout]");
+    const resonanceReadout = root.querySelector<HTMLElement>("[data-resonance-readout]");
+
+    const pauseButton = root.querySelector<HTMLButtonElement>("[data-pause]");
+    const resetSandButton = root.querySelector<HTMLButtonElement>("[data-reset-sand]");
+    const resetAllButton = root.querySelector<HTMLButtonElement>("[data-reset-all]");
+
+    if (
+      !plateCanvas || !spectrumCanvas || !frequencySlider || !strengthSlider ||
+      !frequencyOutput || !strengthOutput || !recordButton || !recordLabel ||
+      !recordTime || !recordStatus || !uploadInput || !audioState || !audioName ||
+      !audioDuration || !analysisStatus || !playAudioButton || !stopAudioButton ||
+      !sourceNote || !materialSelect || !widthSlider || !aspectSlider ||
+      !thicknessSlider || !dampingSlider || !mobilitySlider || !widthOutput ||
+      !aspectOutput || !thicknessOutput || !dampingOutput || !mobilityOutput ||
+      !heightOutput || !rigidityOutput || !modeCountOutput || !nearestModeOutput ||
+      !driveXSlider || !driveYSlider || !driveXOutput || !driveYOutput ||
+      !centerDriverButton || !fieldToggle || !nodesToggle || !modeBars ||
+      !excitationReadout || !modeReadout || !resonanceReadout || !pauseButton ||
+      !resetSandButton || !resetAllButton
+    ) {
+      continue;
+    }
+
+    const ctx = plateCanvas.getContext("2d");
+    const spectrumCtx = spectrumCanvas.getContext("2d");
+    const fieldCanvas = document.createElement("canvas");
+    const fieldCtx = fieldCanvas.getContext("2d");
+    if (!ctx || !spectrumCtx || !fieldCtx) continue;
+
+    const materials: Record<MaterialKey, Material> = {
+      steel: {
+        name: "Steel",
+        youngsModulus: 200e9,
+        density: 7850,
+        poisson: 0.30
+      },
+      aluminium: {
+        name: "Aluminium",
+        youngsModulus: 69e9,
+        density: 2700,
+        poisson: 0.33
+      },
+      brass: {
+        name: "Brass",
+        youngsModulus: 100e9,
+        density: 8500,
+        poisson: 0.34
+      },
+      glass: {
+        name: "Glass",
+        youngsModulus: 70e9,
+        density: 2500,
+        poisson: 0.23
+      }
+    };
+
+    const minModeFrequency = 10;
+    const maxModeFrequency = 10000;
+    const maxModes = 96;
+    const sandCount = 7500;
+    // Coarse occupancy field used only for reduced-order grain/grain pressure.
+    // This prevents thousands of visual grains collapsing onto the same few
+    // pixels while remaining far cheaper than discrete contact mechanics.
+    const sandDensityNx = 56;
+    const sandDensityNy = 56;
+    const sandDensityCellCount = sandDensityNx * sandDensityNy;
+
+    // Sand does not need the exact modal basis evaluated independently at
+    // every grain position. The modal energy field is smooth at grain scale,
+    // so evaluate it on this modest cache and bilinearly sample it instead.
+    // This removes the dominant O(Ngrains × Nmodes) cost while preserving the
+    // visible nodal attraction.
+    const sandForceNx = 42;
+    const sandForceNy = 42;
+    const sandForceCellCount = sandForceNx * sandForceNy;
+    const sandForceUpdateInterval = 1 / 24;
+    const sandDensityUpdateInterval = 1 / 12;
+    const sandPhysicsStep = 1 / 36;
+
+    const maxRecordedSeconds = 8;
+    const maxUploadAnalysisSeconds = 20;
+    const analysisFrameRate = 40;
+    const analysisSampleRate = 24000;
+
+    let sourceMode: SourceMode = "tone";
+    let running = true;
+    let previousTime = performance.now();
+    let simulationTime = 0;
+    let uiAccumulator = 0;
+    let fieldLastUpdate = -Infinity;
+    let fieldDirty = true;
+
+    // Sand physics is intentionally decoupled from display refresh. The plate
+    // can still draw at the browser refresh rate while grain transport runs at
+    // a stable 36 Hz, which is visually smooth for this slow granular motion.
+    let sandPhysicsAccumulator = 0;
+    let sandDensityAccumulator = Infinity;
+    let sandForceLastUpdate = -Infinity;
+    let sandForceDirty = true;
+
+    let materialKey: MaterialKey = "steel";
+    let plateWidth = 0.25;
+    let aspectRatio = 1.0;
+    let plateHeight = 0.25;
+    let plateThickness = 0.0020;
+    let dampingRatio = 0.008;
+    let sandMobility = 2.5;
+    let driveX = 0.50;
+    let driveY = 0.50;
+
+    let showField = true;
+    let showNodes = false;
+    let plateModes: PlateMode[] = [];
+    let modeGroups: number[][] = [];
+    let modalWeights = new Float32Array(0);
+    let smoothedModalWeights = new Float32Array(0);
+
+    const sandX = new Float32Array(sandCount);
+    const sandY = new Float32Array(sandCount);
+    const sandVX = new Float32Array(sandCount);
+    const sandVY = new Float32Array(sandCount);
+    const sandDensity = new Float32Array(sandDensityCellCount);
+    const sandDensitySmoothed = new Float32Array(sandDensityCellCount);
+    const sandForceEnergy = new Float32Array(sandForceCellCount);
+    const sandForceGradX = new Float32Array(sandForceCellCount);
+    const sandForceGradY = new Float32Array(sandForceCellCount);
+
+    // Briefly increases granular mobility when the dominant modal pattern
+    // changes. It represents collision-mediated re-fluidisation of an existing
+    // pile, not a modification of the plate response itself.
+    let sandRemobilization = 0;
+
+    let draggingDriver = false;
+
+    let audioContext: AudioContext | null = null;
+    let audioBuffer: AudioBuffer | null = null;
+    let audioAnalysis: AudioAnalysis | null = null;
+    let audioSource: AudioBufferSourceNode | null = null;
+    let audioStartedAt = 0;
+    let audioPlaybackOffset = 0;
+    let audioPlaying = false;
+
+    let mediaRecorder: MediaRecorder | null = null;
+    let recordingStream: MediaStream | null = null;
+    let recordingChunks: Blob[] = [];
+    let recordingStartedAt = 0;
+    let recordingTimer = 0;
+    let recordingStopTimer = 0;
+    let recordingPointerId: number | null = null;
+    let recordingHoldActive = false;
+    let analysisDebounceTimer = 0;
+    let analysisGeneration = 0;
+
+    function clamp(value: number, min: number, max: number) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function formatFrequency(value: number) {
+      if (!Number.isFinite(value)) return "—";
+      if (value >= 1000) return `${(value / 1000).toFixed(value >= 5000 ? 1 : 2)} kHz`;
+      return `${Math.round(value)} Hz`;
+    }
+
+    function formatRigidity(value: number) {
+      if (!Number.isFinite(value)) return "—";
+      if (value >= 1000) return `${(value / 1000).toFixed(2)} kN·m`;
+      if (value >= 1) return `${value.toFixed(2)} N·m`;
+      return `${(1000 * value).toFixed(2)} mN·m`;
+    }
+
+    function formatDuration(value: number) {
+      if (!Number.isFinite(value)) return "—";
+      if (value < 10) return `${value.toFixed(1)} s`;
+      const minutes = Math.floor(value / 60);
+      const seconds = Math.floor(value % 60).toString().padStart(2, "0");
+      return minutes > 0 ? `${minutes}:${seconds}` : `${Math.round(value)} s`;
+    }
+
+    function ensureAudioContext() {
+      if (!audioContext) {
+        const Ctor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        if (!Ctor) return null;
+        audioContext = new Ctor();
+      }
+      return audioContext;
+    }
+
+    function readPlateControls() {
+      materialKey = materialSelect.value as MaterialKey;
+      plateWidth = Number(widthSlider.value);
+      aspectRatio = Number(aspectSlider.value);
+      plateHeight = plateWidth / Math.max(aspectRatio, 0.1);
+      plateThickness = Number(thicknessSlider.value) / 1000;
+      dampingRatio = Number(dampingSlider.value);
+      sandMobility = Number(mobilitySlider.value);
+      driveX = Number(driveXSlider.value);
+      driveY = Number(driveYSlider.value);
+      showField = fieldToggle.checked;
+      showNodes = nodesToggle.checked;
+    }
+
+    function flexuralRigidity() {
+      const material = materials[materialKey];
+      return (
+        material.youngsModulus * Math.pow(plateThickness, 3) /
+        (12 * (1 - material.poisson * material.poisson))
+      );
+    }
+
+    function modeShape(mode: PlateMode, x: number, y: number) {
+      return Math.sin(mode.m * Math.PI * x) * Math.sin(mode.n * Math.PI * y);
+    }
+
+    function modeShapeGradient(mode: PlateMode, x: number, y: number) {
+      return {
+        x:
+          mode.m * Math.PI *
+          Math.cos(mode.m * Math.PI * x) *
+          Math.sin(mode.n * Math.PI * y),
+        y:
+          mode.n * Math.PI *
+          Math.sin(mode.m * Math.PI * x) *
+          Math.cos(mode.n * Math.PI * y)
+      };
+    }
+
+    function rebuildModes() {
+      readPlateControls();
+      const material = materials[materialKey];
+      const D = flexuralRigidity();
+      const scale = Math.sqrt(D / Math.max(material.density * plateThickness, 1e-12));
+      const candidates: PlateMode[] = [];
+
+      for (let m = 1; m <= 12; m++) {
+        for (let n = 1; n <= 12; n++) {
+          const omega =
+            Math.PI * Math.PI * scale *
+            ((m / plateWidth) ** 2 + (n / plateHeight) ** 2);
+          const frequency = omega / (2 * Math.PI);
+
+          if (frequency < minModeFrequency || frequency > maxModeFrequency) continue;
+
+          candidates.push({
+            m,
+            n,
+            frequency,
+            omega,
+            coupling: 0
+          });
+        }
+      }
+
+      candidates.sort((a, b) => a.frequency - b.frequency);
+      plateModes = candidates.slice(0, maxModes);
+      fieldDirty = true;
+      sandForceDirty = true;
+      modeGroups = [];
+      for (let i = 0; i < plateModes.length; i++) {
+        const mode = plateModes[i];
+        let group = modeGroups.find(indices => {
+          const reference = plateModes[indices[0]];
+          return Math.abs(mode.frequency - reference.frequency) /
+            Math.max(reference.frequency, 1) < 0.003;
+        });
+        if (!group) {
+          group = [];
+          modeGroups.push(group);
+        }
+        group.push(i);
+      }
+
+      updateModeCouplings();
+      modalWeights = new Float32Array(plateModes.length);
+      smoothedModalWeights = new Float32Array(plateModes.length);
+
+      if (audioBuffer && (sourceMode === "record" || sourceMode === "upload")) {
+        stopAudioPlayback();
+        analysisStatus.textContent = "Plate changed · updating…";
+        playAudioButton.disabled = true;
+        scheduleReanalysis();
+      }
+
+      updateOutputs();
+      drawSpectrum();
+    }
+
+    function updateModeCouplings() {
+      driveX = Number(driveXSlider.value);
+      driveY = Number(driveYSlider.value);
+      fieldDirty = true;
+      sandForceDirty = true;
+      for (const mode of plateModes) {
+        mode.coupling = modeShape(mode, driveX, driveY);
+      }
+    }
+
+    function nearestModeTo(frequency: number) {
+      if (plateModes.length === 0) return null;
+      let best = plateModes[0];
+      let bestDifference = Math.abs(best.frequency - frequency);
+      for (let i = 1; i < plateModes.length; i++) {
+        const difference = Math.abs(plateModes[i].frequency - frequency);
+        if (difference < bestDifference) {
+          best = plateModes[i];
+          bestDifference = difference;
+        }
+      }
+      return { mode: best, difference: bestDifference };
+    }
+
+    function toneModalWeights() {
+      const driveFrequency = Number(frequencySlider.value);
+      const driveOmega = 2 * Math.PI * driveFrequency;
+      const strength = Number(strengthSlider.value);
+
+      for (let i = 0; i < plateModes.length; i++) {
+        const mode = plateModes[i];
+        const denominator = Math.sqrt(
+          Math.pow(mode.omega * mode.omega - driveOmega * driveOmega, 2) +
+          Math.pow(2 * dampingRatio * mode.omega * driveOmega, 2)
+        );
+
+        const dimensionalResponse =
+          Math.abs(mode.coupling) *
+          strength *
+          mode.omega * mode.omega /
+          Math.max(denominator, 1e-12);
+
+        // At exact resonance a lightly damped oscillator has a gain of
+        // approximately 1/(2ζ). Multiplying by 2ζ therefore gives a useful
+        // absolute 0–1 visual excitation scale instead of normalising every
+        // off-resonant state to full strength.
+        const resonanceScaled = dimensionalResponse * 2 * dampingRatio;
+        modalWeights[i] = Math.pow(clamp(resonanceScaled, 0, 1), 0.72);
+      }
+    }
+
+    function updateModalWeights(dt: number) {
+      if (sourceMode === "tone") {
+        toneModalWeights();
+      } else if (audioPlaying && audioAnalysis) {
+        const elapsed = Math.max(0, getAudioPlaybackTime());
+        const framePosition = elapsed * audioAnalysis.frameRate;
+        const frame0 = Math.floor(framePosition);
+        const frame1 = Math.min(frame0 + 1, audioAnalysis.modalFrames.length - 1);
+        const blend = framePosition - frame0;
+
+        const a = audioAnalysis.modalFrames[clamp(frame0, 0, audioAnalysis.modalFrames.length - 1)];
+        const b = audioAnalysis.modalFrames[clamp(frame1, 0, audioAnalysis.modalFrames.length - 1)];
+
+        if (a && b) {
+          for (let i = 0; i < modalWeights.length; i++) {
+            modalWeights[i] = a[i] * (1 - blend) + b[i] * blend;
+          }
+        }
+      } else {
+        for (let i = 0; i < modalWeights.length; i++) modalWeights[i] *= Math.exp(-3.0 * dt);
+      }
+
+      const gain = 1 - Math.exp(-dt / 0.065);
+      let modalChangeSquared = 0;
+      let modalLevelSquared = 0;
+
+      for (let i = 0; i < smoothedModalWeights.length; i++) {
+        const before = smoothedModalWeights[i];
+        const after = before + gain * (modalWeights[i] - before);
+        const delta = after - before;
+        smoothedModalWeights[i] = after;
+        modalChangeSquared += delta * delta;
+        modalLevelSquared += after * after;
+      }
+
+      const modalChange = Math.sqrt(
+        modalChangeSquared / Math.max(smoothedModalWeights.length, 1)
+      );
+      const modalLevel = Math.sqrt(
+        modalLevelSquared / Math.max(smoothedModalWeights.length, 1)
+      );
+
+      // A changing spectrum/mode shape re-fluidises an existing sand pile.
+      // This is particularly important for frequency sweeps and recorded audio:
+      // the grains should reorganise rather than preserving the first pattern.
+      if (modalChange > 0.00012) sandForceDirty = true;
+
+      if (modalLevel > 0.003 && modalChange > 0.0005) {
+        sandRemobilization = Math.max(
+          sandRemobilization,
+          clamp(modalChange * 95, 0, 1)
+        );
+      }
+    }
+
+    function seedSand() {
+      // Keep the initial distribution slightly clear of the mathematical
+      // simply-supported boundary. Those boundaries are exact displacement
+      // nodes, so seeding directly against them makes the reduced-order grain
+      // model over-populate the rim before interior Chladni lines can emerge.
+      const seedMargin = 0.035;
+      const span = 1 - 2 * seedMargin;
+      for (let i = 0; i < sandCount; i++) {
+        sandX[i] = seedMargin + Math.random() * span;
+        sandY[i] = seedMargin + Math.random() * span;
+        sandVX[i] = 0;
+        sandVY[i] = 0;
+      }
+      sandRemobilization = 0;
+      sandDensityAccumulator = Infinity;
+      sandForceDirty = true;
+    }
+
+    function vibrationEnergyAndGradient(x: number, y: number) {
+      let energy = 0;
+      let gradX = 0;
+      let gradY = 0;
+
+      // Exactly or nearly degenerate modes share one temporal frequency and
+      // can interfere coherently. Combining them before squaring is what lets
+      // a square plate form curved/diagonal Chladni nodal structures rather
+      // than only the rectangular node grid of isolated sin(mπx)sin(nπy) modes.
+      for (const group of modeGroups) {
+        let displacement = 0;
+        let displacementGradX = 0;
+        let displacementGradY = 0;
+
+        for (const index of group) {
+          const weight = smoothedModalWeights[index];
+          if (weight < 0.002) continue;
+          const mode = plateModes[index];
+          const signedWeight = weight * Math.sign(mode.coupling || 1);
+          const phi = modeShape(mode, x, y);
+          const grad = modeShapeGradient(mode, x, y);
+          displacement += signedWeight * phi;
+          displacementGradX += signedWeight * grad.x;
+          displacementGradY += signedWeight * grad.y;
+        }
+
+        energy += displacement * displacement;
+        gradX += 2 * displacement * displacementGradX;
+        gradY += 2 * displacement * displacementGradY;
+      }
+
+      return { energy, gradX, gradY };
+    }
+
+    function rebuildSandForceField() {
+      for (let iy = 0; iy < sandForceNy; iy++) {
+        const y = iy / Math.max(sandForceNy - 1, 1);
+        for (let ix = 0; ix < sandForceNx; ix++) {
+          const x = ix / Math.max(sandForceNx - 1, 1);
+          const field = vibrationEnergyAndGradient(x, y);
+          const index = iy * sandForceNx + ix;
+          sandForceEnergy[index] = field.energy;
+          sandForceGradX[index] = field.gradX;
+          sandForceGradY[index] = field.gradY;
+        }
+      }
+
+      sandForceLastUpdate = simulationTime;
+      sandForceDirty = false;
+    }
+
+    function sampleSandForceField(x: number, y: number) {
+      const gx = clamp(x, 0, 1) * (sandForceNx - 1);
+      const gy = clamp(y, 0, 1) * (sandForceNy - 1);
+      const ix0 = Math.min(sandForceNx - 2, Math.max(0, Math.floor(gx)));
+      const iy0 = Math.min(sandForceNy - 2, Math.max(0, Math.floor(gy)));
+      const fx = gx - ix0;
+      const fy = gy - iy0;
+
+      const i00 = iy0 * sandForceNx + ix0;
+      const i10 = i00 + 1;
+      const i01 = i00 + sandForceNx;
+      const i11 = i01 + 1;
+
+      const bilerp = (values: Float32Array) => {
+        const a = values[i00] * (1 - fx) + values[i10] * fx;
+        const b = values[i01] * (1 - fx) + values[i11] * fx;
+        return a * (1 - fy) + b * fy;
+      };
+
+      return {
+        energy: bilerp(sandForceEnergy),
+        gradX: bilerp(sandForceGradX),
+        gradY: bilerp(sandForceGradY)
+      };
+    }
+
+    function rebuildSandDensityField() {
+      sandDensity.fill(0);
+
+      for (let i = 0; i < sandCount; i++) {
+        const ix = clamp(Math.floor(sandX[i] * sandDensityNx), 0, sandDensityNx - 1);
+        const iy = clamp(Math.floor(sandY[i] * sandDensityNy), 0, sandDensityNy - 1);
+        sandDensity[iy * sandDensityNx + ix] += 1;
+      }
+
+      // A compact 3x3 blur turns raw cell occupancy into a smooth granular
+      // pressure field. Edge replication avoids creating another artificial
+      // attraction/repulsion at the numerical density-grid boundary.
+      for (let iy = 0; iy < sandDensityNy; iy++) {
+        for (let ix = 0; ix < sandDensityNx; ix++) {
+          let sum = 0;
+          let weight = 0;
+
+          for (let oy = -1; oy <= 1; oy++) {
+            const sy = clamp(iy + oy, 0, sandDensityNy - 1);
+            for (let ox = -1; ox <= 1; ox++) {
+              const sx = clamp(ix + ox, 0, sandDensityNx - 1);
+              const w = ox === 0 && oy === 0 ? 2 : 1;
+              sum += sandDensity[sy * sandDensityNx + sx] * w;
+              weight += w;
+            }
+          }
+
+          sandDensitySmoothed[iy * sandDensityNx + ix] = sum / weight;
+        }
+      }
+    }
+
+    function sandCrowdingAt(x: number, y: number) {
+      const ix = clamp(Math.floor(x * sandDensityNx), 1, sandDensityNx - 2);
+      const iy = clamp(Math.floor(y * sandDensityNy), 1, sandDensityNy - 2);
+      const index = iy * sandDensityNx + ix;
+
+      return {
+        density: sandDensitySmoothed[index],
+        gradX: 0.5 * (
+          sandDensitySmoothed[index + 1] -
+          sandDensitySmoothed[index - 1]
+        ),
+        gradY: 0.5 * (
+          sandDensitySmoothed[index + sandDensityNx] -
+          sandDensitySmoothed[index - sandDensityNx]
+        )
+      };
+    }
+
+    function activeSpatialComplexity() {
+      let weightedOrderSquared = 0;
+      let totalWeight = 0;
+
+      for (let i = 0; i < plateModes.length; i++) {
+        const weight = smoothedModalWeights[i] || 0;
+        if (weight < 0.001) continue;
+        const importance = weight * weight;
+        const mode = plateModes[i];
+        weightedOrderSquared +=
+          importance * (mode.m * mode.m + mode.n * mode.n);
+        totalWeight += importance;
+      }
+
+      if (totalWeight < 1e-10) return { order: 1.5, factor: 0 };
+
+      const order = Math.sqrt(weightedOrderSquared / totalWeight);
+
+      // Modes around (1,1)–(2,2) stay essentially unchanged. From roughly
+      // fourth/fifth order onward, progressively adapt the *grain transport*
+      // to the much denser nodal geometry. This does not alter the plate field.
+      const factor = clamp((order - 2.4) / 7.0, 0, 1);
+      return { order, factor };
+    }
+
+    function updateSand(dt: number) {
+      const cappedDt = Math.min(dt, 0.03);
+      const spatial = activeSpatialComplexity();
+      const highModeFactor = spatial.factor;
+      const driftStrength = 0.045 * sandMobility;
+      const agitationStrength = 0.014 * sandMobility;
+
+      // High-order modes contain many more, much narrower nodal bands. If the
+      // same point-grain pressure law is used unchanged, those bands become
+      // visually under-populated and locally over-packed. Increase spreading
+      // progressively with spatial mode order while leaving low modes alone.
+      const crowdingStrength =
+        0.012 * sandMobility * (1 + 0.55 * highModeFactor);
+      const tangentialCrowdingStrength =
+        0.052 * sandMobility * (1 + 1.75 * highModeFactor);
+      const settledCreepStrength =
+        0.0048 * sandMobility * (1 + 0.55 * highModeFactor);
+      const normalBandAgitationStrength =
+        0.0022 * sandMobility * highModeFactor;
+      const damping = Math.exp(-(5.4 - 0.65 * highModeFactor) * cappedDt);
+
+      let modalEnergy = 0;
+      for (let i = 0; i < smoothedModalWeights.length; i++) {
+        modalEnergy += smoothedModalWeights[i] * smoothedModalWeights[i];
+      }
+      modalEnergy = Math.sqrt(modalEnergy / Math.max(smoothedModalWeights.length, 1));
+
+      if (
+        sandForceDirty ||
+        simulationTime - sandForceLastUpdate >= sandForceUpdateInterval
+      ) {
+        rebuildSandForceField();
+      }
+
+      sandDensityAccumulator += cappedDt;
+      if (sandDensityAccumulator >= sandDensityUpdateInterval) {
+        rebuildSandDensityField();
+        sandDensityAccumulator = 0;
+      }
+
+      sandRemobilization *= Math.exp(-2.0 * cappedDt);
+
+      for (let i = 0; i < sandCount; i++) {
+        const x = sandX[i];
+        const y = sandY[i];
+        const field = sampleSandForceField(x, y);
+        const crowd = sandCrowdingAt(x, y);
+
+        // A small global agitation floor is essential. If agitation vanished
+        // exactly at a node, a previously formed pile would become permanently
+        // frozen there even after the modal pattern changed. The floor scales
+        // with total plate activity, while local high-motion regions still
+        // bounce much more strongly.
+        const plateActivity = clamp(modalEnergy * 18, 0, 1);
+        const globalAgitationEnergy =
+          modalEnergy * modalEnergy * (0.14 + 0.55 * sandRemobilization);
+
+        // Even a settled Chladni figure remains microscopically active while
+        // the plate is being driven. This small floor prevents grains from
+        // becoming numerically frozen on a node, but vanishes when the plate
+        // itself is essentially inactive.
+        const agitationFloor = 0.0017 * sandMobility * plateActivity;
+        const randomScale =
+          agitationStrength *
+          Math.sqrt(Math.max(field.energy + globalAgitationEnergy, 0)) *
+          Math.sqrt(cappedDt) +
+          agitationFloor * Math.sqrt(cappedDt);
+
+        let ax = -driftStrength * field.gradX;
+        let ay = -driftStrength * field.gradY;
+
+        // The vibration-energy gradient is locally normal to an energy
+        // contour. Near a Chladni node, its perpendicular direction therefore
+        // approximates the tangent to the nodal line. Project most granular
+        // spreading onto this tangent so the grains form long continuous bands
+        // instead of compact islands while remaining tightly attracted to the
+        // node in the normal direction.
+        const fieldGradMag = Math.hypot(field.gradX, field.gradY);
+        let tangentX = 0;
+        let tangentY = 0;
+        let normalX = 0;
+        let normalY = 0;
+        if (fieldGradMag > 1e-7) {
+          normalX = field.gradX / fieldGradMag;
+          normalY = field.gradY / fieldGradMag;
+          tangentX = -normalY;
+          tangentY = normalX;
+        }
+
+        // Energy gradients naturally scale with spatial mode number. Without
+        // compensation, high-order modes exert a much stronger artificial
+        // particle attraction and squeeze the sand into razor-thin clumps.
+        // Soft-saturate only the *transport force*; the modal field itself is
+        // untouched. The cap is slightly lower for complex high-order modes so
+        // their many nodal bands remain visibly populated.
+        const gradientCap = 8.0 - 2.7 * highModeFactor;
+        const effectiveGradientMagnitude =
+          gradientCap * Math.tanh(fieldGradMag / Math.max(gradientCap, 1e-6));
+        const gradientTransportScale =
+          fieldGradMag > 1e-7
+            ? effectiveGradientMagnitude / fieldGradMag
+            : 1;
+
+        ax *= gradientTransportScale;
+        ay *= gradientTransportScale;
+
+        // Lower the comfortable occupancy as the nodal network gets denser.
+        // This makes granular pressure act earlier at high resonance orders and
+        // distributes the fixed grain population over more of the available
+        // Chladni geometry instead of allowing a few intersections to hoard it.
+        const comfortableDensity = 2.35 - 0.72 * highModeFactor;
+        const overcrowding = Math.max(0, crowd.density - comfortableDensity);
+        const crowdFactor = clamp(
+          overcrowding / (4.5 - 1.45 * highModeFactor),
+          0,
+          1
+        );
+
+        // A weak isotropic component breaks up dense intersections and local
+        // point piles. The stronger projected component redistributes mass
+        // along the nodal curve itself.
+        ax -= crowdingStrength * crowd.gradX * crowdFactor;
+        ay -= crowdingStrength * crowd.gradY * crowdFactor;
+
+        if (fieldGradMag > 1e-7) {
+          const crowdAlongTangent =
+            crowd.gradX * tangentX + crowd.gradY * tangentY;
+          ax -= tangentialCrowdingStrength * crowdAlongTangent * tangentX * crowdFactor;
+          ay -= tangentialCrowdingStrength * crowdAlongTangent * tangentY * crowdFactor;
+        }
+
+        // At exact nodal intersections the energy gradient can vanish and no
+        // tangent is uniquely defined. Keep a small collision kick there so a
+        // symmetric pile cannot lock permanently into one density-grid cell.
+        const collisionKick =
+          0.0048 * sandMobility * crowdFactor * Math.sqrt(cappedDt);
+
+        // Continuous granular creep. Near a node, where the normal attracting
+        // force is already small, add a very weak random walk *along* the nodal
+        // tangent. This keeps a settled figure alive and lets neighbouring
+        // grains exchange positions without visibly blurring the pattern.
+        const nodalCreep =
+          fieldGradMag > 1e-7
+            ? settledCreepStrength *
+              plateActivity *
+              (0.35 + 0.65 * crowdFactor) *
+              Math.sqrt(cappedDt)
+            : 0;
+        const tangentKick = (Math.random() - 0.5) * 2 * nodalCreep;
+
+        // High-order nodal lines are geometrically very thin. A tiny normal
+        // granular temperature gives them a finite visible sand-band width,
+        // analogous to finite grain size/contact agitation. Because the modal
+        // attraction immediately restores grains toward the node, this broadens
+        // the band without erasing its location.
+        const normalBandKick =
+          (Math.random() - 0.5) *
+          2 *
+          normalBandAgitationStrength *
+          plateActivity *
+          Math.sqrt(cappedDt);
+
+        // The analytical simply-supported basis has w = 0 exactly on every
+        // plate edge. A pure downhill-energy grain model therefore turns the
+        // complete rim into an unrealistically dominant sand trap. Real grains
+        // also experience collisions, finite edge geometry and non-ideal
+        // supports, so use a narrow soft confinement layer for particle
+        // transport only. It does not alter the modal vibration field.
+        const edgeZone = 0.055;
+        const edgeStrength = 0.18 * sandMobility;
+        if (x < edgeZone) ax += edgeStrength * (edgeZone - x) / edgeZone;
+        else if (x > 1 - edgeZone) ax -= edgeStrength * (x - (1 - edgeZone)) / edgeZone;
+        if (y < edgeZone) ay += edgeStrength * (edgeZone - y) / edgeZone;
+        else if (y > 1 - edgeZone) ay -= edgeStrength * (y - (1 - edgeZone)) / edgeZone;
+
+        sandVX[i] =
+          sandVX[i] * damping +
+          ax * cappedDt +
+          (Math.random() - 0.5) * (randomScale + collisionKick) +
+          tangentX * tangentKick +
+          normalX * normalBandKick;
+        sandVY[i] =
+          sandVY[i] * damping +
+          ay * cappedDt +
+          (Math.random() - 0.5) * (randomScale + collisionKick) +
+          tangentY * tangentKick +
+          normalY * normalBandKick;
+
+        const speed = Math.hypot(sandVX[i], sandVY[i]);
+        const maxSpeed = 0.12 + 0.10 * modalEnergy + 0.035 * sandRemobilization;
+        if (speed > maxSpeed) {
+          const scale = maxSpeed / speed;
+          sandVX[i] *= scale;
+          sandVY[i] *= scale;
+        }
+
+        sandX[i] += sandVX[i] * cappedDt;
+        sandY[i] += sandVY[i] * cappedDt;
+
+        const hardMargin = 0.018;
+        if (sandX[i] < hardMargin) {
+          sandX[i] = hardMargin;
+          sandVX[i] = Math.abs(sandVX[i]) * 0.45;
+        } else if (sandX[i] > 1 - hardMargin) {
+          sandX[i] = 1 - hardMargin;
+          sandVX[i] = -Math.abs(sandVX[i]) * 0.45;
+        }
+
+        if (sandY[i] < hardMargin) {
+          sandY[i] = hardMargin;
+          sandVY[i] = Math.abs(sandVY[i]) * 0.45;
+        } else if (sandY[i] > 1 - hardMargin) {
+          sandY[i] = 1 - hardMargin;
+          sandVY[i] = -Math.abs(sandVY[i]) * 0.45;
+        }
+      }
+    }
+
+    function plateRect() {
+      const width = plateCanvas.clientWidth;
+      const height = plateCanvas.clientHeight;
+      const margin = Math.min(width, height) * 0.085;
+      const availableWidth = Math.max(1, width - 2 * margin);
+      const availableHeight = Math.max(1, height - 2 * margin);
+      const physicalAspect = plateWidth / plateHeight;
+
+      let drawWidth = availableWidth;
+      let drawHeight = drawWidth / physicalAspect;
+      if (drawHeight > availableHeight) {
+        drawHeight = availableHeight;
+        drawWidth = drawHeight * physicalAspect;
+      }
+
+      return {
+        x: 0.5 * (width - drawWidth),
+        y: 0.5 * (height - drawHeight),
+        width: drawWidth,
+        height: drawHeight
+      };
+    }
+
+    function plateToScreen(x: number, y: number) {
+      const rect = plateRect();
+      return {
+        x: rect.x + x * rect.width,
+        y: rect.y + (1 - y) * rect.height
+      };
+    }
+
+    function screenToPlate(x: number, y: number) {
+      const rect = plateRect();
+      return {
+        x: clamp((x - rect.x) / Math.max(rect.width, 1), 0.02, 0.98),
+        y: clamp(1 - (y - rect.y) / Math.max(rect.height, 1), 0.02, 0.98)
+      };
+    }
+
+    function normalizedFieldAt(x: number, y: number) {
+      let sum = 0;
+      let norm = 0;
+      for (let i = 0; i < plateModes.length; i++) {
+        const w = smoothedModalWeights[i];
+        if (w < 0.002) continue;
+        const phi = modeShape(plateModes[i], x, y);
+        sum += w * Math.sign(plateModes[i].coupling || 1) * phi;
+        norm += Math.abs(w);
+      }
+      return norm > 1e-9 ? sum / norm : 0;
+    }
+
+    function drawField(rect: { x: number; y: number; width: number; height: number }) {
+      if (!showField && !showNodes) return;
+
+      const nx = Math.max(40, Math.min(76, Math.round(rect.width / 8)));
+      const ny = Math.max(40, Math.min(76, Math.round(rect.height / 8)));
+
+      if (fieldCanvas.width !== nx || fieldCanvas.height !== ny) {
+        fieldCanvas.width = nx;
+        fieldCanvas.height = ny;
+        fieldDirty = true;
+      }
+
+      const needsUpdate = fieldDirty || simulationTime - fieldLastUpdate > 0.065;
+      if (needsUpdate) {
+        const image = fieldCtx.createImageData(nx, ny);
+        let index = 0;
+
+        for (let j = 0; j < ny; j++) {
+          const y = 1 - j / Math.max(ny - 1, 1);
+          for (let i = 0; i < nx; i++) {
+            const x = i / Math.max(nx - 1, 1);
+            const value = clamp(normalizedFieldAt(x, y), -1, 1);
+            const magnitude = Math.abs(value);
+            const node = Math.exp(-Math.pow(magnitude / 0.055, 2));
+
+            let r = 17;
+            let g = 25;
+            let b = 34;
+
+            if (showField) {
+              if (value >= 0) {
+                r += Math.round(44 * magnitude);
+                g += Math.round(88 * magnitude);
+                b += Math.round(130 * magnitude);
+              } else {
+                r += Math.round(112 * magnitude);
+                g += Math.round(55 * magnitude);
+                b += Math.round(32 * magnitude);
+              }
+            }
+
+            if (showNodes && node > 0.30) {
+              const mix = 0.62 * node;
+              r = Math.round(r * (1 - mix) + 224 * mix);
+              g = Math.round(g * (1 - mix) + 232 * mix);
+              b = Math.round(b * (1 - mix) + 236 * mix);
+            }
+
+            image.data[index++] = clamp(r, 0, 255);
+            image.data[index++] = clamp(g, 0, 255);
+            image.data[index++] = clamp(b, 0, 255);
+            image.data[index++] = 255;
+          }
+        }
+
+        fieldCtx.putImageData(image, 0, 0);
+        fieldLastUpdate = simulationTime;
+        fieldDirty = false;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = 0.90;
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(fieldCanvas, rect.x, rect.y, rect.width, rect.height);
+      ctx.restore();
+    }
+
+    function drawPlate() {
+      const width = plateCanvas.clientWidth;
+      const height = plateCanvas.clientHeight;
+      const rect = plateRect();
+
+      const bg = ctx.createLinearGradient(0, 0, 0, height);
+      bg.addColorStop(0, "#091018");
+      bg.addColorStop(1, "#05080c");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.48)";
+      ctx.shadowBlur = 28;
+      ctx.fillStyle = "#111923";
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(rect.x, rect.y, rect.width, rect.height);
+      ctx.clip();
+      drawField(rect);
+
+      // Avoid thousands of repeated plateRect()/layout reads. The rectangle is
+      // already known for this frame, and compound paths are substantially
+      // cheaper than thousands of individual canvas fill calls.
+      //
+      // High-order modes divide the same physical sand population across many
+      // more nodal curves. Add a faint finite-grain footprint beneath the crisp
+      // grain cores as spatial complexity rises. This increases *legibility*,
+      // not simulated particle count, and costs only one additional batched fill.
+      const sandSpatial = activeSpatialComplexity();
+      const coverageBoost = sandSpatial.factor;
+
+      if (coverageBoost > 0.04) {
+        const footprintSize = 1.15 + 0.75 * coverageBoost;
+        const halfFootprint = 0.5 * footprintSize;
+        ctx.fillStyle = `rgba(239,224,181,${0.10 + 0.16 * coverageBoost})`;
+        ctx.beginPath();
+        for (let i = 0; i < sandCount; i++) {
+          const px = rect.x + sandX[i] * rect.width;
+          const py = rect.y + (1 - sandY[i]) * rect.height;
+          ctx.rect(
+            px - halfFootprint,
+            py - halfFootprint,
+            footprintSize,
+            footprintSize
+          );
+        }
+        ctx.fill();
+      }
+
+      const coreSize = 1.02 + 0.10 * coverageBoost;
+      const halfCore = 0.5 * coreSize;
+      ctx.fillStyle = "rgba(239,224,181,0.86)";
+      ctx.beginPath();
+      for (let i = 0; i < sandCount; i++) {
+        const px = rect.x + sandX[i] * rect.width;
+        const py = rect.y + (1 - sandY[i]) * rect.height;
+        ctx.rect(px - halfCore, py - halfCore, coreSize, coreSize);
+      }
+      ctx.fill();
+      ctx.restore();
+
+      ctx.strokeStyle = "rgba(224,235,244,0.56)";
+      ctx.lineWidth = 1.3;
+      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+
+      const driver = plateToScreen(driveX, driveY);
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.92)";
+      ctx.fillStyle = "rgba(255,255,255,0.16)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(driver.x, driver.y, 8.5, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(driver.x - 12, driver.y);
+      ctx.lineTo(driver.x + 12, driver.y);
+      ctx.moveTo(driver.x, driver.y - 12);
+      ctx.lineTo(driver.x, driver.y + 12);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.70)";
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.fillText("shaker", driver.x + 14, driver.y - 10);
+      ctx.restore();
+    }
+
+    function strongestModes(count = 4) {
+      return plateModes
+        .map((mode, index) => ({ mode, index, weight: smoothedModalWeights[index] || 0 }))
+        .sort((a, b) => b.weight - a.weight)
+        .slice(0, count);
+    }
+
+    function updateModeBars() {
+      const strongest = strongestModes(4);
+      modeBars.replaceChildren();
+
+      const peak = Math.max(1e-6, ...strongest.map(item => item.weight));
+      for (const item of strongest) {
+        const row = document.createElement("div");
+        row.className = "mode-bar-row";
+
+        const label = document.createElement("span");
+        label.textContent = `(${item.mode.m},${item.mode.n}) · ${formatFrequency(item.mode.frequency)}`;
+
+        const track = document.createElement("div");
+        track.className = "mode-bar-track";
+        const fill = document.createElement("div");
+        fill.className = "mode-bar-fill";
+        fill.style.width = `${100 * clamp(item.weight / peak, 0, 1)}%`;
+        track.appendChild(fill);
+
+        const value = document.createElement("strong");
+        value.textContent = `${Math.round(100 * clamp(item.weight / peak, 0, 1))}%`;
+
+        row.append(label, track, value);
+        modeBars.appendChild(row);
+      }
+    }
+
+    function drawSpectrum() {
+      const width = spectrumCanvas.clientWidth;
+      const height = spectrumCanvas.clientHeight;
+      spectrumCtx.fillStyle = "#090e14";
+      spectrumCtx.fillRect(0, 0, width, height);
+
+      const left = 44;
+      const right = 16;
+      const top = 14;
+      const bottom = 30;
+      const plotWidth = Math.max(1, width - left - right);
+      const plotHeight = Math.max(1, height - top - bottom);
+      const maxFrequency = sourceMode === "tone"
+        ? maxModeFrequency
+        : Math.min(maxModeFrequency, audioAnalysis?.spectrumMaxFrequency || maxModeFrequency);
+
+      spectrumCtx.strokeStyle = "rgba(255,255,255,0.07)";
+      spectrumCtx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const x = left + (i / 4) * plotWidth;
+        spectrumCtx.beginPath();
+        spectrumCtx.moveTo(x, top);
+        spectrumCtx.lineTo(x, top + plotHeight);
+        spectrumCtx.stroke();
+      }
+
+      if (sourceMode === "tone") {
+        const frequency = Number(frequencySlider.value);
+        const x = left + clamp(frequency / maxFrequency, 0, 1) * plotWidth;
+        spectrumCtx.strokeStyle = "rgba(241,184,106,0.9)";
+        spectrumCtx.lineWidth = 2;
+        spectrumCtx.beginPath();
+        spectrumCtx.moveTo(x, top + plotHeight);
+        spectrumCtx.lineTo(x, top + 4);
+        spectrumCtx.stroke();
+      } else if (audioAnalysis && audioAnalysis.spectrum.length > 1) {
+        spectrumCtx.beginPath();
+        for (let i = 0; i < audioAnalysis.spectrum.length; i++) {
+          const frequency = (i / (audioAnalysis.spectrum.length - 1)) * audioAnalysis.spectrumMaxFrequency;
+          if (frequency > maxFrequency) break;
+          const x = left + (frequency / maxFrequency) * plotWidth;
+          const magnitude = clamp(audioAnalysis.spectrum[i], 0, 1);
+          const y = top + plotHeight * (1 - magnitude);
+          if (i === 0) spectrumCtx.moveTo(x, y);
+          else spectrumCtx.lineTo(x, y);
+        }
+        spectrumCtx.strokeStyle = "rgba(103,207,255,0.78)";
+        spectrumCtx.lineWidth = 1.4;
+        spectrumCtx.stroke();
+      }
+
+      spectrumCtx.save();
+      spectrumCtx.setLineDash([3, 5]);
+      for (const mode of plateModes) {
+        if (mode.frequency > maxFrequency) continue;
+        const x = left + (mode.frequency / maxFrequency) * plotWidth;
+        spectrumCtx.strokeStyle = "rgba(255,255,255,0.16)";
+        spectrumCtx.beginPath();
+        spectrumCtx.moveTo(x, top + plotHeight);
+        spectrumCtx.lineTo(x, top + 7);
+        spectrumCtx.stroke();
+      }
+      spectrumCtx.restore();
+
+      spectrumCtx.fillStyle = "rgba(255,255,255,0.45)";
+      spectrumCtx.font = "10px system-ui, sans-serif";
+      spectrumCtx.textAlign = "center";
+      for (let i = 0; i <= 4; i++) {
+        const frequency = (i / 4) * maxFrequency;
+        const x = left + (i / 4) * plotWidth;
+        spectrumCtx.fillText(formatFrequency(frequency), x, height - 8);
+      }
+    }
+
+    function updateOutputs() {
+      readPlateControls();
+      frequencyOutput.value = formatFrequency(Number(frequencySlider.value));
+      strengthOutput.value = `${Math.round(Number(strengthSlider.value) * 100)}%`;
+      widthOutput.value = `${plateWidth.toFixed(2)} m`;
+      aspectOutput.value = aspectRatio.toFixed(2);
+      thicknessOutput.value = `${(plateThickness * 1000).toFixed(1)} mm`;
+      dampingOutput.value = `${(100 * dampingRatio).toFixed(1)}%`;
+      mobilityOutput.value = `${sandMobility.toFixed(2)}×`;
+      heightOutput.textContent = `${plateHeight.toFixed(2)} m`;
+      rigidityOutput.textContent = formatRigidity(flexuralRigidity());
+      modeCountOutput.textContent = String(plateModes.length);
+      driveXOutput.value = driveX.toFixed(2);
+      driveYOutput.value = driveY.toFixed(2);
+
+      const nearest = nearestModeTo(Number(frequencySlider.value));
+      nearestModeOutput.textContent = nearest
+        ? `(${nearest.mode.m},${nearest.mode.n}) · ${formatFrequency(nearest.mode.frequency)}`
+        : "—";
+
+      excitationReadout.textContent =
+        sourceMode === "tone" ? "Pure tone" :
+        sourceMode === "record" ? "Recorded voice" : "Uploaded audio";
+
+      const strongest = strongestModes(1)[0];
+      modeReadout.textContent = strongest && strongest.weight > 0.01
+        ? `(${strongest.mode.m},${strongest.mode.n}) · ${formatFrequency(strongest.mode.frequency)}`
+        : "—";
+
+      if (sourceMode === "tone" && nearest) {
+        const relativeDifference = nearest.difference / Math.max(nearest.mode.frequency, 1);
+        resonanceReadout.textContent =
+          relativeDifference < 0.005 ? "Very strong" :
+          relativeDifference < 0.02 ? "Strong" :
+          relativeDifference < 0.06 ? "Nearby" : "Off resonance";
+      } else if (strongest && strongest.weight > 0.01) {
+        resonanceReadout.textContent = strongest.weight > 0.70 ? "Strong" : "Mixed";
+      } else {
+        resonanceReadout.textContent = "—";
+      }
+    }
+
+    function setSourceMode(nextMode: SourceMode) {
+      sourceMode = nextMode;
+      fieldDirty = true;
+      stopAudioPlayback();
+
+      for (const tab of sourceTabs) {
+        const active = tab.dataset.sourceTab === nextMode;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+      }
+
+      for (const panel of sourcePanels) {
+        panel.hidden = panel.dataset.sourcePanel !== nextMode;
+      }
+
+      if (nextMode === "tone") {
+        audioState.hidden = true;
+        sourceNote.textContent = "Pure-tone mode continuously drives the plate. Sweep slowly through resonances and watch the sand reorganise.";
+      } else {
+        audioState.hidden = !audioBuffer;
+        sourceNote.textContent = nextMode === "record"
+          ? "Hold the button to record. Microphone permission and HTTPS/localhost are required. On release, the clip is analysed first; then Play on plate replays the original audio in synchrony with the calculated modal response."
+          : "Choose an audio file. The first 20 seconds are analysed if the file is longer, while playback uses the analysed section.";
+      }
+
+      updateOutputs();
+      drawSpectrum();
+    }
+
+    async function decodeAudioArrayBuffer(arrayBuffer: ArrayBuffer) {
+      const context = ensureAudioContext();
+      if (!context) throw new Error("Web Audio is not supported in this browser.");
+      const copy = arrayBuffer.slice(0);
+      return await context.decodeAudioData(copy);
+    }
+
+    function monoSamples(buffer: AudioBuffer, durationLimit: number) {
+      const sampleCount = Math.min(
+        buffer.length,
+        Math.floor(durationLimit * buffer.sampleRate)
+      );
+      const mono = new Float32Array(sampleCount);
+
+      for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+        const source = buffer.getChannelData(channel);
+        for (let i = 0; i < sampleCount; i++) mono[i] += source[i] / buffer.numberOfChannels;
+      }
+      return mono;
+    }
+
+    function resampleLinear(samples: Float32Array, sourceRate: number, targetRate: number) {
+      if (sourceRate <= targetRate * 1.02) {
+        return { samples: samples.slice(), sampleRate: sourceRate };
+      }
+
+      const targetLength = Math.max(1, Math.floor(samples.length * targetRate / sourceRate));
+      const result = new Float32Array(targetLength);
+      const ratio = sourceRate / targetRate;
+
+      for (let i = 0; i < targetLength; i++) {
+        const position = i * ratio;
+        const i0 = Math.floor(position);
+        const i1 = Math.min(i0 + 1, samples.length - 1);
+        const blend = position - i0;
+        result[i] = samples[i0] * (1 - blend) + samples[i1] * blend;
+      }
+
+      return { samples: result, sampleRate: targetRate };
+    }
+
+    function computeOverviewSpectrum(samples: Float32Array, sampleRate: number) {
+      const bins = 320;
+      const maxFrequency = Math.min(maxModeFrequency, 0.48 * sampleRate);
+      const output = new Float32Array(bins);
+      if (samples.length < 4) return { spectrum: output, maxFrequency };
+
+      const segmentCount = Math.min(10, Math.max(1, Math.floor(samples.length / 4096)));
+      const segmentLength = Math.min(2048, Math.max(256, 2 ** Math.floor(Math.log2(samples.length / segmentCount))));
+
+      for (let segment = 0; segment < segmentCount; segment++) {
+        const centre = Math.floor((segment + 0.5) / segmentCount * samples.length);
+        const start = clamp(Math.floor(centre - segmentLength / 2), 0, Math.max(0, samples.length - segmentLength));
+
+        for (let bin = 0; bin < bins; bin++) {
+          const frequency = (bin / Math.max(bins - 1, 1)) * maxFrequency;
+          if (frequency < 1) continue;
+          const omega = 2 * Math.PI * frequency / sampleRate;
+          const coefficient = 2 * Math.cos(omega);
+          let s0 = 0;
+          let s1 = 0;
+          let s2 = 0;
+
+          for (let n = 0; n < segmentLength; n++) {
+            const window = 0.5 - 0.5 * Math.cos(2 * Math.PI * n / Math.max(segmentLength - 1, 1));
+            s0 = samples[start + n] * window + coefficient * s1 - s2;
+            s2 = s1;
+            s1 = s0;
+          }
+
+          const power = Math.max(0, s1 * s1 + s2 * s2 - coefficient * s1 * s2);
+          output[bin] += Math.sqrt(power) / segmentLength;
+        }
+      }
+
+      let peak = 1e-12;
+      for (let i = 0; i < output.length; i++) peak = Math.max(peak, output[i]);
+      for (let i = 0; i < output.length; i++) {
+        output[i] = Math.pow(output[i] / peak, 0.45);
+      }
+
+      return { spectrum: output, maxFrequency };
+    }
+
+    function analyseResonatorBank(samples: Float32Array, sampleRate: number) {
+      const frameStep = Math.max(1, Math.round(sampleRate / analysisFrameRate));
+      const frameCount = Math.max(1, Math.ceil(samples.length / frameStep));
+      const frames = Array.from({ length: frameCount }, () => new Float32Array(plateModes.length));
+
+      const q1 = new Float64Array(plateModes.length);
+      const q2 = new Float64Array(plateModes.length);
+      const envelope = new Float64Array(plateModes.length);
+      const a1 = new Float64Array(plateModes.length);
+      const a2 = new Float64Array(plateModes.length);
+      const gain = new Float64Array(plateModes.length);
+
+      for (let i = 0; i < plateModes.length; i++) {
+        const mode = plateModes[i];
+        const theta = mode.omega / sampleRate;
+        const radius = Math.exp(-dampingRatio * mode.omega / sampleRate);
+        a1[i] = 2 * radius * Math.cos(theta);
+        a2[i] = -radius * radius;
+        gain[i] = (1 - radius) * Math.abs(mode.coupling);
+      }
+
+      let frameIndex = 0;
+      for (let sampleIndex = 0; sampleIndex < samples.length; sampleIndex++) {
+        const input = samples[sampleIndex];
+
+        for (let modeIndex = 0; modeIndex < plateModes.length; modeIndex++) {
+          const q =
+            a1[modeIndex] * q1[modeIndex] +
+            a2[modeIndex] * q2[modeIndex] +
+            gain[modeIndex] * input;
+
+          q2[modeIndex] = q1[modeIndex];
+          q1[modeIndex] = q;
+
+          const energy = q * q;
+          envelope[modeIndex] = 0.9965 * envelope[modeIndex] + 0.0035 * energy;
+        }
+
+        if (sampleIndex % frameStep === 0 || sampleIndex === samples.length - 1) {
+          const frame = frames[Math.min(frameIndex, frames.length - 1)];
+          for (let modeIndex = 0; modeIndex < plateModes.length; modeIndex++) {
+            frame[modeIndex] = Math.sqrt(Math.max(envelope[modeIndex], 0));
+          }
+          frameIndex++;
+        }
+      }
+
+      // Use one global reference for the whole recording. This preserves the
+      // real quiet/loud envelope: a whisper or pause should not be normalised
+      // to the same plate motion as the loudest sustained vowel.
+      let globalPeak = 1e-12;
+      for (const frame of frames) {
+        for (let i = 0; i < frame.length; i++) globalPeak = Math.max(globalPeak, frame[i]);
+      }
+      for (const frame of frames) {
+        for (let i = 0; i < frame.length; i++) {
+          frame[i] = Math.pow(clamp(frame[i] / globalPeak, 0, 1), 0.62);
+        }
+      }
+
+      return frames;
+    }
+
+    function scheduleReanalysis(delay = 180) {
+      window.clearTimeout(analysisDebounceTimer);
+      if (!audioBuffer || sourceMode === "tone") return;
+
+      stopAudioPlayback();
+      analysisStatus.textContent = "Updating modal response…";
+      playAudioButton.disabled = true;
+
+      analysisDebounceTimer = window.setTimeout(() => {
+        if (audioBuffer && sourceMode !== "tone") void analyseLoadedAudio();
+      }, delay);
+    }
+
+    async function analyseLoadedAudio() {
+      if (!audioBuffer) return;
+      const generation = ++analysisGeneration;
+
+      analysisStatus.textContent = "Analysing…";
+      playAudioButton.disabled = true;
+      stopAudioButton.disabled = true;
+
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+
+      try {
+        const durationLimit = Math.min(audioBuffer.duration, maxUploadAnalysisSeconds);
+        const mono = monoSamples(audioBuffer, durationLimit);
+        const resampled = resampleLinear(mono, audioBuffer.sampleRate, analysisSampleRate);
+        const modalFrames = analyseResonatorBank(resampled.samples, resampled.sampleRate);
+        const overview = computeOverviewSpectrum(resampled.samples, resampled.sampleRate);
+
+        if (generation !== analysisGeneration) return;
+
+        audioAnalysis = {
+          frameRate: analysisFrameRate,
+          duration: durationLimit,
+          modalFrames,
+          spectrum: overview.spectrum,
+          spectrumMaxFrequency: overview.maxFrequency,
+          sourceName: audioName.textContent || "Audio"
+        };
+
+        analysisStatus.textContent = `${plateModes.length} modes ready`;
+        playAudioButton.disabled = false;
+        audioState.hidden = false;
+        drawSpectrum();
+      } catch (error) {
+        if (generation !== analysisGeneration) return;
+        console.error(error);
+        audioAnalysis = null;
+        analysisStatus.textContent = "Analysis failed";
+        playAudioButton.disabled = true;
+      }
+    }
+
+    async function loadAudioBuffer(buffer: AudioBuffer, name: string) {
+      stopAudioPlayback();
+      audioBuffer = buffer;
+      audioName.textContent = name;
+      audioDuration.textContent = formatDuration(Math.min(buffer.duration, maxUploadAnalysisSeconds));
+      audioState.hidden = false;
+      await analyseLoadedAudio();
+    }
+
+    function getAudioPlaybackTime() {
+      if (!audioPlaying || !audioContext) return audioPlaybackOffset;
+      return audioPlaybackOffset + (audioContext.currentTime - audioStartedAt);
+    }
+
+    function stopAudioPlayback(resetOffset = true) {
+      if (audioSource) {
+        try { audioSource.stop(); } catch { /* source may already be stopped */ }
+        audioSource.disconnect();
+        audioSource = null;
+      }
+      audioPlaying = false;
+      if (resetOffset) audioPlaybackOffset = 0;
+      stopAudioButton.disabled = true;
+      playAudioButton.textContent = "Play on plate";
+    }
+
+    async function playLoadedAudio() {
+      if (!audioBuffer || !audioAnalysis) return;
+      const context = ensureAudioContext();
+      if (!context) return;
+      if (context.state === "suspended") await context.resume();
+
+      stopAudioPlayback();
+      const source = context.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(context.destination);
+
+      const duration = Math.min(audioAnalysis.duration, audioBuffer.duration);
+      audioStartedAt = context.currentTime;
+      audioPlaybackOffset = 0;
+      audioSource = source;
+      audioPlaying = true;
+      stopAudioButton.disabled = false;
+      playAudioButton.textContent = "Restart";
+
+      source.onended = () => {
+        if (audioSource !== source) return;
+        audioSource = null;
+        audioPlaying = false;
+        audioPlaybackOffset = 0;
+        stopAudioButton.disabled = true;
+        playAudioButton.textContent = "Play on plate";
+      };
+
+      source.start(0, 0, duration);
+    }
+
+    function preferredRecordingMimeType() {
+      if (typeof MediaRecorder === "undefined") return "";
+      const candidates = [
+        "audio/webm;codecs=opus",
+        "audio/ogg;codecs=opus",
+        "audio/mp4",
+        "audio/webm"
+      ];
+      for (const mime of candidates) {
+        if (MediaRecorder.isTypeSupported(mime)) return mime;
+      }
+      return "";
+    }
+
+    async function startRecording() {
+      if (mediaRecorder?.state === "recording") return;
+      if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+        recordStatus.textContent = "Microphone recording is not supported in this browser.";
+        return;
+      }
+
+      try {
+        stopAudioPlayback();
+        recordingStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: false
+          }
+        });
+
+        // Permission prompts can outlive the user's press. If they released
+        // the button while the browser was asking, do not unexpectedly start
+        // an eight-second recording afterwards.
+        if (!recordingHoldActive) {
+          for (const track of recordingStream.getTracks()) track.stop();
+          recordingStream = null;
+          return;
+        }
+
+        const mimeType = preferredRecordingMimeType();
+        mediaRecorder = mimeType
+          ? new MediaRecorder(recordingStream, { mimeType })
+          : new MediaRecorder(recordingStream);
+
+        recordingChunks = [];
+        mediaRecorder.addEventListener("dataavailable", event => {
+          if (event.data.size > 0) recordingChunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", async () => {
+          window.clearInterval(recordingTimer);
+          window.clearTimeout(recordingStopTimer);
+          recordButton.classList.remove("recording");
+          recordLabel.textContent = "Hold to record";
+
+          for (const track of recordingStream?.getTracks() || []) track.stop();
+          recordingStream = null;
+
+          const type = mediaRecorder?.mimeType || recordingChunks[0]?.type || "audio/webm";
+          const blob = new Blob(recordingChunks, { type });
+          if (blob.size === 0) {
+            recordStatus.textContent = "No audio was captured. Try again.";
+            return;
+          }
+
+          recordStatus.textContent = "Decoding recording…";
+          try {
+            const buffer = await decodeAudioArrayBuffer(await blob.arrayBuffer());
+            recordStatus.textContent = "Recording ready.";
+            await loadAudioBuffer(buffer, "Voice recording");
+          } catch (error) {
+            console.error(error);
+            recordStatus.textContent = "This browser could not decode its recording. Try WAV/MP3 upload instead.";
+          }
+        }, { once: true });
+
+        recordingStartedAt = performance.now();
+        recordButton.classList.add("recording");
+        recordLabel.textContent = "Recording… release to stop";
+        recordStatus.textContent = "Speak, sing or hum into the microphone.";
+        recordTime.textContent = "0.0 s";
+
+        recordingTimer = window.setInterval(() => {
+          const elapsed = Math.min(maxRecordedSeconds, (performance.now() - recordingStartedAt) / 1000);
+          recordTime.textContent = `${elapsed.toFixed(1)} s`;
+        }, 50);
+
+        recordingStopTimer = window.setTimeout(() => stopRecording(), maxRecordedSeconds * 1000);
+        mediaRecorder.start(100);
+      } catch (error) {
+        console.error(error);
+        recordStatus.textContent = "Microphone permission was denied or unavailable.";
+        recordButton.classList.remove("recording");
+        recordLabel.textContent = "Hold to record";
+      }
+    }
+
+    function stopRecording() {
+      if (!mediaRecorder || mediaRecorder.state !== "recording") return;
+      try { mediaRecorder.stop(); } catch { /* ignored */ }
+    }
+
+    function updateDriverFromPointer(event: PointerEvent) {
+      const bounds = plateCanvas.getBoundingClientRect();
+      const plate = screenToPlate(event.clientX - bounds.left, event.clientY - bounds.top);
+      driveXSlider.value = plate.x.toFixed(2);
+      driveYSlider.value = plate.y.toFixed(2);
+      updateModeCouplings();
+      updateOutputs();
+    }
+
+    function resizeCanvas(
+      canvas: HTMLCanvasElement,
+      context: CanvasRenderingContext2D
+    ) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(1, Math.round(rect.width * dpr));
+      const height = Math.max(1, Math.round(rect.height * dpr));
+      if (canvas.width === width && canvas.height === height) return;
+      canvas.width = width;
+      canvas.height = height;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function resizeAll() {
+      resizeCanvas(plateCanvas, ctx);
+      resizeCanvas(spectrumCanvas, spectrumCtx);
+      drawSpectrum();
+    }
+
+    function resetAll() {
+      stopAudioPlayback();
+      sourceMode = "tone";
+      frequencySlider.value = "1000";
+      strengthSlider.value = "0.65";
+      materialSelect.value = "steel";
+      widthSlider.value = "0.25";
+      aspectSlider.value = "1.00";
+      thicknessSlider.value = "2.0";
+      dampingSlider.value = "0.008";
+      mobilitySlider.value = "2.50";
+      driveXSlider.value = "0.50";
+      driveYSlider.value = "0.50";
+      fieldToggle.checked = true;
+      nodesToggle.checked = false;
+      uploadInput.value = "";
+      audioBuffer = null;
+      audioAnalysis = null;
+      audioState.hidden = true;
+      audioName.textContent = "—";
+      audioDuration.textContent = "—";
+      analysisStatus.textContent = "—";
+      recordTime.textContent = "0.0 s";
+      recordStatus.textContent = "Up to 8 seconds · processed locally in your browser";
+      running = true;
+      pauseButton.textContent = "Pause";
+      setSourceMode("tone");
+      rebuildModes();
+      seedSand();
+    }
+
+    for (const tab of sourceTabs) {
+      tab.addEventListener("click", () => {
+        const mode = tab.dataset.sourceTab as SourceMode;
+        setSourceMode(mode);
+      });
+    }
+
+    frequencySlider.addEventListener("input", () => {
+      fieldDirty = true;
+      sandForceDirty = true;
+      updateOutputs();
+      drawSpectrum();
+    });
+    strengthSlider.addEventListener("input", () => {
+      fieldDirty = true;
+      sandForceDirty = true;
+      updateOutputs();
+    });
+
+    for (const input of [widthSlider, aspectSlider, thicknessSlider, dampingSlider]) {
+      input.addEventListener("input", () => rebuildModes());
+    }
+    materialSelect.addEventListener("change", () => rebuildModes());
+    mobilitySlider.addEventListener("input", updateOutputs);
+
+    for (const input of [driveXSlider, driveYSlider]) {
+      input.addEventListener("input", () => {
+        updateModeCouplings();
+        updateOutputs();
+      });
+      input.addEventListener("change", () => scheduleReanalysis(0));
+    }
+
+    centerDriverButton.addEventListener("click", () => {
+      driveXSlider.value = "0.50";
+      driveYSlider.value = "0.50";
+      updateModeCouplings();
+      updateOutputs();
+      scheduleReanalysis(0);
+    });
+
+    fieldToggle.addEventListener("change", () => {
+      showField = fieldToggle.checked;
+      fieldDirty = true;
+    });
+    nodesToggle.addEventListener("change", () => {
+      showNodes = nodesToggle.checked;
+      fieldDirty = true;
+    });
+
+    uploadInput.addEventListener("change", async () => {
+      const file = uploadInput.files?.[0];
+      if (!file) return;
+
+      audioState.hidden = false;
+      audioName.textContent = file.name;
+      audioDuration.textContent = "—";
+      analysisStatus.textContent = "Decoding…";
+      playAudioButton.disabled = true;
+
+      try {
+        const buffer = await decodeAudioArrayBuffer(await file.arrayBuffer());
+        await loadAudioBuffer(buffer, file.name);
+      } catch (error) {
+        console.error(error);
+        audioBuffer = null;
+        audioAnalysis = null;
+        analysisStatus.textContent = "Unsupported audio format";
+        sourceNote.textContent = "This browser could not decode that file. WAV and MP3 are the most reliable cross-browser formats.";
+      }
+    });
+
+    playAudioButton.addEventListener("click", () => void playLoadedAudio());
+    stopAudioButton.addEventListener("click", () => stopAudioPlayback());
+
+    recordButton.addEventListener("pointerdown", event => {
+      if (event.button !== 0) return;
+      recordingPointerId = event.pointerId;
+      recordingHoldActive = true;
+      recordButton.setPointerCapture(event.pointerId);
+      void startRecording();
+    });
+
+    const finishPointerRecording = (event: PointerEvent) => {
+      if (recordingPointerId !== event.pointerId) return;
+      recordingPointerId = null;
+      recordingHoldActive = false;
+      stopRecording();
+      if (recordButton.hasPointerCapture(event.pointerId)) {
+        recordButton.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    recordButton.addEventListener("pointerup", finishPointerRecording);
+    recordButton.addEventListener("pointercancel", finishPointerRecording);
+    recordButton.addEventListener("keydown", event => {
+      if ((event.key === " " || event.key === "Enter") && !event.repeat) {
+        event.preventDefault();
+        recordingHoldActive = true;
+        void startRecording();
+      }
+    });
+    recordButton.addEventListener("keyup", event => {
+      if (event.key === " " || event.key === "Enter") {
+        event.preventDefault();
+        recordingHoldActive = false;
+        stopRecording();
+      }
+    });
+
+    plateCanvas.addEventListener("pointerdown", event => {
+      const bounds = plateCanvas.getBoundingClientRect();
+      const pointerX = event.clientX - bounds.left;
+      const pointerY = event.clientY - bounds.top;
+      const driver = plateToScreen(driveX, driveY);
+      if (Math.hypot(pointerX - driver.x, pointerY - driver.y) > 28) return;
+      draggingDriver = true;
+      plateCanvas.setPointerCapture(event.pointerId);
+      updateDriverFromPointer(event);
+    });
+
+    plateCanvas.addEventListener("pointermove", event => {
+      if (!draggingDriver) return;
+      updateDriverFromPointer(event);
+    });
+
+    const stopDriverDrag = (event: PointerEvent) => {
+      if (!draggingDriver) return;
+      draggingDriver = false;
+      if (plateCanvas.hasPointerCapture(event.pointerId)) plateCanvas.releasePointerCapture(event.pointerId);
+      scheduleReanalysis(0);
+    };
+
+    plateCanvas.addEventListener("pointerup", stopDriverDrag);
+    plateCanvas.addEventListener("pointercancel", stopDriverDrag);
+
+    pauseButton.addEventListener("click", () => {
+      running = !running;
+      pauseButton.textContent = running ? "Pause" : "Play";
+    });
+    resetSandButton.addEventListener("click", seedSand);
+    resetAllButton.addEventListener("click", resetAll);
+
+    if (typeof ResizeObserver !== "undefined") {
+      const resizeObserver = new ResizeObserver(resizeAll);
+      resizeObserver.observe(plateCanvas);
+      resizeObserver.observe(spectrumCanvas);
+    } else {
+      window.addEventListener("resize", resizeAll);
+    }
+
+    function animate(now: number) {
+      const rawDt = Math.max(0, (now - previousTime) / 1000);
+      previousTime = now;
+      const dt = Math.min(rawDt, 0.035);
+
+      if (running) {
+        simulationTime += dt;
+        uiAccumulator += dt;
+        updateModalWeights(dt);
+
+        sandPhysicsAccumulator += dt;
+        let sandIterations = 0;
+        while (sandPhysicsAccumulator >= sandPhysicsStep && sandIterations < 2) {
+          updateSand(sandPhysicsStep);
+          sandPhysicsAccumulator -= sandPhysicsStep;
+          sandIterations++;
+        }
+      }
+
+      if (audioPlaying && audioAnalysis && getAudioPlaybackTime() >= audioAnalysis.duration) {
+        stopAudioPlayback();
+      }
+
+      drawPlate();
+      if (uiAccumulator >= 0.10 || !running) {
+        updateModeBars();
+        updateOutputs();
+        uiAccumulator = 0;
+      }
+      requestAnimationFrame(animate);
+    }
+
+    readPlateControls();
+    resizeAll();
+    rebuildModes();
+    seedSand();
+    setSourceMode("tone");
+    requestAnimationFrame(animate);
+  }
+</script>
+
+<style>
+  .chladni-lab {
+    max-width: 950px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    background: #080c11;
+    color: #f5f7fa;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  .visual-wrap {
+    position: relative;
+    background: #080c11;
+  }
+
+  .plate-canvas {
+    display: block;
+    width: 100%;
+    height: 560px;
+    cursor: crosshair;
+    touch-action: pan-y;
+  }
+
+  .visual-label {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    padding: 0.42rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    background: rgba(3, 7, 11, 0.58);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.72rem;
+    pointer-events: none;
+  }
+
+  .plate-readout {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    display: grid;
+    gap: 0.28rem;
+    width: min(280px, calc(100% - 32px));
+    padding: 0.68rem 0.76rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    background: rgba(3, 7, 11, 0.72);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .plate-readout > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.69rem;
+  }
+
+  .plate-readout span {
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  .plate-readout strong {
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 500;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+    padding: 1.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, #0d131a, #090d12);
+  }
+
+  .section-title {
+    color: #798692;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .source-section,
+  .plate-section,
+  .driver-section,
+  .analysis-section {
+    min-width: 0;
+  }
+
+  .source-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+    margin-top: 0.65rem;
+  }
+
+  .source-tab {
+    min-height: 40px;
+  }
+
+  .source-tab.active {
+    border-color: rgba(101, 199, 255, 0.48);
+    background: rgba(101, 199, 255, 0.10);
+    color: #d8f2ff;
+  }
+
+  .source-panel {
+    margin-top: 0.9rem;
+  }
+
+  .control-row {
+    display: grid;
+    grid-template-columns: 175px 120px 1fr;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.55rem 0;
+  }
+
+  .control-row.compact {
+    grid-template-columns: 175px 100px 1fr;
+  }
+
+  .control-row > span,
+  .select-row > span {
+    color: #a1abb5;
+    font-size: 0.8rem;
+  }
+
+  output {
+    color: #9ca9b5;
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  select {
+    min-height: 38px;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    background: #0c131b;
+    color: #d5dee7;
+  }
+
+  .record-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) 1fr;
+    gap: 0.8rem;
+    align-items: stretch;
+  }
+
+  .record-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    min-height: 58px;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .record-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #e46b6b;
+  }
+
+  .record-button.recording {
+    border-color: rgba(228, 107, 107, 0.62);
+    background: rgba(228, 107, 107, 0.10);
+  }
+
+  .record-button.recording .record-dot {
+    transform: scale(1.25);
+  }
+
+  .record-status {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.68rem 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .record-status strong {
+    color: #d5dee7;
+    font-size: 0.86rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .record-status span {
+    color: #71808d;
+    font-size: 0.73rem;
+  }
+
+  .upload-box {
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    padding: 1rem;
+    border: 1px dashed rgba(255, 255, 255, 0.17);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+  }
+
+  .upload-box input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-title {
+    color: #cbd6df;
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+
+  .upload-copy,
+  .source-note,
+  .driver-heading p,
+  .analysis-subtitle {
+    color: #6e7b87;
+    font-size: 0.73rem;
+    line-height: 1.5;
+  }
+
+  .source-note {
+    margin: 0.75rem 0 0;
+  }
+
+  .audio-state {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.8rem;
+    align-items: center;
+    margin-top: 0.85rem;
+    padding: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.022);
+  }
+
+  .audio-meta {
+    display: grid;
+    grid-template-columns: 1.4fr 0.7fr 0.9fr;
+    gap: 0.65rem;
+  }
+
+  .audio-meta > div {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .audio-meta span {
+    color: #71808d;
+    font-size: 0.67rem;
+  }
+
+  .audio-meta strong {
+    overflow: hidden;
+    color: #d5dee7;
+    font-size: 0.76rem;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .audio-actions,
+  .buttons,
+  .visual-toggles {
+    display: flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+  }
+
+  .plate-section,
+  .driver-section,
+  .analysis-section {
+    padding-top: 0.95rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+  }
+
+  .control-grid {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: 0.55rem;
+  }
+
+  .select-row {
+    display: grid;
+    grid-template-columns: 175px minmax(180px, 260px);
+    align-items: center;
+    gap: 1rem;
+    margin: 0.55rem 0;
+  }
+
+  .derived-values {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin-top: 0.8rem;
+  }
+
+  .derived-values > div {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.025);
+    color: #7f8b96;
+    font-size: 0.72rem;
+  }
+
+  .derived-values strong {
+    color: #d4dee7;
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .driver-heading,
+  .analysis-heading,
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .driver-heading p {
+    margin: 0.25rem 0 0;
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #a1abb5;
+    font-size: 0.76rem;
+    cursor: pointer;
+  }
+
+  .toggle input {
+    width: 15px;
+    height: 15px;
+    accent-color: #65c7ff;
+  }
+
+  .mode-bars {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .mode-bar-row {
+    display: grid;
+    grid-template-columns: 145px 1fr 44px;
+    gap: 0.65rem;
+    align-items: center;
+    font-size: 0.72rem;
+  }
+
+  .mode-bar-row span {
+    color: #8d99a5;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mode-bar-row strong {
+    color: #b9c5cf;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .mode-bar-track {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.055);
+  }
+
+  .mode-bar-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgba(101,199,255,0.52), rgba(101,199,255,0.92));
+  }
+
+  .spectrum-canvas {
+    display: block;
+    width: 100%;
+    height: 165px;
+    margin-top: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 9px;
+    background: #090e14;
+  }
+
+  .model-details {
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .model-details summary {
+    padding: 0.72rem 0.9rem;
+    cursor: pointer;
+    color: #9ca7b2;
+    font-size: 0.8rem;
+    user-select: none;
+  }
+
+  .model-details summary:hover {
+    color: #d7dee6;
+  }
+
+  .model-content {
+    padding: 0 0.9rem 0.9rem;
+    color: #8d99a4;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .model-content p {
+    margin: 0.3rem 0 0.7rem;
+  }
+
+  .model-content ul {
+    padding-left: 1.2rem;
+  }
+
+  .equation {
+    margin: 0.45rem 0;
+    padding: 0.55rem 0.7rem;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #c7d1db;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .model-info {
+    color: #7f8b96;
+    font-size: 0.79rem;
+  }
+
+  .model-info strong {
+    color: #adb8c2;
+    font-weight: 500;
+  }
+
+  button {
+    min-height: 38px;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.055);
+    color: rgba(255, 255, 255, 0.86);
+    cursor: pointer;
+  }
+
+  button:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  button:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid rgba(101, 199, 255, 0.8);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 800px) {
+    .plate-canvas {
+      height: 480px;
+    }
+
+    .control-row,
+    .control-row.compact {
+      grid-template-columns: 1fr auto;
+    }
+
+    .control-row input[type="range"] {
+      grid-column: 1 / -1;
+    }
+
+    .derived-values {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .record-grid,
+    .audio-state {
+      grid-template-columns: 1fr;
+    }
+
+    .audio-meta {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .plate-canvas {
+      height: 390px;
+    }
+
+    .visual-label {
+      display: none;
+    }
+
+    .controls {
+      padding: 1.05rem;
+    }
+
+    .source-tabs {
+      grid-template-columns: 1fr;
+    }
+
+    .select-row {
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+    }
+
+    .derived-values,
+    .audio-meta {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .driver-heading,
+    .analysis-heading,
+    .bottom-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .mode-bar-row {
+      grid-template-columns: 118px 1fr 36px;
+      gap: 0.45rem;
+    }
+
+    .plate-readout {
+      width: calc(100% - 24px);
+      left: 12px;
+      bottom: 10px;
+    }
+  }
+</style>

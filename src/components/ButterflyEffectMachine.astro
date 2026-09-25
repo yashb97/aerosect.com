@@ -1,0 +1,1715 @@
+<section class="butterfly-machine" data-butterfly-machine>
+  <div class="visual-wrap">
+    <canvas
+      data-chaos-canvas
+      aria-label="Two nearly identical chaotic simulations evolving and diverging over time"
+    ></canvas>
+
+    <div class="canvas-label">
+      Universe A and B begin almost indistinguishably close · divergence updates live
+    </div>
+
+    <div class="universe-key" aria-hidden="true">
+      <span class="key-item"><i class="swatch swatch-a"></i>Universe A</span>
+      <span class="key-item"><i class="swatch swatch-b"></i>Universe B</span>
+    </div>
+
+    <div class="difference-panel">
+      <div class="difference-kicker">State separation</div>
+      <strong data-difference-value>1.000 × 10⁻⁹</strong>
+      <div class="difference-meter" aria-hidden="true">
+        <div data-difference-meter></div>
+      </div>
+      <div class="difference-subline">
+        <span data-amplification-value>×1.00</span>
+        <span data-horizon-value>Predictability intact</span>
+      </div>
+    </div>
+
+    <div class="time-panel">
+      <span>Simulation time</span>
+      <strong data-time-value>0.00</strong>
+    </div>
+
+    <div class="divergence-panel">
+      <div class="divergence-header">
+        <span>Predictability decay</span>
+        <strong data-divergence-label>log₁₀ separation</strong>
+      </div>
+      <canvas
+        data-divergence-canvas
+        aria-label="History of the logarithm of separation between the two simulations"
+      ></canvas>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="system-control">
+      <div class="control-heading">
+        <span>Chaotic system</span>
+        <small data-system-description>
+          Lorenz equations: two trajectories start 10⁻⁹ apart in x and share every other parameter.
+        </small>
+      </div>
+
+      <div class="segmented system-segmented" role="group" aria-label="Chaotic system">
+        <button class="system-button" type="button" data-system="pendulum" aria-pressed="false">
+          Double pendulum
+        </button>
+        <button class="system-button is-active" type="button" data-system="lorenz" aria-pressed="true">
+          Lorenz attractor
+        </button>
+        <button class="system-button" type="button" data-system="threebody" aria-pressed="false">
+          Three-body
+        </button>
+        <button class="system-button" type="button" data-system="logistic" aria-pressed="false">
+          Logistic map
+        </button>
+      </div>
+
+      <div class="initial-pair" aria-label="Initial conditions in the two universes">
+        <div>
+          <span><i class="swatch swatch-a"></i>Universe A</span>
+          <strong data-initial-a>x₀ = 1.000000000000</strong>
+        </div>
+        <div>
+          <span><i class="swatch swatch-b"></i>Universe B</span>
+          <strong data-initial-b>x₀ = 1.000000001000</strong>
+        </div>
+      </div>
+    </div>
+
+    <label class="control-row">
+      <span>Initial perturbation ε</span>
+      <output data-epsilon-output>1 × 10⁻⁹</output>
+      <input data-epsilon type="range" min="-12" max="-3" step="1" value="-9" />
+    </label>
+
+    <label class="control-row">
+      <span>Simulation speed</span>
+      <output data-speed-output>2.00×</output>
+      <input data-speed type="range" min="0.20" max="3.00" step="0.05" value="2.00" />
+    </label>
+
+    <label class="control-row" data-chaos-control>
+      <span data-chaos-label>Rayleigh parameter ρ</span>
+      <output data-chaos-output>28.0</output>
+      <input data-chaos type="range" min="18" max="40" step="0.1" value="28" />
+    </label>
+
+    <div class="derived-values">
+      <div>
+        <span>Initial separation</span>
+        <strong data-initial-output>1.000 × 10⁻⁹</strong>
+      </div>
+      <div>
+        <span>Current amplification</span>
+        <strong data-amplification-output>1.00×</strong>
+      </div>
+      <div>
+        <span>Predictability horizon</span>
+        <strong data-horizon-output>Not crossed</strong>
+      </div>
+    </div>
+
+    <div class="visual-controls">
+      <div class="visual-title">Visual layers</div>
+      <div class="toggle-grid">
+        <label class="toggle">
+          <input data-trail-toggle type="checkbox" checked />
+          <span>Trajectory trails</span>
+        </label>
+        <label class="toggle">
+          <input data-grid-toggle type="checkbox" checked />
+          <span>Reference grid</span>
+        </label>
+        <label class="toggle">
+          <input data-log-toggle type="checkbox" checked />
+          <span>Log separation graph</span>
+        </label>
+      </div>
+    </div>
+
+    <details class="model-details">
+      <summary>Model assumptions & equations</summary>
+      <div class="model-content">
+        <p>
+          Each option advances two simulations with identical numerical methods and parameters.
+          Only one initial state coordinate differs by ε. The displayed separation is the Euclidean
+          distance between the two full system states, normalised where necessary so that the four
+          models can use one common divergence display.
+        </p>
+
+        <div class="equation">
+          Universe A: x₀ = x* &nbsp;&nbsp; · &nbsp;&nbsp; Universe B: x₀ = x* + ε
+        </div>
+
+        <div class="equation">
+          Δ(t) = ‖Xᴮ(t) − Xᴬ(t)‖ &nbsp;&nbsp; · &nbsp;&nbsp; A(t) = Δ(t) / Δ(0)
+        </div>
+
+        <div class="equation">
+          Lorenz: ẋ = σ(y − x), &nbsp; ẏ = x(ρ − z) − y, &nbsp; ż = xy − βz
+        </div>
+
+        <div class="equation">
+          Logistic map: xₙ₊₁ = r xₙ(1 − xₙ)
+        </div>
+
+        <p>
+          The double pendulum uses the standard coupled nonlinear equations for two equal point
+          masses and equal rod lengths. The three-body option integrates a softened planar Newtonian
+          gravitational system with three equal masses. Continuous systems use fourth-order
+          Runge–Kutta integration; the logistic map is iterated exactly.
+        </p>
+
+        <ul>
+          <li>The default perturbation is ε = 10⁻⁹.</li>
+          <li>Both universes are stepped with exactly the same timestep and algorithm.</li>
+          <li>The predictability horizon is the first time normalised separation exceeds 0.25.</li>
+          <li>Three-body gravitational softening prevents numerical singularities during close encounters.</li>
+          <li>Trail length is finite for display performance; it does not alter the state evolution.</li>
+          <li>Changing ε or the system parameter restarts both universes from the same baseline state.</li>
+        </ul>
+
+        <p class="model-note">
+          Exponential-looking divergence is characteristic of sensitive dependence on initial
+          conditions, but the instantaneous slope of this graph is not presented as a formal
+          Lyapunov-exponent estimate. The point of the machine is operational: how long can two
+          almost identical initial states remain predictively interchangeable?
+        </p>
+      </div>
+    </details>
+
+    <div class="bottom-row">
+      <div class="model-info">
+        <strong>Experiment:</strong>
+        identical dynamics · one microscopic perturbation · watch forecast agreement disappear
+      </div>
+      <div class="buttons">
+        <button data-pause type="button">Pause</button>
+        <button data-reset type="button">Restart divergence</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const machines =
+    document.querySelectorAll<HTMLElement>("[data-butterfly-machine]");
+
+  for (const root of machines) {
+    const chaosCanvas =
+      root.querySelector<HTMLCanvasElement>("[data-chaos-canvas]")!;
+    const divergenceCanvas =
+      root.querySelector<HTMLCanvasElement>("[data-divergence-canvas]")!;
+
+    const ctx = chaosCanvas.getContext("2d")!;
+    const divergenceCtx = divergenceCanvas.getContext("2d")!;
+
+    const epsilonSlider =
+      root.querySelector<HTMLInputElement>("[data-epsilon]")!;
+    const speedSlider =
+      root.querySelector<HTMLInputElement>("[data-speed]")!;
+    const chaosSlider =
+      root.querySelector<HTMLInputElement>("[data-chaos]")!;
+
+    const epsilonOutput =
+      root.querySelector<HTMLOutputElement>("[data-epsilon-output]")!;
+    const speedOutput =
+      root.querySelector<HTMLOutputElement>("[data-speed-output]")!;
+    const chaosOutput =
+      root.querySelector<HTMLOutputElement>("[data-chaos-output]")!;
+
+    const chaosLabel =
+      root.querySelector<HTMLElement>("[data-chaos-label]")!;
+    const chaosControl =
+      root.querySelector<HTMLElement>("[data-chaos-control]")!;
+    const systemDescription =
+      root.querySelector<HTMLElement>("[data-system-description]")!;
+    const initialAValue =
+      root.querySelector<HTMLElement>("[data-initial-a]")!;
+    const initialBValue =
+      root.querySelector<HTMLElement>("[data-initial-b]")!;
+
+    const differenceValue =
+      root.querySelector<HTMLElement>("[data-difference-value]")!;
+    const differenceMeter =
+      root.querySelector<HTMLElement>("[data-difference-meter]")!;
+    const amplificationValue =
+      root.querySelector<HTMLElement>("[data-amplification-value]")!;
+    const horizonValue =
+      root.querySelector<HTMLElement>("[data-horizon-value]")!;
+    const timeValue =
+      root.querySelector<HTMLElement>("[data-time-value]")!;
+
+    const initialOutput =
+      root.querySelector<HTMLElement>("[data-initial-output]")!;
+    const amplificationOutput =
+      root.querySelector<HTMLElement>("[data-amplification-output]")!;
+    const horizonOutput =
+      root.querySelector<HTMLElement>("[data-horizon-output]")!;
+
+    const trailToggle =
+      root.querySelector<HTMLInputElement>("[data-trail-toggle]")!;
+    const gridToggle =
+      root.querySelector<HTMLInputElement>("[data-grid-toggle]")!;
+    const logToggle =
+      root.querySelector<HTMLInputElement>("[data-log-toggle]")!;
+
+    const pauseButton =
+      root.querySelector<HTMLButtonElement>("[data-pause]")!;
+    const resetButton =
+      root.querySelector<HTMLButtonElement>("[data-reset]")!;
+    const systemButtons =
+      root.querySelectorAll<HTMLButtonElement>("[data-system]");
+
+    if (
+      !chaosCanvas || !divergenceCanvas || !ctx || !divergenceCtx ||
+      !epsilonSlider || !speedSlider || !chaosSlider ||
+      !epsilonOutput || !speedOutput || !chaosOutput ||
+      !chaosLabel || !chaosControl || !systemDescription ||
+      !initialAValue || !initialBValue || !differenceValue || !differenceMeter || !amplificationValue ||
+      !horizonValue || !timeValue || !initialOutput ||
+      !amplificationOutput || !horizonOutput || !trailToggle ||
+      !gridToggle || !logToggle || !pauseButton || !resetButton ||
+      systemButtons.length === 0
+    ) {
+      continue;
+    }
+
+    type SystemType = "pendulum" | "lorenz" | "threebody" | "logistic";
+    type Point = { x: number; y: number };
+    type DivergenceSample = { t: number; value: number };
+
+    const TAU = Math.PI * 2;
+    const colourA = "rgba(101, 199, 255, 0.96)";
+    const colourATrail = "rgba(101, 199, 255, 0.34)";
+    const colourB = "rgba(255, 177, 92, 0.96)";
+    const colourBTrail = "rgba(255, 177, 92, 0.34)";
+
+    let system: SystemType = "lorenz";
+    let running = true;
+    let simTime = 0;
+    let horizonTime: number | null = null;
+    let previousFrame = performance.now();
+    let frameAccumulator = 0;
+    let logisticAccumulator = 0;
+
+    let epsilon = Math.pow(10, Number(epsilonSlider.value));
+    let speed = Number(speedSlider.value);
+
+    let stateA: number[] = [];
+    let stateB: number[] = [];
+    let initialSeparation = epsilon;
+    let currentSeparation = epsilon;
+    let normalizedSeparation = epsilon;
+
+    let trailA: Point[] = [];
+    let trailB: Point[] = [];
+    let divergenceHistory: DivergenceSample[] = [];
+
+    let logisticHistoryA: number[] = [];
+    let logisticHistoryB: number[] = [];
+    let logisticIteration = 0;
+
+    const maxTrail = 1800;
+    const maxDivergenceSamples = 900;
+    const horizonThreshold = 0.25;
+
+    function clamp(value: number, min: number, max: number) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function colourWithAlpha(colour: string, alpha: number) {
+      if (colour.startsWith("rgba(")) {
+        return colour.replace(/,\s*[0-9.]+\)$/, `, ${alpha})`);
+      }
+      if (colour.startsWith("rgb(")) {
+        return colour.replace(/\)$/, `, ${alpha})`).replace("rgb(", "rgba(");
+      }
+      return colour;
+    }
+
+    function scientific(value: number, digits = 3) {
+      if (!Number.isFinite(value)) return "—";
+      if (value === 0) return "0";
+
+      const exponent = Math.floor(Math.log10(Math.abs(value)));
+      const mantissa = value / Math.pow(10, exponent);
+      const superscriptMap: Record<string, string> = {
+        "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+        "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹"
+      };
+      const exponentText = String(exponent)
+        .split("")
+        .map(character => superscriptMap[character] ?? character)
+        .join("");
+
+      return `${mantissa.toFixed(digits)} × 10${exponentText}`;
+    }
+
+    function formatAmplification(value: number) {
+      if (!Number.isFinite(value)) return "—";
+      if (value < 1000) return `${value.toFixed(value < 10 ? 2 : 1)}×`;
+      return `${scientific(value, 2)}×`;
+    }
+
+    function stateDistance(a: number[], b: number[]) {
+      let sum = 0;
+      for (let i = 0; i < Math.min(a.length, b.length); i++) {
+        const d = b[i] - a[i];
+        sum += d * d;
+      }
+      return Math.sqrt(sum);
+    }
+
+    function wrapAngle(angle: number) {
+      let wrapped = angle % TAU;
+      if (wrapped > Math.PI) wrapped -= TAU;
+      if (wrapped < -Math.PI) wrapped += TAU;
+      return wrapped;
+    }
+
+    function angularDistance(a: number, b: number) {
+      return wrapAngle(b - a);
+    }
+
+    function currentRawSeparation() {
+      if (system === "pendulum") {
+        const differences = [
+          angularDistance(stateA[0], stateB[0]),
+          stateB[1] - stateA[1],
+          angularDistance(stateA[2], stateB[2]),
+          stateB[3] - stateA[3]
+        ];
+        return Math.hypot(...differences);
+      }
+
+      return stateDistance(stateA, stateB);
+    }
+
+    function normalisationScale() {
+      if (system === "lorenz") return 35;
+      if (system === "pendulum") return 2.5;
+      if (system === "threebody") return 4.0;
+      return 1.0;
+    }
+
+    function configurationPoint(state: number[], universe: "a" | "b"): Point {
+      if (system === "lorenz") {
+        return { x: state[0], y: state[2] };
+      }
+
+      if (system === "pendulum") {
+        const theta1 = state[0];
+        const theta2 = state[2];
+        const x1 = Math.sin(theta1);
+        const y1 = Math.cos(theta1);
+        return {
+          x: x1 + Math.sin(theta2),
+          y: y1 + Math.cos(theta2)
+        };
+      }
+
+      if (system === "threebody") {
+        const offset = universe === "a" ? 0 : 0;
+        return { x: state[0] + offset, y: state[1] };
+      }
+
+      return {
+        x: logisticIteration,
+        y: state[0]
+      };
+    }
+
+    function lorenzDerivative(state: number[]) {
+      const sigma = 10;
+      const rho = Number(chaosSlider.value);
+      const beta = 8 / 3;
+      const [x, y, z] = state;
+      return [
+        sigma * (y - x),
+        x * (rho - z) - y,
+        x * y - beta * z
+      ];
+    }
+
+    function pendulumDerivative(state: number[]) {
+      const g = 9.81;
+      const l1 = 1;
+      const l2 = 1;
+      const m1 = 1;
+      const m2 = 1;
+      const [theta1, omega1, theta2, omega2] = state;
+      const delta = theta1 - theta2;
+      const denominator = 2 * m1 + m2 - m2 * Math.cos(2 * delta);
+
+      const alpha1 = (
+        -g * (2 * m1 + m2) * Math.sin(theta1)
+        -m2 * g * Math.sin(theta1 - 2 * theta2)
+        -2 * Math.sin(delta) * m2 * (
+          omega2 * omega2 * l2 +
+          omega1 * omega1 * l1 * Math.cos(delta)
+        )
+      ) / (l1 * denominator);
+
+      const alpha2 = (
+        2 * Math.sin(delta) * (
+          omega1 * omega1 * l1 * (m1 + m2) +
+          g * (m1 + m2) * Math.cos(theta1) +
+          omega2 * omega2 * l2 * m2 * Math.cos(delta)
+        )
+      ) / (l2 * denominator);
+
+      return [omega1, alpha1, omega2, alpha2];
+    }
+
+    function threeBodyDerivative(state: number[]) {
+      const derivative = new Array<number>(12).fill(0);
+      const gravity = Number(chaosSlider.value);
+      const softening2 = 0.055 * 0.055;
+
+      for (let body = 0; body < 3; body++) {
+        const index = body * 4;
+        derivative[index] = state[index + 2];
+        derivative[index + 1] = state[index + 3];
+      }
+
+      for (let i = 0; i < 3; i++) {
+        const ii = i * 4;
+        let ax = 0;
+        let ay = 0;
+
+        for (let j = 0; j < 3; j++) {
+          if (i === j) continue;
+          const jj = j * 4;
+          const dx = state[jj] - state[ii];
+          const dy = state[jj + 1] - state[ii + 1];
+          const r2 = dx * dx + dy * dy + softening2;
+          const invR3 = 1 / Math.pow(r2, 1.5);
+          ax += gravity * dx * invR3;
+          ay += gravity * dy * invR3;
+        }
+
+        derivative[ii + 2] = ax;
+        derivative[ii + 3] = ay;
+      }
+
+      return derivative;
+    }
+
+    function addScaled(base: number[], delta: number[], scale: number) {
+      return base.map((value, index) => value + delta[index] * scale);
+    }
+
+    function rk4(state: number[], dt: number, derivative: (state: number[]) => number[]) {
+      const k1 = derivative(state);
+      const k2 = derivative(addScaled(state, k1, dt * 0.5));
+      const k3 = derivative(addScaled(state, k2, dt * 0.5));
+      const k4 = derivative(addScaled(state, k3, dt));
+
+      return state.map((value, index) =>
+        value + dt / 6 * (k1[index] + 2 * k2[index] + 2 * k3[index] + k4[index])
+      );
+    }
+
+    function initialiseSystem() {
+      epsilon = Math.pow(10, Number(epsilonSlider.value));
+      simTime = 0;
+      horizonTime = null;
+      frameAccumulator = 0;
+      logisticAccumulator = 0;
+      logisticIteration = 0;
+      trailA = [];
+      trailB = [];
+      divergenceHistory = [];
+      logisticHistoryA = [];
+      logisticHistoryB = [];
+
+      if (system === "lorenz") {
+        stateA = [1, 1, 1];
+        stateB = [1 + epsilon, 1, 1];
+      } else if (system === "pendulum") {
+        stateA = [1.2, 0, 1.85, 0];
+        stateB = [1.2 + epsilon, 0, 1.85, 0];
+      } else if (system === "threebody") {
+        stateA = [
+           0.166, -0.113, -0.463,  0.387,
+          -0.093, -0.808,  0.571, -0.366,
+          -0.073,  0.921, -0.108, -0.021
+        ];
+        stateB = [...stateA];
+        stateB[0] += epsilon;
+      } else {
+        stateA = [0.237];
+        stateB = [0.237 + epsilon];
+        logisticHistoryA.push(stateA[0]);
+        logisticHistoryB.push(stateB[0]);
+      }
+
+      initialSeparation = Math.max(currentRawSeparation(), 1e-30);
+      currentSeparation = initialSeparation;
+      normalizedSeparation = currentSeparation / normalisationScale();
+
+      if (system !== "logistic") {
+        trailA.push(configurationPoint(stateA, "a"));
+        trailB.push(configurationPoint(stateB, "b"));
+      }
+
+      divergenceHistory.push({ t: 0, value: Math.max(normalizedSeparation, 1e-16) });
+      updateOutputs();
+    }
+
+    function appendContinuousTrail() {
+      trailA.push(configurationPoint(stateA, "a"));
+      trailB.push(configurationPoint(stateB, "b"));
+
+      if (trailA.length > maxTrail) trailA.splice(0, trailA.length - maxTrail);
+      if (trailB.length > maxTrail) trailB.splice(0, trailB.length - maxTrail);
+    }
+
+    function updateDivergence() {
+      currentSeparation = Math.max(currentRawSeparation(), 1e-30);
+      normalizedSeparation = currentSeparation / normalisationScale();
+
+      if (horizonTime === null && normalizedSeparation >= horizonThreshold) {
+        horizonTime = simTime;
+      }
+
+      const last = divergenceHistory[divergenceHistory.length - 1];
+      if (!last || simTime - last.t >= 0.045 || system === "logistic") {
+        divergenceHistory.push({
+          t: simTime,
+          value: Math.max(normalizedSeparation, 1e-16)
+        });
+        if (divergenceHistory.length > maxDivergenceSamples) {
+          divergenceHistory.shift();
+        }
+      }
+    }
+
+    function advanceContinuous(dt: number) {
+      const derivative = system === "lorenz"
+        ? lorenzDerivative
+        : system === "pendulum"
+          ? pendulumDerivative
+          : threeBodyDerivative;
+
+      const baseStep = system === "lorenz"
+        ? 0.0045
+        : system === "pendulum"
+          ? 0.0035
+          : 0.0025;
+
+      frameAccumulator += dt * speed;
+      let steps = 0;
+      const maxStepsPerFrame = 180;
+
+      while (frameAccumulator >= baseStep && steps < maxStepsPerFrame) {
+        stateA = rk4(stateA, baseStep, derivative);
+        stateB = rk4(stateB, baseStep, derivative);
+        simTime += baseStep;
+        frameAccumulator -= baseStep;
+        steps++;
+
+        if (steps % 2 === 0) appendContinuousTrail();
+        updateDivergence();
+      }
+
+      if (steps >= maxStepsPerFrame) frameAccumulator = 0;
+    }
+
+    function advanceLogistic(dt: number) {
+      const iterationsPerSecond = 8 * speed;
+      logisticAccumulator += dt * iterationsPerSecond;
+      const r = Number(chaosSlider.value);
+      let steps = 0;
+
+      while (logisticAccumulator >= 1 && steps < 80) {
+        stateA[0] = r * stateA[0] * (1 - stateA[0]);
+        stateB[0] = r * stateB[0] * (1 - stateB[0]);
+        logisticIteration += 1;
+        simTime = logisticIteration;
+        logisticAccumulator -= 1;
+        steps++;
+
+        logisticHistoryA.push(stateA[0]);
+        logisticHistoryB.push(stateB[0]);
+        if (logisticHistoryA.length > 220) logisticHistoryA.shift();
+        if (logisticHistoryB.length > 220) logisticHistoryB.shift();
+        updateDivergence();
+      }
+    }
+
+    function resizeCanvasToDisplaySize(
+      canvas: HTMLCanvasElement,
+      context: CanvasRenderingContext2D
+    ) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(1, Math.round(rect.width * dpr));
+      const height = Math.max(1, Math.round(rect.height * dpr));
+
+      if (canvas.width === width && canvas.height === height) return;
+
+      canvas.width = width;
+      canvas.height = height;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function resizeAll() {
+      resizeCanvasToDisplaySize(chaosCanvas, ctx);
+      resizeCanvasToDisplaySize(divergenceCanvas, divergenceCtx);
+    }
+
+    function drawBackground() {
+      const width = chaosCanvas.clientWidth;
+      const height = chaosCanvas.clientHeight;
+
+      ctx.clearRect(0, 0, width, height);
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, "#071019");
+      gradient.addColorStop(1, "#080c11");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      if (!gridToggle.checked) return;
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.042)";
+      ctx.lineWidth = 1;
+      const spacing = 42;
+      for (let x = spacing; x < width; x += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = spacing; y < height; y += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function worldToScreen(x: number, y: number, bounds: [number, number, number, number]) {
+      const width = chaosCanvas.clientWidth;
+      const height = chaosCanvas.clientHeight;
+      const [xmin, xmax, ymin, ymax] = bounds;
+      const px = (x - xmin) / (xmax - xmin) * width;
+      const py = height - (y - ymin) / (ymax - ymin) * height;
+      return { x: px, y: py };
+    }
+
+    function drawTrail(points: Point[], bounds: [number, number, number, number], colour: string) {
+      if (!trailToggle.checked || points.length < 2) return;
+
+      ctx.save();
+      ctx.strokeStyle = colour;
+      ctx.lineWidth = 1.25;
+      ctx.beginPath();
+
+      points.forEach((point, index) => {
+        const p = worldToScreen(point.x, point.y, bounds);
+        if (index === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      });
+
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPoint(x: number, y: number, radius: number, colour: string) {
+      ctx.save();
+      const halo = ctx.createRadialGradient(x, y, 0, x, y, radius * 3.6);
+      halo.addColorStop(0, colourWithAlpha(colour, 0.24));
+      halo.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 3.6, 0, TAU);
+      ctx.fill();
+
+      ctx.fillStyle = colour;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawLorenz() {
+      const bounds: [number, number, number, number] = [-22, 22, -2, 52];
+      drawTrail(trailA, bounds, colourATrail);
+      drawTrail(trailB, bounds, colourBTrail);
+
+      const a = worldToScreen(stateA[0], stateA[2], bounds);
+      const b = worldToScreen(stateB[0], stateB[2], bounds);
+      drawPoint(a.x, a.y, 4.4, colourA);
+      drawPoint(b.x, b.y, 4.4, colourB);
+
+      ctx.save();
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.36)";
+      ctx.fillText("projection: x–z phase space", 16, chaosCanvas.clientHeight - 18);
+      ctx.restore();
+    }
+
+    function pendulumCoordinates(state: number[]) {
+      const scale = Math.min(chaosCanvas.clientWidth, chaosCanvas.clientHeight) * 0.165;
+      const cx = chaosCanvas.clientWidth / 2;
+      const cy = chaosCanvas.clientHeight * 0.29;
+      const x1 = cx + Math.sin(state[0]) * scale;
+      const y1 = cy + Math.cos(state[0]) * scale;
+      const x2 = x1 + Math.sin(state[2]) * scale;
+      const y2 = y1 + Math.cos(state[2]) * scale;
+      return { cx, cy, x1, y1, x2, y2 };
+    }
+
+    function drawPendulumInstance(state: number[], colour: string, alpha: number) {
+      const p = pendulumCoordinates(state);
+      ctx.save();
+      ctx.strokeStyle = colour.replace("0.96", String(alpha));
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(p.cx, p.cy);
+      ctx.lineTo(p.x1, p.y1);
+      ctx.lineTo(p.x2, p.y2);
+      ctx.stroke();
+      drawPoint(p.x1, p.y1, 5.2, colour);
+      drawPoint(p.x2, p.y2, 6.1, colour);
+      ctx.restore();
+    }
+
+    function drawPendulumTrails() {
+      if (!trailToggle.checked) return;
+      const bounds: [number, number, number, number] = [-2.15, 2.15, -2.15, 2.15];
+      const mappedA = trailA.map(point => ({ x: point.x, y: -point.y }));
+      const mappedB = trailB.map(point => ({ x: point.x, y: -point.y }));
+
+      const width = chaosCanvas.clientWidth;
+      const height = chaosCanvas.clientHeight;
+      const scale = Math.min(width, height) * 0.165;
+      const cx = width / 2;
+      const cy = height * 0.29;
+
+      function localToScreen(point: Point) {
+        const nx = (point.x - bounds[0]) / (bounds[1] - bounds[0]) - 0.5;
+        const ny = (point.y - bounds[2]) / (bounds[3] - bounds[2]) - 0.5;
+        return { x: cx + nx * 4.3 * scale, y: cy + ny * 4.3 * scale };
+      }
+
+      for (const [points, colour] of [[mappedA, colourATrail], [mappedB, colourBTrail]] as const) {
+        if (points.length < 2) continue;
+        ctx.save();
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          const p = localToScreen(point);
+          if (index === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawPendulum() {
+      drawPendulumTrails();
+      const pivot = pendulumCoordinates(stateA);
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,0.48)";
+      ctx.beginPath();
+      ctx.arc(pivot.cx, pivot.cy, 3.2, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+
+      drawPendulumInstance(stateA, colourA, 0.72);
+      drawPendulumInstance(stateB, colourB, 0.72);
+    }
+
+    function threeBodyPositions(state: number[]) {
+      const positions: Point[] = [];
+      for (let body = 0; body < 3; body++) {
+        const index = body * 4;
+        positions.push({ x: state[index], y: state[index + 1] });
+      }
+      return positions;
+    }
+
+    function drawThreeBodyUniverse(state: number[], colours: string[], alpha = 1) {
+      const bounds: [number, number, number, number] = [-3.4, 3.4, -2.55, 2.55];
+      const positions = threeBodyPositions(state);
+      positions.forEach((position, index) => {
+        const p = worldToScreen(position.x, position.y, bounds);
+        drawPoint(p.x, p.y, index === 0 ? 5.5 : 4.7, colourWithAlpha(colours[index], alpha));
+      });
+    }
+
+    function drawThreeBody() {
+      const bounds: [number, number, number, number] = [-3.4, 3.4, -2.55, 2.55];
+      drawTrail(trailA, bounds, colourATrail);
+      drawTrail(trailB, bounds, colourBTrail);
+
+      drawThreeBodyUniverse(
+        stateA,
+        ["rgba(101,199,255,1)", "rgba(101,199,255,0.72)", "rgba(101,199,255,0.48)"],
+        1
+      );
+      drawThreeBodyUniverse(
+        stateB,
+        ["rgba(255,177,92,1)", "rgba(255,177,92,0.72)", "rgba(255,177,92,0.48)"],
+        1
+      );
+
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,0.34)";
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.fillText("trail follows body 1 · all three bodies remain fully integrated", 16, chaosCanvas.clientHeight - 18);
+      ctx.restore();
+    }
+
+    function drawLogistic() {
+      const width = chaosCanvas.clientWidth;
+      const height = chaosCanvas.clientHeight;
+      const left = 44;
+      const right = width - 18;
+      const top = 42;
+      const bottom = height - 42;
+      const usableWidth = right - left;
+      const usableHeight = bottom - top;
+      const count = Math.max(logisticHistoryA.length, 2);
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.14)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(left, top);
+      ctx.lineTo(left, bottom);
+      ctx.lineTo(right, bottom);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,0.38)";
+      ctx.font = "10px system-ui, sans-serif";
+      ctx.fillText("1", left - 16, top + 3);
+      ctx.fillText("0", left - 16, bottom + 3);
+      ctx.fillText("iteration n →", right - 68, bottom + 24);
+
+      function drawSeries(values: number[], colour: string) {
+        if (values.length < 2) return;
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        values.forEach((value, index) => {
+          const x = left + index / Math.max(1, count - 1) * usableWidth;
+          const y = bottom - value * usableHeight;
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
+
+      drawSeries(logisticHistoryA, colourATrail);
+      drawSeries(logisticHistoryB, colourBTrail);
+
+      const aY = bottom - stateA[0] * usableHeight;
+      const bY = bottom - stateB[0] * usableHeight;
+      drawPoint(right, aY, 4.4, colourA);
+      drawPoint(right, bY, 4.4, colourB);
+      ctx.restore();
+    }
+
+    function drawMainCanvas() {
+      drawBackground();
+      if (system === "lorenz") drawLorenz();
+      else if (system === "pendulum") drawPendulum();
+      else if (system === "threebody") drawThreeBody();
+      else drawLogistic();
+    }
+
+    function drawDivergenceGraph() {
+      const width = divergenceCanvas.clientWidth;
+      const height = divergenceCanvas.clientHeight;
+      divergenceCtx.clearRect(0, 0, width, height);
+
+      if (!logToggle.checked) {
+        divergenceCtx.save();
+        divergenceCtx.fillStyle = "rgba(255,255,255,0.32)";
+        divergenceCtx.font = "11px system-ui, sans-serif";
+        divergenceCtx.textAlign = "center";
+        divergenceCtx.fillText("Graph hidden", width / 2, height / 2);
+        divergenceCtx.restore();
+        return;
+      }
+
+      const padding = { left: 34, right: 10, top: 12, bottom: 23 };
+      const plotWidth = Math.max(1, width - padding.left - padding.right);
+      const plotHeight = Math.max(1, height - padding.top - padding.bottom);
+      const minLog = -13;
+      const maxLog = 0.5;
+      const minTime = divergenceHistory.length > 0 ? divergenceHistory[0].t : 0;
+      const maxTime = Math.max(simTime, minTime + (system === "logistic" ? 15 : 2));
+
+      divergenceCtx.save();
+      divergenceCtx.strokeStyle = "rgba(255,255,255,0.08)";
+      divergenceCtx.lineWidth = 1;
+
+      for (const logValue of [-12, -9, -6, -3, 0]) {
+        const y = padding.top + (maxLog - logValue) / (maxLog - minLog) * plotHeight;
+        divergenceCtx.beginPath();
+        divergenceCtx.moveTo(padding.left, y);
+        divergenceCtx.lineTo(width - padding.right, y);
+        divergenceCtx.stroke();
+        divergenceCtx.fillStyle = "rgba(255,255,255,0.30)";
+        divergenceCtx.font = "9px ui-monospace, monospace";
+        divergenceCtx.textAlign = "right";
+        divergenceCtx.fillText(String(logValue), padding.left - 6, y + 3);
+      }
+
+      const thresholdLog = Math.log10(horizonThreshold);
+      const thresholdY = padding.top + (maxLog - thresholdLog) / (maxLog - minLog) * plotHeight;
+      divergenceCtx.setLineDash([4, 4]);
+      divergenceCtx.strokeStyle = "rgba(255,177,92,0.30)";
+      divergenceCtx.beginPath();
+      divergenceCtx.moveTo(padding.left, thresholdY);
+      divergenceCtx.lineTo(width - padding.right, thresholdY);
+      divergenceCtx.stroke();
+      divergenceCtx.setLineDash([]);
+
+      if (divergenceHistory.length >= 2) {
+        divergenceCtx.beginPath();
+        divergenceHistory.forEach((sample, index) => {
+          const x = padding.left + (sample.t - minTime) / Math.max(1e-9, maxTime - minTime) * plotWidth;
+          const logValue = clamp(Math.log10(Math.max(sample.value, 1e-16)), minLog, maxLog);
+          const y = padding.top + (maxLog - logValue) / (maxLog - minLog) * plotHeight;
+          if (index === 0) divergenceCtx.moveTo(x, y);
+          else divergenceCtx.lineTo(x, y);
+        });
+        divergenceCtx.strokeStyle = "rgba(151,222,255,0.92)";
+        divergenceCtx.lineWidth = 1.7;
+        divergenceCtx.stroke();
+      }
+
+      divergenceCtx.fillStyle = "rgba(255,255,255,0.28)";
+      divergenceCtx.font = "9px system-ui, sans-serif";
+      divergenceCtx.textAlign = "left";
+      divergenceCtx.fillText(system === "logistic" ? "iteration" : "time", padding.left, height - 5);
+      divergenceCtx.restore();
+    }
+
+    function systemCopy() {
+      if (system === "lorenz") {
+        return "Lorenz equations: the two trajectories differ only in x₀; every parameter and other state coordinate is identical.";
+      }
+      if (system === "pendulum") {
+        return "Double pendulum: Universe B begins with an imperceptibly different first-arm angle.";
+      }
+      if (system === "threebody") {
+        return "Three-body gravity: one body's initial x-position is shifted by ε; every mass and velocity is otherwise identical.";
+      }
+      return "Logistic map: two scalar seeds differ by ε and are repeatedly transformed by the same nonlinear rule.";
+    }
+
+    function perturbedCoordinate() {
+      if (system === "lorenz") return { label: "x₀", base: 1, suffix: "" };
+      if (system === "pendulum") return { label: "θ₁,₀", base: 1.2, suffix: " rad" };
+      if (system === "threebody") return { label: "x₁,₀", base: 0.166, suffix: "" };
+      return { label: "x₀", base: 0.237, suffix: "" };
+    }
+
+    function updateSystemControl() {
+      if (system === "lorenz") {
+        chaosControl.hidden = false;
+        chaosLabel.textContent = "Rayleigh parameter ρ";
+        chaosSlider.min = "18";
+        chaosSlider.max = "40";
+        chaosSlider.step = "0.1";
+        chaosSlider.value = "28";
+      } else if (system === "pendulum") {
+        chaosControl.hidden = true;
+      } else if (system === "threebody") {
+        chaosControl.hidden = false;
+        chaosLabel.textContent = "Gravity strength G";
+        chaosSlider.min = "0.65";
+        chaosSlider.max = "1.35";
+        chaosSlider.step = "0.01";
+        chaosSlider.value = "1.00";
+      } else {
+        chaosControl.hidden = false;
+        chaosLabel.textContent = "Logistic parameter r";
+        chaosSlider.min = "3.55";
+        chaosSlider.max = "4.00";
+        chaosSlider.step = "0.001";
+        chaosSlider.value = "4.00";
+      }
+
+      systemDescription.textContent = systemCopy();
+    }
+
+    function updateOutputs() {
+      epsilon = Math.pow(10, Number(epsilonSlider.value));
+      speed = Number(speedSlider.value);
+      const amplification = currentSeparation / Math.max(initialSeparation, 1e-30);
+      const meterLog = Math.log10(Math.max(normalizedSeparation, 1e-13));
+      const meterProgress = clamp((meterLog + 12) / 12, 0, 1);
+
+      epsilonOutput.value = `1 × 10${scientific(epsilon, 0).split("10")[1] ?? ""}`;
+      speedOutput.value = `${speed.toFixed(2)}×`;
+
+      const coordinate = perturbedCoordinate();
+      initialAValue.textContent =
+        `${coordinate.label} = ${coordinate.base.toFixed(12)}${coordinate.suffix}`;
+      initialBValue.textContent =
+        `${coordinate.label} = ${(coordinate.base + epsilon).toFixed(12)}${coordinate.suffix}`;
+
+      if (system === "lorenz") chaosOutput.value = Number(chaosSlider.value).toFixed(1);
+      else if (system === "threebody") chaosOutput.value = Number(chaosSlider.value).toFixed(2);
+      else if (system === "logistic") chaosOutput.value = Number(chaosSlider.value).toFixed(3);
+      else chaosOutput.value = "—";
+
+      differenceValue.textContent = scientific(currentSeparation, 3);
+      amplificationValue.textContent = formatAmplification(amplification);
+      initialOutput.textContent = scientific(initialSeparation, 3);
+      amplificationOutput.textContent = formatAmplification(amplification);
+      timeValue.textContent = system === "logistic"
+        ? `${Math.round(simTime)} iter.`
+        : `${simTime.toFixed(2)} s`;
+
+      differenceMeter.style.width = `${meterProgress * 100}%`;
+
+      if (horizonTime === null) {
+        horizonValue.textContent = "Predictability intact";
+        horizonOutput.textContent = "Not crossed";
+      } else {
+        const label = system === "logistic"
+          ? `${Math.round(horizonTime)} iterations`
+          : `${horizonTime.toFixed(2)} s`;
+        horizonValue.textContent = `Forecasts separated at ${label}`;
+        horizonOutput.textContent = label;
+      }
+    }
+
+    function selectSystem(next: SystemType) {
+      system = next;
+      systemButtons.forEach(button => {
+        const active = button.dataset.system === system;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      updateSystemControl();
+      initialiseSystem();
+    }
+
+    systemButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const next = button.dataset.system;
+        if (next === "pendulum" || next === "lorenz" || next === "threebody" || next === "logistic") {
+          selectSystem(next);
+        }
+      });
+    });
+
+    epsilonSlider.addEventListener("input", () => {
+      initialiseSystem();
+    });
+
+    speedSlider.addEventListener("input", () => {
+      speed = Number(speedSlider.value);
+      updateOutputs();
+    });
+
+    chaosSlider.addEventListener("input", () => {
+      initialiseSystem();
+    });
+
+    trailToggle.addEventListener("change", drawMainCanvas);
+    gridToggle.addEventListener("change", drawMainCanvas);
+    logToggle.addEventListener("change", drawDivergenceGraph);
+
+    pauseButton.addEventListener("click", () => {
+      running = !running;
+      pauseButton.textContent = running ? "Pause" : "Play";
+    });
+
+    resetButton.addEventListener("click", () => {
+      running = true;
+      pauseButton.textContent = "Pause";
+      initialiseSystem();
+    });
+
+    function animate(now: number) {
+      const rawDt = Math.min((now - previousFrame) / 1000, 0.04);
+      previousFrame = now;
+
+      if (running) {
+        if (system === "logistic") advanceLogistic(rawDt);
+        else advanceContinuous(rawDt);
+      }
+
+      updateOutputs();
+      drawMainCanvas();
+      drawDivergenceGraph();
+      requestAnimationFrame(animate);
+    }
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(resizeAll);
+      observer.observe(chaosCanvas);
+      observer.observe(divergenceCanvas);
+    } else {
+      window.addEventListener("resize", resizeAll);
+    }
+
+    updateSystemControl();
+    resizeAll();
+    initialiseSystem();
+    requestAnimationFrame(animate);
+  }
+</script>
+
+<style>
+  .butterfly-machine {
+    max-width: 950px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    background: #080c11;
+    color: #f5f7fa;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  .visual-wrap {
+    position: relative;
+    min-height: 525px;
+    background: #080c11;
+  }
+
+  [data-chaos-canvas] {
+    display: block;
+    width: 100%;
+    height: 525px;
+  }
+
+  .canvas-label {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    max-width: calc(100% - 360px);
+    padding: 0.42rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    background: rgba(3, 7, 11, 0.56);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.50);
+    font-size: 0.72rem;
+    pointer-events: none;
+  }
+
+  .universe-key {
+    position: absolute;
+    left: 16px;
+    top: 56px;
+    display: flex;
+    gap: 0.8rem;
+    padding: 0.42rem 0.65rem;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    background: rgba(3, 7, 11, 0.46);
+    backdrop-filter: blur(7px);
+    color: rgba(255,255,255,0.52);
+    font-size: 0.68rem;
+    pointer-events: none;
+  }
+
+  .key-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+  }
+
+  .swatch {
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  .swatch-a { background: #65c7ff; color: #65c7ff; }
+  .swatch-b { background: #ffb15c; color: #ffb15c; }
+
+  .difference-panel {
+    position: absolute;
+    right: 16px;
+    top: 14px;
+    width: 296px;
+    padding: 0.78rem 0.82rem 0.72rem;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    background: rgba(3,7,11,0.70);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .difference-kicker {
+    margin-bottom: 0.3rem;
+    color: rgba(255,255,255,0.42);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .difference-panel strong {
+    display: block;
+    color: #f1f7fb;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1.08rem;
+    font-weight: 540;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .difference-meter {
+    height: 4px;
+    margin-top: 0.56rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  .difference-meter > div {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #65c7ff, #98d9f9 54%, #ffb15c);
+    transition: width 80ms linear;
+  }
+
+  .difference-subline {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-top: 0.46rem;
+    color: rgba(255,255,255,0.42);
+    font-size: 0.63rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .difference-subline span:last-child {
+    text-align: right;
+  }
+
+  .time-panel {
+    position: absolute;
+    right: 16px;
+    top: 133px;
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    padding: 0.42rem 0.62rem;
+    border: 1px solid rgba(255,255,255,0.075);
+    border-radius: 8px;
+    background: rgba(3,7,11,0.50);
+    backdrop-filter: blur(7px);
+    color: rgba(255,255,255,0.40);
+    font-size: 0.64rem;
+    pointer-events: none;
+  }
+
+  .time-panel strong {
+    color: rgba(255,255,255,0.74);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .divergence-panel {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    height: 122px;
+    padding: 0.58rem 0.68rem 0.48rem;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 11px;
+    background: rgba(3,7,11,0.66);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .divergence-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    height: 17px;
+    color: rgba(255,255,255,0.43);
+    font-size: 0.64rem;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .divergence-header strong {
+    color: rgba(255,255,255,0.66);
+    font-size: 0.62rem;
+    font-weight: 500;
+  }
+
+  [data-divergence-canvas] {
+    display: block;
+    width: 100%;
+    height: 96px;
+  }
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+    padding: 1.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, #0d131a, #090d12);
+  }
+
+  .system-control {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .control-heading {
+    display: grid;
+    gap: 0.18rem;
+    color: #c4ced8;
+    font-size: 0.88rem;
+  }
+
+  .control-heading small {
+    color: #6f7c88;
+    font-size: 0.70rem;
+    line-height: 1.45;
+  }
+
+  .initial-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .initial-pair > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+    padding: 0.62rem 0.75rem;
+    border: 1px solid rgba(255,255,255,0.065);
+    border-radius: 9px;
+    background: rgba(255,255,255,0.018);
+  }
+
+  .initial-pair span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #7f8b96;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .initial-pair strong {
+    min-width: 0;
+    overflow: hidden;
+    color: #cdd7e0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.70rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .segmented {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .system-segmented {
+    width: 100%;
+  }
+
+  .system-button {
+    flex: 1 1 0;
+    min-height: 36px;
+    padding: 0.46rem 0.72rem;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #7f8b96;
+    font-size: 0.74rem;
+    cursor: pointer;
+    transition: color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+  }
+
+  .system-button:hover {
+    color: #d4dce4;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .system-button.is-active {
+    color: #e7f5ff;
+    background: rgba(101,199,255,0.13);
+    box-shadow: inset 0 0 0 1px rgba(101,199,255,0.20);
+  }
+
+  .control-row {
+    display: grid;
+    grid-template-columns: 180px 135px 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .control-row[hidden] { display: none; }
+
+  output {
+    color: #9ca9b5;
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  .derived-values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.1rem;
+  }
+
+  .derived-values > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.72rem 0.9rem;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.025);
+    color: #7f8b96;
+    font-size: 0.78rem;
+  }
+
+  .derived-values strong {
+    color: #d6dee7;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .visual-controls {
+    padding: 0.8rem 0;
+    border-top: 1px solid rgba(255,255,255,0.055);
+    border-bottom: 1px solid rgba(255,255,255,0.055);
+  }
+
+  .visual-title {
+    margin-bottom: 0.65rem;
+    color: #798692;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    color: #a1abb5;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .toggle input {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    accent-color: #65c7ff;
+    cursor: pointer;
+  }
+
+  .model-details {
+    border: 1px solid rgba(255,255,255,0.065);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.018);
+  }
+
+  .model-details summary {
+    padding: 0.72rem 0.9rem;
+    cursor: pointer;
+    color: #9ca7b2;
+    font-size: 0.8rem;
+    user-select: none;
+  }
+
+  .model-details summary:hover { color: #d7dee6; }
+
+  .model-content {
+    padding: 0 0.9rem 0.9rem;
+    color: #8d99a4;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .model-content p { margin: 0.2rem 0 0.7rem; }
+  .model-content ul { margin: 0.65rem 0; padding-left: 1.2rem; }
+
+  .equation {
+    margin: 0.45rem 0;
+    padding: 0.55rem 0.7rem;
+    border-radius: 7px;
+    background: rgba(255,255,255,0.035);
+    color: #c7d1db;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .model-note { color: #74808c; }
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.1rem;
+  }
+
+  .model-info {
+    color: #7f8b96;
+    font-size: 0.79rem;
+  }
+
+  .model-info strong {
+    color: #aeb8c2;
+    font-weight: 500;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .buttons button {
+    min-height: 38px;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 9px;
+    background: rgba(255,255,255,0.055);
+    color: rgba(255,255,255,0.84);
+    cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+  }
+
+  .buttons button:hover {
+    border-color: rgba(255,255,255,0.24);
+    background: rgba(255,255,255,0.10);
+  }
+
+  .buttons button:active { transform: translateY(1px); }
+
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid rgba(101,199,255,0.8);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 760px) {
+    .visual-wrap { min-height: 500px; }
+    [data-chaos-canvas] { height: 500px; }
+
+    .canvas-label {
+      max-width: calc(100% - 32px);
+      right: 16px;
+    }
+
+    .universe-key { top: 56px; }
+
+    .difference-panel {
+      top: 96px;
+      width: 250px;
+    }
+
+    .time-panel { top: 210px; }
+
+    .system-segmented {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .control-row { grid-template-columns: 1fr auto; }
+    .control-row input[type="range"] { grid-column: 1 / -1; }
+    .initial-pair { grid-template-columns: 1fr; }
+    .derived-values { grid-template-columns: 1fr; }
+    .toggle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bottom-row { align-items: flex-start; flex-direction: column; }
+  }
+
+  @media (max-width: 520px) {
+    .visual-wrap { min-height: 470px; }
+    [data-chaos-canvas] { height: 470px; }
+    .canvas-label { display: none; }
+
+    .universe-key {
+      left: 10px;
+      top: 10px;
+      font-size: 0.61rem;
+    }
+
+    .difference-panel {
+      right: 10px;
+      top: 50px;
+      width: 218px;
+      padding: 0.65rem 0.7rem;
+    }
+
+    .difference-panel strong { font-size: 0.92rem; }
+    .difference-subline { font-size: 0.57rem; }
+
+    .time-panel {
+      right: 10px;
+      top: 154px;
+    }
+
+    .divergence-panel {
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      height: 116px;
+    }
+
+    [data-divergence-canvas] { height: 90px; }
+    .controls { padding: 1.1rem; }
+    .toggle-grid { grid-template-columns: 1fr; }
+    .system-button { padding-inline: 0.38rem; font-size: 0.68rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button, .difference-meter > div { transition: none; }
+  }
+</style>
