@@ -10,6 +10,9 @@ import rehypeKatex from 'rehype-katex';
 export default defineConfig({
   site: 'https://aerosect.com',
   devToolbar: { enabled: false },
+  // satellite.js includes a WebAssembly worker with top-level await.
+  // Keep workers as ES modules instead of Vite's default IIFE output.
+  vite: { worker: { format: 'es' } },
   integrations: [mdx({
     processor: unified({
       remarkPlugins: [remarkMath],
