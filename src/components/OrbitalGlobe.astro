@@ -1,0 +1,1945 @@
+---
+/**
+ * OrbitalGlobe.astro
+ *
+ * Dependencies:
+ *   npm install three satellite.js
+ *
+ * Data model:
+ * - Fetches a curated set of CelesTrak OMM/JSON orbital elements on the Astro side.
+ * - Keeps a two-hour in-process cache so local dev does not repeatedly hit CelesTrak.
+ * - Embeds the compact catalogue into the page.
+ * - Propagates satellite positions in the browser with satellite.js / SGP4.
+ *
+ * This keeps the tool self-contained in one Astro component. For a site that
+ * remains deployed for long periods without rebuilds, a cached API endpoint can
+ * be added later so the element set refreshes independently of deployments.
+ */
+
+type OmmRecord = {
+  OBJECT_NAME?: string;
+  OBJECT_ID?: string;
+  EPOCH?: string;
+  MEAN_MOTION?: number | string;
+  ECCENTRICITY?: number | string;
+  INCLINATION?: number | string;
+  RA_OF_ASC_NODE?: number | string;
+  ARG_OF_PERICENTER?: number | string;
+  MEAN_ANOMALY?: number | string;
+  EPHEMERIS_TYPE?: number | string;
+  CLASSIFICATION_TYPE?: string;
+  NORAD_CAT_ID?: number | string;
+  ELEMENT_SET_NO?: number | string;
+  REV_AT_EPOCH?: number | string;
+  BSTAR?: number | string;
+  MEAN_MOTION_DOT?: number | string;
+  MEAN_MOTION_DDOT?: number | string;
+  _GROUP?: string;
+};
+
+type CachePayload = {
+  fetchedAt: string;
+  records: OmmRecord[];
+  failedGroups: string[];
+};
+
+const groups = [
+  { code: "STATIONS", label: "Stations", max: 40 },
+  { code: "GPS-OPS", label: "Navigation", max: 45 },
+  { code: "WEATHER", label: "Weather", max: 90 },
+  { code: "SCIENCE", label: "Science", max: 90 },
+  { code: "GEO", label: "GEO", max: 160 },
+  { code: "STARLINK", label: "Starlink", max: 420 },
+  { code: "ONEWEB", label: "OneWeb", max: 120 },
+  { code: "VISUAL", label: "Visible", max: 120 },
+] as const;
+
+const compactFields = [
+  "OBJECT_NAME",
+  "OBJECT_ID",
+  "EPOCH",
+  "MEAN_MOTION",
+  "ECCENTRICITY",
+  "INCLINATION",
+  "RA_OF_ASC_NODE",
+  "ARG_OF_PERICENTER",
+  "MEAN_ANOMALY",
+  "EPHEMERIS_TYPE",
+  "CLASSIFICATION_TYPE",
+  "NORAD_CAT_ID",
+  "ELEMENT_SET_NO",
+  "REV_AT_EPOCH",
+  "BSTAR",
+  "MEAN_MOTION_DOT",
+  "MEAN_MOTION_DDOT",
+] as const;
+
+function sampleEvenly<T>(rows: T[], max: number): T[] {
+  if (rows.length <= max) return rows;
+  const result: T[] = [];
+  const step = rows.length / max;
+  for (let i = 0; i < max; i++) result.push(rows[Math.floor(i * step)]);
+  return result;
+}
+
+function compactRecord(row: Record<string, unknown>, group: string): OmmRecord {
+  const compact: Record<string, unknown> = { _GROUP: group };
+  for (const key of compactFields) {
+    if (row[key] !== undefined && row[key] !== null) compact[key] = row[key];
+  }
+  return compact as OmmRecord;
+}
+
+async function fetchCatalogue(): Promise<CachePayload> {
+  const records: OmmRecord[] = [];
+  const failedGroups: string[] = [];
+  const seen = new Set<string>();
+
+  for (const group of groups) {
+    try {
+      const url = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${encodeURIComponent(group.code)}&FORMAT=JSON`;
+      const response = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) throw new Error(`${group.code}: HTTP ${response.status}`);
+
+      const raw = (await response.json()) as Record<string, unknown>[];
+      const sampled = sampleEvenly(raw, group.max);
+
+      for (const row of sampled) {
+        const id = String(row.NORAD_CAT_ID ?? row.OBJECT_ID ?? row.OBJECT_NAME ?? "");
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+        records.push(compactRecord(row, group.label));
+      }
+    } catch (error) {
+      failedGroups.push(group.code);
+      console.warn(`[OrbitalGlobe] Failed to fetch ${group.code}`, error);
+    }
+  }
+
+  return {
+    fetchedAt: new Date().toISOString(),
+    records,
+    failedGroups,
+  };
+}
+
+const cacheHost = globalThis as typeof globalThis & {
+  __AEROSECT_ORBITAL_GLOBE_CACHE__?: {
+    storedAt: number;
+    payload: CachePayload;
+  };
+};
+
+const CACHE_MS = 2 * 60 * 60 * 1000;
+const now = Date.now();
+let cache = cacheHost.__AEROSECT_ORBITAL_GLOBE_CACHE__;
+
+if (!cache || now - cache.storedAt > CACHE_MS) {
+  const payload = await fetchCatalogue();
+  cache = { storedAt: now, payload };
+  cacheHost.__AEROSECT_ORBITAL_GLOBE_CACHE__ = cache;
+}
+
+const catalogue = cache.payload;
+const catalogueJson = JSON.stringify(catalogue).replace(/</g, "\\u003c");
+---
+
+<section class="orbital-globe" data-orbital-globe>
+  <div class="globe-stage" data-stage>
+    <script type="application/json" data-orbital-data set:html={catalogueJson}></script>
+
+    <div class="stage-heading">
+      <div class="eyebrow"><span class="live-dot"></span> Orbital environment</div>
+      <div class="stage-title">Earth orbit, now</div>
+      <div class="stage-subtitle">SGP4 propagation from current public orbital elements</div>
+    </div>
+
+    <div class="stage-stats">
+      <div>
+        <span>Objects shown</span>
+        <strong data-visible-count>—</strong>
+      </div>
+      <div>
+        <span>Simulation UTC</span>
+        <strong data-sim-time>—</strong>
+      </div>
+    </div>
+
+    <div class="loading-panel" data-loading>
+      <div class="loading-orbit"></div>
+      <strong>Building orbital scene</strong>
+      <span data-loading-note>Preparing satellite catalogue…</span>
+    </div>
+
+    <div class="object-card" data-object-card hidden>
+      <button class="card-close" data-card-close type="button" aria-label="Close satellite details">×</button>
+      <div class="object-kicker" data-object-category>Satellite</div>
+      <div class="object-name" data-object-name>—</div>
+      <div class="object-id" data-object-id>—</div>
+
+      <div class="object-grid">
+        <span>Altitude</span><strong data-object-altitude>—</strong>
+        <span>Speed</span><strong data-object-speed>—</strong>
+        <span>Latitude</span><strong data-object-latitude>—</strong>
+        <span>Longitude</span><strong data-object-longitude>—</strong>
+        <span>Inclination</span><strong data-object-inclination>—</strong>
+        <span>Period</span><strong data-object-period>—</strong>
+      </div>
+
+      <button class="focus-object-button" data-focus-object type="button">Focus satellite</button>
+    </div>
+
+    <div class="stage-hint">
+      Drag to rotate · scroll to zoom · click an object to inspect
+    </div>
+  </div>
+
+  <div class="orbital-controls">
+    <div class="control-section">
+      <div class="section-title">Orbital shell</div>
+      <div class="filter-row" role="group" aria-label="Filter by orbital regime">
+        <button class="filter-button" data-filter="ALL" type="button">All</button>
+        <button class="filter-button is-active" data-filter="LEO" type="button">LEO</button>
+        <button class="filter-button" data-filter="MEO" type="button">MEO</button>
+        <button class="filter-button" data-filter="GEO" type="button">GEO</button>
+        <button class="filter-button" data-filter="HEO" type="button">Other</button>
+      </div>
+    </div>
+
+    <div class="control-section time-control">
+      <div class="section-title">Time</div>
+      <div class="time-row">
+        <input data-time-scale type="range" min="0" max="3" step="1" value="1" aria-label="Simulation speed" />
+        <output data-time-scale-output>1×</output>
+        <button data-now type="button">Now</button>
+      </div>
+    </div>
+
+    <div class="visual-options">
+      <label class="toggle">
+        <input data-trails-toggle type="checkbox" checked />
+        <span>Trails</span>
+      </label>
+      <label class="toggle">
+        <input data-rotate-toggle type="checkbox" checked />
+        <span>Slow camera drift</span>
+      </label>
+    </div>
+
+    <div class="legend" aria-label="Satellite category colours">
+      <span><i class="legend-dot stations"></i>Stations</span>
+      <span><i class="legend-dot starlink"></i>Starlink</span>
+      <span><i class="legend-dot navigation"></i>Navigation</span>
+      <span><i class="legend-dot weather"></i>Weather</span>
+      <span><i class="legend-dot science"></i>Science</span>
+      <span><i class="legend-dot geo"></i>GEO</span>
+      <span><i class="legend-dot other"></i>Other</span>
+    </div>
+
+    <div class="data-note">
+      <span>
+        Positions are propagated locally from the embedded CelesTrak catalogue snapshot.
+        LEO is shown by default; orbital altitude is visually compressed when viewing higher shells.
+      </span>
+      <strong data-snapshot>Catalogue snapshot: —</strong>
+    </div>
+  </div>
+</section>
+
+<script>
+  import * as THREE from "three";
+  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+  import * as satellite from "satellite.js";
+
+  type Vec3Like = { x: number; y: number; z: number };
+
+  type EmbeddedRecord = {
+    OBJECT_NAME?: string;
+    OBJECT_ID?: string;
+    EPOCH?: string;
+    MEAN_MOTION?: number | string;
+    ECCENTRICITY?: number | string;
+    INCLINATION?: number | string;
+    RA_OF_ASC_NODE?: number | string;
+    ARG_OF_PERICENTER?: number | string;
+    MEAN_ANOMALY?: number | string;
+    EPHEMERIS_TYPE?: number | string;
+    CLASSIFICATION_TYPE?: string;
+    NORAD_CAT_ID?: number | string;
+    ELEMENT_SET_NO?: number | string;
+    REV_AT_EPOCH?: number | string;
+    BSTAR?: number | string;
+    MEAN_MOTION_DOT?: number | string;
+    MEAN_MOTION_DDOT?: number | string;
+    _GROUP?: string;
+  };
+
+  type RuntimeObject = {
+    raw: EmbeddedRecord;
+    satrec: any;
+    category: string;
+    regime: "LEO" | "MEO" | "GEO" | "HEO";
+    periodMinutes: number;
+    lastAltitude: number;
+    lastSpeed: number;
+    lastLatitude: number;
+    lastLongitude: number;
+    valid: boolean;
+  };
+
+  type CataloguePayload = {
+    fetchedAt: string;
+    records: EmbeddedRecord[];
+    failedGroups: string[];
+  };
+
+  const EARTH_RADIUS_KM = 6378.137;
+  const TIME_SCALES = [0, 1, 20, 100];
+  const TRAIL_SAMPLES = 22;
+  const NORMAL_MARKER_REFRESH_MS = 95;
+  const FAST_MARKER_REFRESH_MS = 65;
+  const NORMAL_TRAIL_REFRESH_MS = 320;
+  const FAST_TRAIL_REFRESH_MS = 180;
+
+  const CATEGORY_COLOURS: Record<string, number> = {
+    Stations: 0xf4fbff,
+    Starlink: 0x70c7ff,
+    Navigation: 0xffc96b,
+    Weather: 0x70ead6,
+    Science: 0xc7a0ff,
+    GEO: 0xff91bf,
+    OneWeb: 0x9adf7f,
+    Visible: 0xb7c3ce,
+  };
+
+  const FALLBACK_COLOUR = 0x9aa8b4;
+
+  function numberValue(value: unknown, fallback = 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  function classifyRegime(record: EmbeddedRecord): RuntimeObject["regime"] {
+    const meanMotion = Math.max(numberValue(record.MEAN_MOTION), 1e-6);
+    const period = 1440 / meanMotion;
+    const eccentricity = Math.abs(numberValue(record.ECCENTRICITY));
+
+    if (period < 128) return "LEO";
+    if (period >= 1200 && period <= 1600 && eccentricity < 0.15) return "GEO";
+    if (period < 1200) return "MEO";
+    return "HEO";
+  }
+
+  function visualRadiusForAltitude(altitudeKm: number) {
+    const altitude = Math.max(0, altitudeKm);
+
+    // Keep LEO close to the Earth while strongly compressing MEO/GEO distance.
+    if (altitude <= 2000) {
+      return 1 + 0.055 + 0.245 * (altitude / 2000);
+    }
+
+    const t = Math.log1p((Math.min(altitude, 50000) - 2000) / 3000) /
+      Math.log1p((50000 - 2000) / 3000);
+    return 1.30 + 1.62 * Math.max(0, Math.min(1, t));
+  }
+
+  function eciToScene(position: Vec3Like) {
+    const radiusKm = Math.hypot(position.x, position.y, position.z);
+    if (!Number.isFinite(radiusKm) || radiusKm < 1) return null;
+
+    const altitudeKm = radiusKm - EARTH_RADIUS_KM;
+    const visualRadius = visualRadiusForAltitude(altitudeKm);
+    const scale = visualRadius / radiusKm;
+
+    // ECI z is Earth's spin axis. Map it to Three.js +Y.
+    return new THREE.Vector3(
+      position.x * scale,
+      position.z * scale,
+      -position.y * scale
+    );
+  }
+
+  function formatUtc(date: Date) {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone: "UTC",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).format(date);
+  }
+
+  function formatSnapshot(iso: string) {
+    const date = new Date(iso);
+    if (!Number.isFinite(date.getTime())) return "Catalogue snapshot: unknown";
+    return `Catalogue snapshot: ${date.toLocaleString("en-GB", {
+      timeZone: "UTC",
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "short",
+    })}`;
+  }
+
+  function createAtmosphereMaterial() {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      uniforms: {},
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        void main() {
+          float intensity = pow(0.70 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.4);
+          gl_FragColor = vec4(0.46, 0.62, 0.72, 1.0) * intensity * 0.46;
+        }
+      `,
+    });
+  }
+
+  function makeLatitudeLine(latitudeDeg: number, radius = 1.006) {
+    const points: THREE.Vector3[] = [];
+    const lat = THREE.MathUtils.degToRad(latitudeDeg);
+    const ringRadius = Math.cos(lat) * radius;
+    const y = Math.sin(lat) * radius;
+
+    for (let i = 0; i <= 128; i++) {
+      const a = (i / 128) * Math.PI * 2;
+      points.push(new THREE.Vector3(
+        Math.cos(a) * ringRadius,
+        y,
+        Math.sin(a) * ringRadius
+      ));
+    }
+
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }
+
+  function makeLongitudeLine(longitudeDeg: number, radius = 1.006) {
+    const points: THREE.Vector3[] = [];
+    const lon = THREE.MathUtils.degToRad(longitudeDeg);
+
+    for (let i = 0; i <= 128; i++) {
+      const lat = -Math.PI / 2 + (i / 128) * Math.PI;
+      const cosLat = Math.cos(lat);
+      points.push(new THREE.Vector3(
+        radius * cosLat * Math.cos(lon),
+        radius * Math.sin(lat),
+        radius * cosLat * Math.sin(lon)
+      ));
+    }
+
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }
+
+  function initialiseOrbitalGlobe(root: HTMLElement) {
+    if (root.dataset.initialised === "true") return;
+    root.dataset.initialised = "true";
+
+    const stage = root.querySelector<HTMLElement>("[data-stage]");
+    const dataNode = root.querySelector<HTMLScriptElement>("[data-orbital-data]");
+    const loading = root.querySelector<HTMLElement>("[data-loading]");
+    const loadingNote = root.querySelector<HTMLElement>("[data-loading-note]");
+    const visibleCount = root.querySelector<HTMLElement>("[data-visible-count]");
+    const simTimeOutput = root.querySelector<HTMLElement>("[data-sim-time]");
+    const snapshotOutput = root.querySelector<HTMLElement>("[data-snapshot]");
+    const timeSlider = root.querySelector<HTMLInputElement>("[data-time-scale]");
+    const timeScaleOutput = root.querySelector<HTMLOutputElement>("[data-time-scale-output]");
+    const nowButton = root.querySelector<HTMLButtonElement>("[data-now]");
+    const trailsToggle = root.querySelector<HTMLInputElement>("[data-trails-toggle]");
+    const rotateToggle = root.querySelector<HTMLInputElement>("[data-rotate-toggle]");
+    const filterButtons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-filter]"));
+
+    const objectCard = root.querySelector<HTMLElement>("[data-object-card]");
+    const closeCard = root.querySelector<HTMLButtonElement>("[data-card-close]");
+    const objectCategory = root.querySelector<HTMLElement>("[data-object-category]");
+    const objectName = root.querySelector<HTMLElement>("[data-object-name]");
+    const objectId = root.querySelector<HTMLElement>("[data-object-id]");
+    const objectAltitude = root.querySelector<HTMLElement>("[data-object-altitude]");
+    const objectSpeed = root.querySelector<HTMLElement>("[data-object-speed]");
+    const objectLatitude = root.querySelector<HTMLElement>("[data-object-latitude]");
+    const objectLongitude = root.querySelector<HTMLElement>("[data-object-longitude]");
+    const objectInclination = root.querySelector<HTMLElement>("[data-object-inclination]");
+    const objectPeriod = root.querySelector<HTMLElement>("[data-object-period]");
+    const focusObjectButton = root.querySelector<HTMLButtonElement>("[data-focus-object]");
+
+    if (
+      !stage || !dataNode || !loading || !loadingNote || !visibleCount || !simTimeOutput ||
+      !snapshotOutput || !timeSlider || !timeScaleOutput || !nowButton || !trailsToggle ||
+      !rotateToggle || !objectCard || !closeCard || !objectCategory ||
+      !objectName || !objectId || !objectAltitude || !objectSpeed || !objectLatitude ||
+      !objectLongitude || !objectInclination || !objectPeriod || !focusObjectButton
+    ) return;
+
+    let payload: CataloguePayload;
+    try {
+      payload = JSON.parse(dataNode.textContent || "{}");
+    } catch {
+      loadingNote.textContent = "Could not read the embedded orbital catalogue.";
+      return;
+    }
+
+    snapshotOutput.textContent = formatSnapshot(payload.fetchedAt);
+
+    const objects: RuntimeObject[] = [];
+    for (const raw of payload.records ?? []) {
+      try {
+        const satrec = satellite.json2satrec(raw as any);
+        if (!satrec || satrec.error) continue;
+
+        const meanMotion = Math.max(numberValue(raw.MEAN_MOTION), 1e-6);
+        objects.push({
+          raw,
+          satrec,
+          category: raw._GROUP || "Other",
+          regime: classifyRegime(raw),
+          periodMinutes: 1440 / meanMotion,
+          lastAltitude: 0,
+          lastSpeed: 0,
+          lastLatitude: 0,
+          lastLongitude: 0,
+          valid: true,
+        });
+      } catch {
+        // Ignore malformed element sets rather than failing the visualisation.
+      }
+    }
+
+    if (objects.length === 0) {
+      loadingNote.textContent = "No orbital data was available when this page was built.";
+      return;
+    }
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x000000, 0.021);
+
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.02, 80);
+    camera.position.set(0.55, 0.92, 4.85);
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance",
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.setClearColor(0x000000, 1);
+    stage.prepend(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.055;
+    controls.enablePan = false;
+    controls.minDistance = 2.05;
+    controls.maxDistance = 10.5;
+    controls.rotateSpeed = 0.48;
+    controls.zoomSpeed = 0.68;
+    controls.target.set(0, 0, 0);
+
+    // --------------------------------------------------
+    // Earth
+    // --------------------------------------------------
+
+    const earthGroup = new THREE.Group();
+    scene.add(earthGroup);
+
+    const earth = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 96, 96),
+      new THREE.MeshStandardMaterial({
+        color: 0x030405,
+        emissive: 0x000000,
+        emissiveIntensity: 0.15,
+        roughness: 0.72,
+        metalness: 0.22,
+      })
+    );
+    earthGroup.add(earth);
+
+    const nightShell = new THREE.Mesh(
+      new THREE.SphereGeometry(1.0015, 72, 72),
+      new THREE.MeshBasicMaterial({
+        color: 0x0a0b0c,
+        transparent: true,
+        opacity: 0.20,
+        blending: THREE.MultiplyBlending,
+      })
+    );
+    earthGroup.add(nightShell);
+
+    const gridMaterial = new THREE.LineBasicMaterial({
+      color: 0x9aa2a8,
+      transparent: true,
+      opacity: 0.10,
+      depthWrite: false,
+    });
+
+    for (const lat of [-60, -30, 0, 30, 60]) {
+      earthGroup.add(new THREE.Line(makeLatitudeLine(lat), gridMaterial));
+    }
+
+    for (let lon = 0; lon < 180; lon += 30) {
+      earthGroup.add(new THREE.Line(makeLongitudeLine(lon), gridMaterial));
+    }
+
+    const primeMaterial = new THREE.LineBasicMaterial({
+      color: 0xd4dde3,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+    });
+    earthGroup.add(new THREE.Line(makeLongitudeLine(0, 1.008), primeMaterial));
+
+    const equatorMaterial = new THREE.LineBasicMaterial({
+      color: 0xc1cbd1,
+      transparent: true,
+      opacity: 0.20,
+      depthWrite: false,
+    });
+    earthGroup.add(new THREE.Line(makeLatitudeLine(0, 1.009), equatorMaterial));
+
+    const atmosphere = new THREE.Mesh(
+      new THREE.SphereGeometry(1.085, 80, 80),
+      createAtmosphereMaterial()
+    );
+    earthGroup.add(atmosphere);
+
+    const ambient = new THREE.AmbientLight(0x42484d, 0.48);
+    scene.add(ambient);
+
+    const sun = new THREE.DirectionalLight(0xe8eef2, 2.45);
+    sun.position.set(4.5, 2.4, 5.2);
+    scene.add(sun);
+
+    const rim = new THREE.DirectionalLight(0x7893a6, 1.0);
+    rim.position.set(-5, -1.3, -4.2);
+    scene.add(rim);
+
+    function makeParticleTexture(ring = false) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 64;
+      canvas.height = 64;
+      const context = canvas.getContext("2d");
+      if (!context) return null;
+
+      if (ring) {
+        context.strokeStyle = "rgba(255,255,255,0.95)";
+        context.lineWidth = 4;
+        context.beginPath();
+        context.arc(32, 32, 21, 0, Math.PI * 2);
+        context.stroke();
+      } else {
+        const glow = context.createRadialGradient(32, 32, 0, 32, 32, 30);
+        glow.addColorStop(0, "rgba(255,255,255,1)");
+        glow.addColorStop(0.16, "rgba(255,255,255,1)");
+        glow.addColorStop(0.38, "rgba(255,255,255,0.84)");
+        glow.addColorStop(0.70, "rgba(255,255,255,0.18)");
+        glow.addColorStop(1, "rgba(255,255,255,0)");
+        context.fillStyle = glow;
+        context.fillRect(0, 0, 64, 64);
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      return texture;
+    }
+
+    const particleTexture = makeParticleTexture(false);
+    const selectedTexture = makeParticleTexture(true);
+
+    // --------------------------------------------------
+    // Stars
+    // --------------------------------------------------
+
+    const starCount = 1150;
+    const starPositions = new Float32Array(starCount * 3);
+    const starColours = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount; i++) {
+      const radius = 14 + Math.random() * 15;
+      const theta = Math.random() * Math.PI * 2;
+      const u = Math.random() * 2 - 1;
+      const phi = Math.acos(u);
+      const s = Math.sin(phi);
+
+      starPositions[i * 3] = radius * s * Math.cos(theta);
+      starPositions[i * 3 + 1] = radius * Math.cos(phi);
+      starPositions[i * 3 + 2] = radius * s * Math.sin(theta);
+
+      const brightness = 0.30 + Math.random() * 0.52;
+      starColours[i * 3] = brightness * 0.83;
+      starColours[i * 3 + 1] = brightness * 0.91;
+      starColours[i * 3 + 2] = brightness;
+    }
+
+    const starGeometry = new THREE.BufferGeometry();
+    starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+    starGeometry.setAttribute("color", new THREE.BufferAttribute(starColours, 3));
+
+    const starPoints = new THREE.Points(
+      starGeometry,
+      new THREE.PointsMaterial({
+        size: 0.022,
+        map: particleTexture ?? undefined,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.42,
+        alphaTest: 0.02,
+        sizeAttenuation: true,
+        depthWrite: false,
+      })
+    );
+    scene.add(starPoints);
+
+    // --------------------------------------------------
+    // Satellite cloud + smoothly interpolated particle trails
+    // --------------------------------------------------
+
+    const hidden = 9999;
+    const satellitePositions = new Float32Array(objects.length * 3);
+    const satelliteFromPositions = new Float32Array(objects.length * 3);
+    const satelliteTargetPositions = new Float32Array(objects.length * 3);
+    const satelliteColours = new Float32Array(objects.length * 3);
+
+    for (let i = 0; i < objects.length; i++) {
+      const base = i * 3;
+      satellitePositions[base] = hidden;
+      satellitePositions[base + 1] = hidden;
+      satellitePositions[base + 2] = hidden;
+      satelliteFromPositions[base] = hidden;
+      satelliteFromPositions[base + 1] = hidden;
+      satelliteFromPositions[base + 2] = hidden;
+      satelliteTargetPositions[base] = hidden;
+      satelliteTargetPositions[base + 1] = hidden;
+      satelliteTargetPositions[base + 2] = hidden;
+
+      const colour = new THREE.Color(CATEGORY_COLOURS[objects[i].category] ?? FALLBACK_COLOUR)
+        .lerp(new THREE.Color(0xffffff), 0.18);
+      satelliteColours[base] = colour.r;
+      satelliteColours[base + 1] = colour.g;
+      satelliteColours[base + 2] = colour.b;
+    }
+
+    const satelliteGeometry = new THREE.BufferGeometry();
+    satelliteGeometry.setAttribute("position", new THREE.BufferAttribute(satellitePositions, 3));
+    satelliteGeometry.setAttribute("color", new THREE.BufferAttribute(satelliteColours, 3));
+
+    const satelliteMaterial = new THREE.PointsMaterial({
+      // Screen-space sizing keeps sparse MEO/GEO objects just as legible as LEO.
+      size: 7.0,
+      map: particleTexture ?? undefined,
+      vertexColors: true,
+      transparent: true,
+      opacity: 1.0,
+      alphaTest: 0.012,
+      sizeAttenuation: false,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      fog: false,
+    });
+
+    const satelliteCloud = new THREE.Points(satelliteGeometry, satelliteMaterial);
+    satelliteCloud.frustumCulled = false;
+    satelliteCloud.renderOrder = 3;
+    scene.add(satelliteCloud);
+
+    const selectedMarker = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        color: 0xffffff,
+        map: selectedTexture ?? undefined,
+        transparent: true,
+        opacity: 0.92,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      })
+    );
+    selectedMarker.scale.setScalar(0.125);
+    selectedMarker.visible = false;
+    selectedMarker.renderOrder = 4;
+    scene.add(selectedMarker);
+
+    const selectedOrbit = new THREE.Line(
+      new THREE.BufferGeometry(),
+      new THREE.LineBasicMaterial({
+        color: 0x9bc9df,
+        transparent: true,
+        opacity: 0.30,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      })
+    );
+    selectedOrbit.visible = false;
+    selectedOrbit.renderOrder = 2;
+    scene.add(selectedOrbit);
+
+    const totalTrailPoints = objects.length * TRAIL_SAMPLES;
+    const trailPositions = new Float32Array(totalTrailPoints * 3);
+    const trailFromPositions = new Float32Array(totalTrailPoints * 3);
+    const trailTargetPositions = new Float32Array(totalTrailPoints * 3);
+
+    for (let i = 0; i < totalTrailPoints; i++) {
+      const base = i * 3;
+      trailPositions[base] = hidden;
+      trailPositions[base + 1] = hidden;
+      trailPositions[base + 2] = hidden;
+      trailFromPositions[base] = hidden;
+      trailFromPositions[base + 1] = hidden;
+      trailFromPositions[base + 2] = hidden;
+      trailTargetPositions[base] = hidden;
+      trailTargetPositions[base + 1] = hidden;
+      trailTargetPositions[base + 2] = hidden;
+    }
+
+    // Continuous line trails. Each neighbouring pair of samples becomes one
+    // independent segment, allowing a smooth fade from the tail to the marker.
+    const segmentsPerObject = TRAIL_SAMPLES - 1;
+    const totalTrailSegments = objects.length * segmentsPerObject;
+    const trailLinePositions = new Float32Array(totalTrailSegments * 2 * 3);
+    const trailLineColours = new Float32Array(totalTrailSegments * 2 * 3);
+
+    for (let objectIndex = 0; objectIndex < objects.length; objectIndex++) {
+      const colour = new THREE.Color(CATEGORY_COLOURS[objects[objectIndex].category] ?? FALLBACK_COLOUR);
+      for (let segment = 0; segment < segmentsPerObject; segment++) {
+        const t0 = segment / Math.max(segmentsPerObject, 1);
+        const t1 = (segment + 1) / Math.max(segmentsPerObject, 1);
+        const b0 = 0.10 + 0.82 * Math.pow(t0, 1.35);
+        const b1 = 0.10 + 0.82 * Math.pow(t1, 1.35);
+        const lineBase = (objectIndex * segmentsPerObject + segment) * 6;
+
+        trailLineColours[lineBase] = colour.r * b0;
+        trailLineColours[lineBase + 1] = colour.g * b0;
+        trailLineColours[lineBase + 2] = colour.b * b0;
+        trailLineColours[lineBase + 3] = colour.r * b1;
+        trailLineColours[lineBase + 4] = colour.g * b1;
+        trailLineColours[lineBase + 5] = colour.b * b1;
+      }
+    }
+
+    const trailLineGeometry = new THREE.BufferGeometry();
+    trailLineGeometry.setAttribute("position", new THREE.BufferAttribute(trailLinePositions, 3));
+    trailLineGeometry.setAttribute("color", new THREE.BufferAttribute(trailLineColours, 3));
+
+    const trailLines = new THREE.LineSegments(
+      trailLineGeometry,
+      new THREE.LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.84,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false,
+      })
+    );
+    trailLines.frustumCulled = false;
+    trailLines.renderOrder = 2;
+    scene.add(trailLines);
+
+    let activeFilter = "LEO";
+    let selectedIndex = -1;
+    let simulationMs = Date.now();
+    let timeScale = 1;
+    let lastFrame = performance.now();
+    let lastMarkerTargetReal = -Infinity;
+    let lastTrailTargetReal = -Infinity;
+    let markerTransitionStart = performance.now();
+    let markerTransitionDuration = NORMAL_MARKER_REFRESH_MS;
+    let trailTransitionStart = performance.now();
+    let trailTransitionDuration = NORMAL_TRAIL_REFRESH_MS;
+    let cameraDrift = true;
+    let userInteracting = false;
+
+    let focusMode = false;
+    let focusTransitionStart = 0;
+    let focusTransitionDuration = 650;
+    let focusTransitionActive = false;
+    const focusFromCamera = new THREE.Vector3();
+    const focusToCamera = new THREE.Vector3();
+    const focusFromTarget = new THREE.Vector3();
+    const focusToTarget = new THREE.Vector3();
+    const lastFocusedPosition = new THREE.Vector3();
+    const preFocusCamera = new THREE.Vector3();
+    const preFocusTarget = new THREE.Vector3();
+    let preFocusMinDistance = controls.minDistance;
+    let preFocusMaxDistance = controls.maxDistance;
+
+    controls.addEventListener("start", () => { userInteracting = true; });
+    controls.addEventListener("end", () => { userInteracting = false; });
+
+    function passesFilter(object: RuntimeObject) {
+      return activeFilter === "ALL" || object.regime === activeFilter;
+    }
+
+    function trailSpanMinutes(object: RuntimeObject) {
+      if (object.regime === "LEO") return 11.5;
+      if (object.regime === "MEO") return 40;
+      if (object.regime === "GEO") return 140;
+      return 64;
+    }
+
+    function propagateObject(object: RuntimeObject, date: Date) {
+      const propagated = satellite.propagate(object.satrec, date) as any;
+      if (!propagated?.position || typeof propagated.position === "boolean") return null;
+
+      const position = propagated.position as Vec3Like;
+      const velocity = propagated.velocity && typeof propagated.velocity !== "boolean"
+        ? propagated.velocity as Vec3Like
+        : null;
+
+      const scenePosition = eciToScene(position);
+      if (!scenePosition) return null;
+
+      const radiusKm = Math.hypot(position.x, position.y, position.z);
+      const altitude = radiusKm - EARTH_RADIUS_KM;
+      const speed = velocity ? Math.hypot(velocity.x, velocity.y, velocity.z) : 0;
+
+      const gmst = satellite.gstime(date);
+      const geodetic = satellite.eciToGeodetic(position as any, gmst);
+      const latitude = geodetic.latitude * 180 / Math.PI;
+      let longitude = geodetic.longitude * 180 / Math.PI;
+      if (longitude > 180) longitude -= 360;
+      if (longitude < -180) longitude += 360;
+
+      return { scenePosition, altitude, speed, latitude, longitude };
+    }
+
+    function tripletHidden(array: Float32Array, base: number) {
+      return Math.abs(array[base]) > 1000 || Math.abs(array[base + 1]) > 1000 || Math.abs(array[base + 2]) > 1000;
+    }
+
+    function setHidden(array: Float32Array, base: number) {
+      array[base] = hidden;
+      array[base + 1] = hidden;
+      array[base + 2] = hidden;
+    }
+
+    function prepareSatelliteTargets(date: Date, transitionMs: number, realNow = performance.now()) {
+      satelliteFromPositions.set(satellitePositions);
+      let visible = 0;
+
+      for (let i = 0; i < objects.length; i++) {
+        const base = i * 3;
+        const object = objects[i];
+
+        if (!passesFilter(object)) {
+          setHidden(satelliteTargetPositions, base);
+          continue;
+        }
+
+        const result = propagateObject(object, date);
+        if (!result) {
+          object.valid = false;
+          setHidden(satelliteTargetPositions, base);
+          continue;
+        }
+
+        object.valid = true;
+        object.lastAltitude = result.altitude;
+        object.lastSpeed = result.speed;
+        object.lastLatitude = result.latitude;
+        object.lastLongitude = result.longitude;
+        visible++;
+
+        satelliteTargetPositions[base] = result.scenePosition.x;
+        satelliteTargetPositions[base + 1] = result.scenePosition.y;
+        satelliteTargetPositions[base + 2] = result.scenePosition.z;
+
+        if (tripletHidden(satelliteFromPositions, base)) {
+          satelliteFromPositions[base] = satelliteTargetPositions[base];
+          satelliteFromPositions[base + 1] = satelliteTargetPositions[base + 1];
+          satelliteFromPositions[base + 2] = satelliteTargetPositions[base + 2];
+        }
+      }
+
+      markerTransitionStart = realNow;
+      markerTransitionDuration = Math.max(1, transitionMs);
+      visibleCount.textContent = visible.toLocaleString();
+      updateSelectedCard();
+    }
+
+    function interpolateSatellitePositions(realNow: number) {
+      const t = THREE.MathUtils.clamp((realNow - markerTransitionStart) / markerTransitionDuration, 0, 1);
+      const eased = t * t * (3 - 2 * t);
+      const attribute = satelliteGeometry.getAttribute("position") as THREE.BufferAttribute;
+
+      for (let i = 0; i < objects.length; i++) {
+        const base = i * 3;
+        if (tripletHidden(satelliteTargetPositions, base)) {
+          setHidden(satellitePositions, base);
+          continue;
+        }
+
+        satellitePositions[base] = THREE.MathUtils.lerp(satelliteFromPositions[base], satelliteTargetPositions[base], eased);
+        satellitePositions[base + 1] = THREE.MathUtils.lerp(satelliteFromPositions[base + 1], satelliteTargetPositions[base + 1], eased);
+        satellitePositions[base + 2] = THREE.MathUtils.lerp(satelliteFromPositions[base + 2], satelliteTargetPositions[base + 2], eased);
+      }
+
+      attribute.needsUpdate = true;
+
+      if (selectedIndex >= 0) {
+        const base = selectedIndex * 3;
+        if (!tripletHidden(satellitePositions, base)) {
+          selectedMarker.position.set(
+            satellitePositions[base],
+            satellitePositions[base + 1],
+            satellitePositions[base + 2]
+          );
+        }
+      }
+    }
+
+    function prepareTrailTargets(date: Date, transitionMs: number, realNow = performance.now()) {
+      trailFromPositions.set(trailPositions);
+
+      for (let objectIndex = 0; objectIndex < objects.length; objectIndex++) {
+        const object = objects[objectIndex];
+        const visible = passesFilter(object) && object.valid;
+        const spanMinutes = trailSpanMinutes(object);
+
+        for (let sample = 0; sample < TRAIL_SAMPLES; sample++) {
+          const pointIndex = objectIndex * TRAIL_SAMPLES + sample;
+          const base = pointIndex * 3;
+
+          if (!visible) {
+            setHidden(trailTargetPositions, base);
+            continue;
+          }
+
+          const progress = sample / Math.max(TRAIL_SAMPLES - 1, 1);
+          const minutesAgo = spanMinutes * (1 - progress);
+          const sampleDate = new Date(date.getTime() - minutesAgo * 60_000);
+          const result = propagateObject(object, sampleDate);
+
+          if (!result) {
+            setHidden(trailTargetPositions, base);
+            continue;
+          }
+
+          trailTargetPositions[base] = result.scenePosition.x;
+          trailTargetPositions[base + 1] = result.scenePosition.y;
+          trailTargetPositions[base + 2] = result.scenePosition.z;
+
+          if (tripletHidden(trailFromPositions, base)) {
+            trailFromPositions[base] = trailTargetPositions[base];
+            trailFromPositions[base + 1] = trailTargetPositions[base + 1];
+            trailFromPositions[base + 2] = trailTargetPositions[base + 2];
+          }
+        }
+      }
+
+      trailTransitionStart = realNow;
+      trailTransitionDuration = Math.max(1, transitionMs);
+    }
+
+    function interpolateTrailPositions(realNow: number) {
+      const t = THREE.MathUtils.clamp((realNow - trailTransitionStart) / trailTransitionDuration, 0, 1);
+      const eased = t * t * (3 - 2 * t);
+
+      for (let i = 0; i < totalTrailPoints; i++) {
+        const base = i * 3;
+        if (tripletHidden(trailTargetPositions, base)) {
+          setHidden(trailPositions, base);
+          continue;
+        }
+
+        trailPositions[base] = THREE.MathUtils.lerp(trailFromPositions[base], trailTargetPositions[base], eased);
+        trailPositions[base + 1] = THREE.MathUtils.lerp(trailFromPositions[base + 1], trailTargetPositions[base + 1], eased);
+        trailPositions[base + 2] = THREE.MathUtils.lerp(trailFromPositions[base + 2], trailTargetPositions[base + 2], eased);
+      }
+
+      const lineAttribute = trailLineGeometry.getAttribute("position") as THREE.BufferAttribute;
+      for (let objectIndex = 0; objectIndex < objects.length; objectIndex++) {
+        for (let segment = 0; segment < segmentsPerObject; segment++) {
+          const p0 = (objectIndex * TRAIL_SAMPLES + segment) * 3;
+          const p1 = (objectIndex * TRAIL_SAMPLES + segment + 1) * 3;
+          const lineBase = (objectIndex * segmentsPerObject + segment) * 6;
+
+          if (tripletHidden(trailPositions, p0) || tripletHidden(trailPositions, p1)) {
+            trailLinePositions[lineBase] = hidden;
+            trailLinePositions[lineBase + 1] = hidden;
+            trailLinePositions[lineBase + 2] = hidden;
+            trailLinePositions[lineBase + 3] = hidden;
+            trailLinePositions[lineBase + 4] = hidden;
+            trailLinePositions[lineBase + 5] = hidden;
+            continue;
+          }
+
+          trailLinePositions[lineBase] = trailPositions[p0];
+          trailLinePositions[lineBase + 1] = trailPositions[p0 + 1];
+          trailLinePositions[lineBase + 2] = trailPositions[p0 + 2];
+          trailLinePositions[lineBase + 3] = trailPositions[p1];
+          trailLinePositions[lineBase + 4] = trailPositions[p1 + 1];
+          trailLinePositions[lineBase + 5] = trailPositions[p1 + 2];
+        }
+      }
+      lineAttribute.needsUpdate = true;
+    }
+
+    function rebuildSelectedOrbit() {
+      selectedOrbit.visible = false;
+      if (selectedIndex < 0 || !objects[selectedIndex]) return;
+
+      const object = objects[selectedIndex];
+      if (!object.valid) return;
+
+      const sampleCount = 180;
+      const periodMs = Math.max(45, Math.min(object.periodMinutes, 24 * 60)) * 60_000;
+      const start = simulationMs - periodMs * 0.22;
+      const points: THREE.Vector3[] = [];
+
+      for (let i = 0; i <= sampleCount; i++) {
+        const date = new Date(start + (i / sampleCount) * periodMs);
+        const result = propagateObject(object, date);
+        if (result) points.push(result.scenePosition);
+      }
+
+      if (points.length < 2) return;
+      selectedOrbit.geometry.dispose();
+      selectedOrbit.geometry = new THREE.BufferGeometry().setFromPoints(points);
+      selectedOrbit.visible = true;
+    }
+
+    function updateSelectedCard() {
+      if (selectedIndex < 0 || !objects[selectedIndex]) {
+        objectCard.hidden = true;
+        selectedMarker.visible = false;
+        selectedOrbit.visible = false;
+        return;
+      }
+
+      const object = objects[selectedIndex];
+      if (!object.valid || !passesFilter(object)) {
+        clearSelection();
+        return;
+      }
+
+      objectCard.hidden = false;
+      selectedMarker.visible = true;
+      objectCategory.textContent = `${object.category} · ${object.regime}`;
+      objectName.textContent = object.raw.OBJECT_NAME || "Unnamed object";
+      objectId.textContent = `NORAD ${object.raw.NORAD_CAT_ID ?? "—"}${object.raw.OBJECT_ID ? ` · ${object.raw.OBJECT_ID}` : ""}`;
+      objectAltitude.textContent = `${Math.max(0, object.lastAltitude).toLocaleString("en-GB", { maximumFractionDigits: 0 })} km`;
+      objectSpeed.textContent = `${object.lastSpeed.toFixed(2)} km/s`;
+      objectLatitude.textContent = `${Math.abs(object.lastLatitude).toFixed(1)}° ${object.lastLatitude >= 0 ? "N" : "S"}`;
+      objectLongitude.textContent = `${Math.abs(object.lastLongitude).toFixed(1)}° ${object.lastLongitude >= 0 ? "E" : "W"}`;
+      objectInclination.textContent = `${numberValue(object.raw.INCLINATION).toFixed(1)}°`;
+      objectPeriod.textContent = object.periodMinutes >= 180
+        ? `${(object.periodMinutes / 60).toFixed(1)} h`
+        : `${object.periodMinutes.toFixed(0)} min`;
+      focusObjectButton.textContent = focusMode ? "Return to Earth" : "Focus satellite";
+    }
+
+    function selectedScenePosition() {
+      if (selectedIndex < 0) return null;
+      const base = selectedIndex * 3;
+      if (tripletHidden(satellitePositions, base)) return null;
+      return new THREE.Vector3(
+        satellitePositions[base],
+        satellitePositions[base + 1],
+        satellitePositions[base + 2]
+      );
+    }
+
+    function beginCameraTransition(toCamera: THREE.Vector3, toTarget: THREE.Vector3) {
+      focusFromCamera.copy(camera.position);
+      focusFromTarget.copy(controls.target);
+      focusToCamera.copy(toCamera);
+      focusToTarget.copy(toTarget);
+      focusTransitionStart = performance.now();
+      focusTransitionActive = true;
+    }
+
+    function focusSelectedSatellite() {
+      const position = selectedScenePosition();
+      if (!position) return;
+
+      preFocusCamera.copy(camera.position);
+      preFocusTarget.copy(controls.target);
+      preFocusMinDistance = controls.minDistance;
+      preFocusMaxDistance = controls.maxDistance;
+
+      const radial = position.clone().normalize();
+      let tangent = new THREE.Vector3().crossVectors(radial, new THREE.Vector3(0, 1, 0));
+      if (tangent.lengthSq() < 1e-5) tangent = new THREE.Vector3(1, 0, 0);
+      tangent.normalize();
+
+      focusMode = true;
+      lastFocusedPosition.copy(position);
+      controls.minDistance = 0.09;
+      controls.maxDistance = 1.8;
+      focusObjectButton.textContent = "Return to Earth";
+      selectedMarker.scale.setScalar(0.055);
+
+      beginCameraTransition(
+        position.clone().addScaledVector(radial, 0.34).addScaledVector(tangent, 0.12),
+        position
+      );
+    }
+
+    function returnToEarth() {
+      if (!focusMode && !focusTransitionActive) return;
+      focusMode = false;
+      controls.minDistance = preFocusMinDistance;
+      controls.maxDistance = preFocusMaxDistance;
+      focusObjectButton.textContent = "Focus satellite";
+      selectedMarker.scale.setScalar(0.125);
+      beginCameraTransition(preFocusCamera, preFocusTarget);
+    }
+
+    function updateFocusCamera(realNow: number) {
+      if (focusTransitionActive) {
+        const t = THREE.MathUtils.clamp((realNow - focusTransitionStart) / focusTransitionDuration, 0, 1);
+        const eased = t * t * (3 - 2 * t);
+        camera.position.lerpVectors(focusFromCamera, focusToCamera, eased);
+        controls.target.lerpVectors(focusFromTarget, focusToTarget, eased);
+        if (t >= 1) focusTransitionActive = false;
+        return;
+      }
+
+      if (!focusMode) return;
+      const position = selectedScenePosition();
+      if (!position) {
+        returnToEarth();
+        return;
+      }
+
+      // Follow the moving object without changing the user's relative orbit view.
+      const delta = position.clone().sub(lastFocusedPosition);
+      camera.position.add(delta);
+      controls.target.copy(position);
+      lastFocusedPosition.copy(position);
+    }
+
+    focusObjectButton.addEventListener("click", () => {
+      if (focusMode) returnToEarth();
+      else focusSelectedSatellite();
+    });
+
+    function clearSelection() {
+      if (focusMode || focusTransitionActive) returnToEarth();
+      selectedIndex = -1;
+      objectCard.hidden = true;
+      selectedMarker.visible = false;
+      selectedOrbit.visible = false;
+    }
+
+    // --------------------------------------------------
+    // Picking
+    // --------------------------------------------------
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.params.Points = { threshold: 0.052 };
+    const pointer = new THREE.Vector2();
+    let pointerDownX = 0;
+    let pointerDownY = 0;
+
+    renderer.domElement.addEventListener("pointerdown", event => {
+      pointerDownX = event.clientX;
+      pointerDownY = event.clientY;
+    });
+
+    renderer.domElement.addEventListener("pointerup", event => {
+      const moved = Math.hypot(event.clientX - pointerDownX, event.clientY - pointerDownY);
+      if (moved > 5) return;
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObject(satelliteCloud, false);
+      const hit = hits.find(candidate => {
+        const index = candidate.index ?? -1;
+        return index >= 0 && objects[index]?.valid && passesFilter(objects[index]);
+      });
+
+      if (!hit || hit.index === undefined) {
+        clearSelection();
+        return;
+      }
+
+      selectedIndex = hit.index;
+      const selectedColour = new THREE.Color(
+        CATEGORY_COLOURS[objects[selectedIndex].category] ?? FALLBACK_COLOUR
+      );
+      (selectedMarker.material as THREE.SpriteMaterial).color
+        .copy(selectedColour)
+        .lerp(new THREE.Color(0xffffff), 0.46);
+      rebuildSelectedOrbit();
+      updateSelectedCard();
+    });
+
+    closeCard.addEventListener("click", clearSelection);
+
+    // --------------------------------------------------
+    // Controls
+    // --------------------------------------------------
+
+    function snapSceneToCurrentTime() {
+      const realNow = performance.now();
+      const date = new Date(simulationMs);
+      prepareSatelliteTargets(date, 1, realNow);
+      interpolateSatellitePositions(realNow + 1);
+      if (trailsToggle.checked) {
+        prepareTrailTargets(date, 1, realNow);
+        interpolateTrailPositions(realNow + 1);
+      }
+      simTimeOutput.textContent = formatUtc(date);
+      earthGroup.rotation.y = satellite.gstime(date);
+      lastMarkerTargetReal = realNow;
+      lastTrailTargetReal = realNow;
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter || "LEO";
+        filterButtons.forEach(item => item.classList.toggle("is-active", item === button));
+        clearSelection();
+        snapSceneToCurrentTime();
+      });
+    });
+
+    timeSlider.addEventListener("input", () => {
+      const index = Math.max(0, Math.min(TIME_SCALES.length - 1, Number(timeSlider.value)));
+      timeScale = TIME_SCALES[index];
+      timeScaleOutput.value = `${timeScale}×`;
+      lastMarkerTargetReal = -Infinity;
+      lastTrailTargetReal = -Infinity;
+    });
+
+    nowButton.addEventListener("click", () => {
+      simulationMs = Date.now();
+      timeSlider.value = "1";
+      timeScale = 1;
+      timeScaleOutput.value = "1×";
+      snapSceneToCurrentTime();
+      rebuildSelectedOrbit();
+    });
+
+    trailsToggle.addEventListener("change", () => {
+      trailLines.visible = trailsToggle.checked;
+      if (trailsToggle.checked) {
+        lastTrailTargetReal = -Infinity;
+        const realNow = performance.now();
+        prepareTrailTargets(new Date(simulationMs), 1, realNow);
+        interpolateTrailPositions(realNow + 1);
+      }
+    });
+
+    rotateToggle.addEventListener("change", () => {
+      cameraDrift = rotateToggle.checked;
+    });
+
+    // --------------------------------------------------
+    // Resize + animation
+    // --------------------------------------------------
+
+    function resize() {
+      const width = Math.max(stage.clientWidth, 1);
+      const height = Math.max(stage.clientHeight, 1);
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(stage);
+    resize();
+
+    snapSceneToCurrentTime();
+    loading.hidden = true;
+
+    if (payload.failedGroups?.length) {
+      console.info(`[OrbitalGlobe] Some CelesTrak groups were unavailable: ${payload.failedGroups.join(", ")}`);
+    }
+
+    function animate(now: number) {
+      const realDt = Math.min((now - lastFrame) / 1000, 0.08);
+      lastFrame = now;
+      simulationMs += realDt * 1000 * timeScale;
+
+      const markerRefreshMs = timeScale >= 20 ? FAST_MARKER_REFRESH_MS : NORMAL_MARKER_REFRESH_MS;
+      if (now - lastMarkerTargetReal >= markerRefreshMs) {
+        const predictedMs = simulationMs + markerRefreshMs * timeScale;
+        prepareSatelliteTargets(new Date(predictedMs), markerRefreshMs, now);
+        lastMarkerTargetReal = now;
+      }
+      interpolateSatellitePositions(now);
+
+      const currentDate = new Date(simulationMs);
+      simTimeOutput.textContent = formatUtc(currentDate);
+      earthGroup.rotation.y = satellite.gstime(currentDate);
+
+      if (trailsToggle.checked) {
+        const trailRefreshMs = timeScale >= 20 ? FAST_TRAIL_REFRESH_MS : NORMAL_TRAIL_REFRESH_MS;
+        if (now - lastTrailTargetReal >= trailRefreshMs) {
+          const predictedMs = simulationMs + trailRefreshMs * timeScale;
+          prepareTrailTargets(new Date(predictedMs), trailRefreshMs, now);
+          lastTrailTargetReal = now;
+        }
+        interpolateTrailPositions(now);
+      }
+
+      if (cameraDrift) {
+        starPoints.rotation.y += realDt * 0.0012;
+      }
+      if (cameraDrift && !userInteracting && !focusMode && !focusTransitionActive) {
+        const angle = realDt * 0.011;
+        camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+      }
+
+      updateFocusCamera(now);
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-orbital-globe]").forEach(initialiseOrbitalGlobe);
+</script>
+
+<style>
+  .orbital-globe {
+    max-width: 1000px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border: 1px solid rgba(210, 224, 232, 0.10);
+    border-radius: 22px;
+    background: #000;
+    color: #f4f7f8;
+    box-shadow:
+      0 28px 90px rgba(0, 0, 0, 0.38),
+      0 0 0 1px rgba(120, 170, 195, 0.015),
+      0 0 70px rgba(70, 135, 165, 0.035);
+  }
+
+  .globe-stage {
+    position: relative;
+    height: 620px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 48%, rgba(112, 143, 159, 0.07), transparent 31%),
+      radial-gradient(circle at 50% 52%, rgba(42, 85, 106, 0.055), transparent 47%),
+      #000;
+    isolation: isolate;
+  }
+
+  .globe-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 52%, transparent 0 37%, rgba(185, 210, 221, 0.022) 37.2%, transparent 37.6%),
+      linear-gradient(180deg, rgba(255,255,255,0.012), transparent 22%, transparent 78%, rgba(130,170,190,0.018));
+    box-shadow: inset 0 0 90px rgba(0,0,0,0.62);
+  }
+
+  .globe-stage :global(canvas) {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .globe-stage :global(canvas):active {
+    cursor: grabbing;
+  }
+
+  .stage-heading,
+  .stage-stats,
+  .stage-hint,
+  .object-card,
+  .loading-panel {
+    position: absolute;
+    z-index: 3;
+  }
+
+  .stage-heading {
+    top: 22px;
+    left: 24px;
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.48rem;
+    color: rgba(191, 205, 212, 0.58);
+    font-size: 0.69rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #9dd8ef;
+    box-shadow: 0 0 12px rgba(128, 196, 224, 0.62);
+  }
+
+  .stage-title {
+    margin-top: 0.38rem;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    font-weight: 580;
+    letter-spacing: -0.035em;
+  }
+
+  .stage-subtitle {
+    margin-top: 0.25rem;
+    color: rgba(196, 205, 210, 0.45);
+    font-size: 0.76rem;
+  }
+
+  .stage-stats {
+    top: 20px;
+    right: 22px;
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 0.55rem;
+    pointer-events: none;
+  }
+
+  .stage-stats > div {
+    min-width: 118px;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    background: rgba(4, 6, 8, 0.64);
+    backdrop-filter: blur(10px);
+  }
+
+  .stage-stats span,
+  .object-grid span {
+    display: block;
+    color: rgba(190, 198, 203, 0.40);
+    font-size: 0.63rem;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .stage-stats strong {
+    display: block;
+    margin-top: 0.18rem;
+    color: rgba(235, 245, 251, 0.85);
+    font-size: 0.76rem;
+    font-weight: 520;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stage-hint {
+    left: 20px;
+    bottom: 17px;
+    padding: 0.48rem 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    background: rgba(3, 8, 12, 0.48);
+    color: rgba(215, 228, 236, 0.40);
+    font-size: 0.67rem;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+  }
+
+  .loading-panel {
+    inset: 0;
+    z-index: 5;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.55rem;
+    background: rgba(2, 6, 10, 0.84);
+    backdrop-filter: blur(8px);
+    text-align: center;
+  }
+
+  .loading-panel[hidden] {
+    display: none;
+  }
+
+  .loading-panel strong {
+    font-size: 0.84rem;
+    font-weight: 560;
+  }
+
+  .loading-panel span {
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 0.72rem;
+  }
+
+  .loading-orbit {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(120, 211, 255, 0.28);
+    border-top-color: rgba(120, 211, 255, 0.95);
+    border-radius: 50%;
+    animation: orbital-spin 0.9s linear infinite;
+  }
+
+  @keyframes orbital-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .object-card {
+    right: 20px;
+    bottom: 18px;
+    width: min(270px, calc(100% - 40px));
+    padding: 0.95rem;
+    border: 1px solid rgba(137, 209, 246, 0.16);
+    border-radius: 14px;
+    background: rgba(4, 11, 17, 0.78);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(14px);
+  }
+
+  .object-card[hidden] {
+    display: none;
+  }
+
+  .card-close {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.6rem;
+    width: 28px;
+    height: 28px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .card-close:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .object-kicker {
+    padding-right: 2rem;
+    color: #76d9ff;
+    font-size: 0.65rem;
+    font-weight: 650;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .object-name {
+    margin-top: 0.28rem;
+    padding-right: 1.4rem;
+    overflow: hidden;
+    color: #eef7fc;
+    font-size: 1rem;
+    font-weight: 580;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .object-id {
+    margin-top: 0.15rem;
+    color: rgba(215, 228, 236, 0.40);
+    font-size: 0.67rem;
+  }
+
+  .object-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 0.9rem;
+    margin-top: 0.85rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.065);
+  }
+
+  .object-grid strong {
+    color: rgba(235, 245, 250, 0.78);
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .focus-object-button {
+    width: 100%;
+    margin-top: 0.85rem;
+    min-height: 36px;
+    border: 1px solid rgba(126, 214, 255, 0.20);
+    border-radius: 9px;
+    background: linear-gradient(180deg, rgba(91, 190, 239, 0.11), rgba(91, 190, 239, 0.055));
+    color: rgba(218, 244, 255, 0.88);
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: 150ms ease;
+  }
+
+  .focus-object-button:hover {
+    border-color: rgba(126, 214, 255, 0.38);
+    background: rgba(91, 190, 239, 0.15);
+    box-shadow: 0 0 22px rgba(91, 190, 239, 0.08);
+  }
+
+  .orbital-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr);
+    gap: 1rem 1.25rem;
+    padding: 1.35rem 1.45rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    background:
+      linear-gradient(180deg, rgba(12, 15, 17, 0.98), rgba(5, 6, 7, 0.99));
+  }
+
+  .control-section {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .section-title {
+    color: #747c81;
+    font-size: 0.68rem;
+    font-weight: 650;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.48rem;
+  }
+
+  .filter-button,
+  .time-row button {
+    min-height: 34px;
+    padding: 0.48rem 0.72rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.025);
+    color: rgba(225, 234, 241, 0.58);
+    font-size: 0.74rem;
+    cursor: pointer;
+    transition: 140ms ease;
+  }
+
+  .filter-button:hover,
+  .time-row button:hover {
+    border-color: rgba(118, 217, 255, 0.22);
+    background: rgba(118, 217, 255, 0.05);
+    color: rgba(235, 247, 253, 0.85);
+  }
+
+  .filter-button.is-active {
+    border-color: rgba(118, 217, 255, 0.38);
+    background: rgba(91, 190, 239, 0.11);
+    color: #ccefff;
+    box-shadow: inset 0 0 18px rgba(61, 167, 221, 0.06);
+  }
+
+  .time-row {
+    display: grid;
+    grid-template-columns: 1fr 44px auto;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .time-row input[type="range"] {
+    width: 100%;
+    accent-color: #8acbe4;
+    cursor: pointer;
+  }
+
+  .time-row output {
+    color: #bfd7e1;
+    font-size: 0.76rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .visual-options {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    padding: 0.8rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.48rem;
+    color: rgba(206, 218, 227, 0.58);
+    font-size: 0.74rem;
+    cursor: pointer;
+  }
+
+  .toggle input {
+    width: 14px;
+    height: 14px;
+    accent-color: #8acbe4;
+  }
+
+  .legend {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    color: rgba(197, 210, 219, 0.48);
+    font-size: 0.68rem;
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+  }
+
+  .legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    box-shadow: 0 0 7px currentColor;
+  }
+
+  .legend-dot.stations { background: #f4fbff; color: #f4fbff; }
+  .legend-dot.starlink { background: #70c7ff; color: #70c7ff; }
+  .legend-dot.navigation { background: #ffc96b; color: #ffc96b; }
+  .legend-dot.weather { background: #70ead6; color: #70ead6; }
+  .legend-dot.science { background: #c7a0ff; color: #c7a0ff; }
+  .legend-dot.geo { background: #ff91bf; color: #ff91bf; }
+  .legend-dot.other { background: #a7b5c0; color: #a7b5c0; }
+
+  .data-note {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: rgba(181, 197, 208, 0.37);
+    font-size: 0.66rem;
+    line-height: 1.45;
+  }
+
+  .data-note strong {
+    flex: 0 0 auto;
+    color: rgba(185, 211, 225, 0.47);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid rgba(115, 215, 255, 0.7);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 760px) {
+    .globe-stage {
+      height: 520px;
+    }
+
+    .stage-stats {
+      top: auto;
+      right: auto;
+      left: 18px;
+      bottom: 55px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stage-stats > div {
+      min-width: 106px;
+    }
+
+    .orbital-controls {
+      grid-template-columns: 1fr;
+    }
+
+    .data-note {
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .orbital-globe {
+      border-radius: 16px;
+    }
+
+    .globe-stage {
+      height: 445px;
+    }
+
+    .stage-heading {
+      top: 17px;
+      left: 17px;
+      right: 17px;
+    }
+
+    .stage-subtitle {
+      max-width: 260px;
+    }
+
+    .stage-stats {
+      left: 14px;
+      bottom: 52px;
+      gap: 0.4rem;
+    }
+
+    .stage-stats > div {
+      min-width: 0;
+      padding: 0.52rem 0.6rem;
+    }
+
+    .stage-hint {
+      left: 14px;
+      bottom: 12px;
+      max-width: calc(100% - 28px);
+      font-size: 0.62rem;
+    }
+
+    .object-card {
+      right: 14px;
+      bottom: 112px;
+      width: calc(100% - 28px);
+    }
+
+    .orbital-controls {
+      padding: 1.05rem;
+    }
+
+    .filter-row {
+      gap: 0.4rem;
+    }
+
+    .filter-button {
+      flex: 1 1 auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loading-orbit {
+      animation: none;
+    }
+  }
+</style>

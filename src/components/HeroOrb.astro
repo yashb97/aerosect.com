@@ -1,0 +1,184 @@
+<div class="hero-orb" data-hero-orb>
+  <canvas role="img" aria-label="Interactive particle orb. Drag to rotate and release to spin. Arrow keys rotate; Space stops the spin." tabindex="0" width="1" height="1"></canvas>
+</div>
+
+<script>
+  import { OrbSpin } from "../scripts/orb-spin";
+  const host = document.querySelector<HTMLElement>("[data-hero-orb]");
+  const canvas = host?.querySelector("canvas");
+  const ctx = canvas?.getContext("2d");
+  const hero = host?.closest("section");
+
+  if (host && canvas && ctx && hero) {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    const compact = matchMedia("(max-width: 900px)");
+    const tau = Math.PI * 2;
+    // A fixed population, not a particle simulation: no pairwise interactions.
+    const points = Array.from({ length: 620 }, (_, i) => {
+      const y = 1 - 2 * (i + 0.5) / 620;
+      const radius = Math.sqrt(1 - y * y);
+      const angle = i * Math.PI * (3 - Math.sqrt(5));
+      return [radius * Math.cos(angle), y, radius * Math.sin(angle)];
+    });
+    let frame = 0;
+    let visible = false;
+    const spin = new OrbSpin();
+    let pointer: number | null = null;
+    let previous: [number, number, number] = [0, 0, 1];
+    let movedAt = 0;
+    let last = 0;
+    let clock = 0;
+    function project(x: number, y: number, z: number) {
+      const [rx, ry, depth] = spin.project(x, y, z);
+      const perspective = 3.8 / (3.8 - depth);
+      return { x: 300 + rx * 174 * perspective, y: 300 + ry * 174 * perspective, depth, perspective };
+    }
+
+    function paint() {
+      ctx!.clearRect(0, 0, 600, 600);
+      // Complete hairline orbits remain closed through every rotation.
+      for (let ring = 0; ring < 3; ring++) {
+        const bank = -0.55 + ring * 0.8;
+        ctx!.beginPath();
+        for (let step = 0; step <= 120; step++) {
+          const angle = step / 120 * tau + ring * 2.1;
+          const x = 1.34 * Math.cos(angle);
+          const y = 1.34 * Math.sin(angle);
+          const p = project(x, y * Math.cos(bank), y * Math.sin(bank));
+          if (step === 0) ctx!.moveTo(p.x, p.y);
+          else ctx!.lineTo(p.x, p.y);
+        }
+        ctx!.closePath();
+        ctx!.strokeStyle = ring === 1 ? "rgba(186,230,253,0.28)" : "rgba(186,230,253,0.12)";
+        ctx!.lineWidth = 0.65;
+        ctx!.stroke();
+        const angle = clock * 0.00016 + ring * 2.1;
+        const p = project(1.34 * Math.cos(angle), 1.34 * Math.sin(angle) * Math.cos(bank), 1.34 * Math.sin(angle) * Math.sin(bank));
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, 2, 0, tau);
+        ctx!.fillStyle = "rgba(224,247,255,0.8)";
+        ctx!.fill();
+      }
+      for (const [x, y, z] of points) {
+        const p = project(x, y, z);
+        const front = (p.depth + 1) / 2;
+        const wave = 0.85 + 0.15 * Math.sin(y * 8 - clock * 0.0007);
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, (0.65 + front * 0.85) * p.perspective, 0, tau);
+        ctx!.fillStyle = `rgba(202,237,250,${(0.12 + front * 0.7) * wave})`;
+        ctx!.fill();
+      }
+    }
+
+    function animate(now: number) {
+      frame = 0;
+      const dt = last ? Math.min(now - last, 50) : 16;
+      last = now;
+      clock += dt;
+      if (pointer === null) spin.advance(dt / 1000);
+      paint();
+      frame = requestAnimationFrame(animate);
+    }
+
+    function sync() {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      last = 0;
+      if (compact.matches || !visible || document.hidden) return;
+      paint();
+      if (!reduced.matches) frame = requestAnimationFrame(animate);
+    }
+
+    function resize() {
+      if (compact.matches) { sync(); return; }
+      const pixels = Math.max(1, Math.min(900, Math.round(host!.clientWidth * Math.min(devicePixelRatio || 1, 1.5))));
+      canvas!.width = pixels;
+      canvas!.height = pixels;
+      ctx!.setTransform(pixels / 600, 0, 0, pixels / 600, 0, 0);
+      sync();
+    }
+
+    function trackball(event: PointerEvent): [number, number, number] {
+      const rect = canvas!.getBoundingClientRect();
+      const radius = rect.width * 0.32;
+      const x = (event.clientX - rect.left - rect.width / 2) / radius;
+      const y = (event.clientY - rect.top - rect.height / 2) / radius;
+      const length = Math.hypot(x, y);
+      return length > 1 ? [x / length, y / length, 0] : [x, y, Math.sqrt(1 - length * length)];
+    }
+    function release(event?: PointerEvent) {
+      if (pointer === null || (event && event.pointerId !== pointer)) return;
+      if (!event || event.type !== "pointerup" || performance.now() - movedAt > 100) spin.velocity = [0, 0, 0];
+      const id = pointer;
+      pointer = null;
+      delete host!.dataset.dragging;
+      if (canvas!.hasPointerCapture(id)) canvas!.releasePointerCapture(id);
+    }
+    canvas.addEventListener("pointerdown", (event) => {
+      if (!event.isPrimary || event.button !== 0 || pointer !== null) return;
+      event.preventDefault();
+      canvas.focus({ preventScroll: true });
+      pointer = event.pointerId;
+      previous = trackball(event);
+      movedAt = performance.now();
+      spin.velocity = [0, 0, 0];
+      canvas.setPointerCapture(pointer);
+      host.dataset.dragging = "true";
+    });
+    canvas.addEventListener("pointermove", (event) => {
+      if (event.pointerId !== pointer) return;
+      const next = trackball(event);
+      const now = performance.now();
+      spin.drag(previous, next, (now - movedAt) / 1000);
+      previous = next;
+      movedAt = now;
+      if (reduced.matches) paint();
+    });
+    canvas.addEventListener("pointerup", release);
+    canvas.addEventListener("pointercancel", release);
+    canvas.addEventListener("lostpointercapture", release);
+    window.addEventListener("blur", () => release());
+    canvas.addEventListener("keydown", (event) => {
+      const axes: Record<string, [number, number, number]> = {
+        ArrowLeft: [0, -1, 0], ArrowRight: [0, 1, 0],
+        ArrowUp: [1, 0, 0], ArrowDown: [-1, 0, 0],
+      };
+      if (event.code === "Space") { event.preventDefault(); spin.velocity = [0, 0, 0]; }
+      else if (axes[event.key]) {
+        event.preventDefault();
+        spin.rotate(axes[event.key], 0.15);
+        spin.velocity = axes[event.key].map(v => v * 0.6) as [number, number, number];
+        if (reduced.matches) paint();
+      }
+    });
+    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }).observe(host);
+    new ResizeObserver(resize).observe(host);
+    document.addEventListener("visibilitychange", sync);
+    reduced.addEventListener("change", sync);
+    compact.addEventListener("change", resize);
+    resize();
+  }
+</script>
+
+<style>
+  .hero-orb {
+    position: absolute;
+    width: min(49vw, 720px);
+    aspect-ratio: 1;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  canvas {
+    width: 100%; height: 100%; display: block;
+    pointer-events: auto;
+    cursor: grab;
+    touch-action: none;
+    border-radius: 50%;
+  }
+  canvas:focus { outline: none; }
+  [data-dragging] canvas { cursor: grabbing; }
+  @media (max-width: 900px) { .hero-orb { display: none; } }
+</style>

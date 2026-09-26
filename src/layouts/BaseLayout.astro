@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import ParticleCursor from "../components/ParticleCursor.astro";
 import { Image, getImage } from "astro:assets";
 import siteBackground from "../assets/backgrounds/homepage-dream.jpg";
 import siteSocialCard from "../assets/social/aerosect-social-card.jpg";
@@ -57,6 +58,7 @@ const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
   </head>
 
   <body data-page-kind={ogType}>
+    <ParticleCursor />
     <main class="page">
       <div class="site-background" aria-hidden="true">
         <Image

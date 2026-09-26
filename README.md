@@ -1,5 +1,30 @@
 # Astro Starter Kit: Minimal
 
+## Aerosect particle cursor
+
+The shared layout includes `src/components/ParticleCursor.astro`. Its small native SVG
+cursor stays responsive independently of JavaScript; the blue canvas trail fades after
+200 ms and stops rendering when idle. Links and buttons retain their hand cursor.
+Simulation canvases, input fields, selection/drag gestures and resize handles retain
+their normal interactions. Add `data-native-cursor` to opt a region out of the effect.
+
+The effect activates only for a mouse on a fine-pointer, hover-capable device with
+forced colours off. Reduced motion disables only the trail, keeping the particle cursor.
+It uses no external service or library.
+The canvas is fixed at 512 CSS pixels square, capped at 1.5× resolution; it never grows
+with the viewport. History is capped at 40 points and 220 pixels from the pointer.
+Timing and history limits live in `src/scripts/cursor-trail.ts`.
+
+Run the cursor tests with Node 24 (or a Node release supporting TypeScript stripping):
+
+```sh
+node --test tests/cursor-trail.test.mjs tests/particle-cursor.test.mjs
+```
+
+Check the effect with the system's reduced-motion preference off. With reduced motion
+on, the intended result is the particle cursor and no trail. Device-specific frame rates
+should be profiled in a regular browser alongside the interactive tools.
+
 ```sh
 npm create astro@latest -- --template minimal
 ```

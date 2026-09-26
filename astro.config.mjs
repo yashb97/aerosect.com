@@ -9,6 +9,7 @@ import rehypeKatex from 'rehype-katex';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://aerosect.com',
+  devToolbar: { enabled: false },
   integrations: [mdx({
     processor: unified({
       remarkPlugins: [remarkMath],

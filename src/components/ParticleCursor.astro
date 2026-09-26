@@ -1,0 +1,223 @@
+<div class="particle-cursor-layer" aria-hidden="true" inert>
+  <canvas data-cursor-trail width="1" height="1"></canvas>
+</div>
+
+<script>
+  import { CursorTrail, TRAIL_LIFETIME } from "../scripts/cursor-trail";
+
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-cursor-trail]");
+  const context = canvas?.getContext("2d");
+
+  if (canvas && context) {
+    const root = document.documentElement;
+    const eligible = window.matchMedia(
+      "(hover: hover) and (pointer: fine) and (forced-colors: none)"
+    );
+    const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
+    const trail = new CursorTrail();
+    const size = 512;
+    const half = size / 2;
+    let frame = 0;
+    let scale = 0;
+    let previousTarget: EventTarget | null = null;
+    let targetAllowsTrail = false;
+
+    function clearTrail() {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      trail.clear();
+      delete root.dataset.particleDrawing;
+      context!.clearRect(0, 0, size, size);
+      canvas!.style.visibility = "hidden";
+    }
+
+    function deactivate() {
+      clearTrail();
+      delete root.dataset.particleCursor;
+      previousTarget = null;
+    }
+
+    function resize() {
+      clearTrail();
+      // Allocate only after an eligible mouse is used. At most 768 × 768 pixels.
+      scale = 0;
+    }
+
+    function draw(now: number) {
+      frame = 0;
+      trail.prune(now);
+      context!.clearRect(0, 0, size, size);
+      const points = trail.points;
+      if (points.length < 2) {
+        clearTrail();
+        return;
+      }
+
+      const head = points[points.length - 1];
+      const left = head.x - half;
+      const top = head.y - half;
+      canvas!.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+      canvas!.style.visibility = "visible";
+      root.dataset.particleDrawing = "active";
+      // One solid ribbon, matching the marker's 5 px diameter at the head.
+      const ribbon: { x: number; y: number; width: number }[] = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        const a = points[i];
+        const b = points[i + 1];
+        const previous = points[Math.max(0, i - 1)];
+        const startX = (previous.x + a.x) / 2;
+        const startY = (previous.y + a.y) / 2;
+        const endX = i === points.length - 2 ? b.x : (a.x + b.x) / 2;
+        const endY = i === points.length - 2 ? b.y : (a.y + b.y) / 2;
+        const startTime = (previous.time + a.time) / 2;
+        const endTime = i === points.length - 2 ? b.time : (a.time + b.time) / 2;
+        for (let step = i === 0 ? 0 : 1; step <= 4; step++) {
+          const t = step / 4;
+          const u = 1 - t;
+          const time = u * u * startTime + 2 * u * t * a.time + t * t * endTime;
+          const freshness = Math.max(0, 1 - (head.time - time) / TRAIL_LIFETIME);
+          ribbon.push({
+            x: u * u * startX + 2 * u * t * a.x + t * t * endX - left,
+            y: u * u * startY + 2 * u * t * a.y + t * t * endY - top,
+            width: (i + t) / (points.length - 1) * freshness,
+          });
+        }
+      }
+      const edges = ribbon.map((point, i) => {
+        const before = ribbon[Math.max(0, i - 1)];
+        const after = ribbon[Math.min(ribbon.length - 1, i + 1)];
+        const dx = after.x - before.x;
+        const dy = after.y - before.y;
+        const length = Math.hypot(dx, dy) || 1;
+        return { ...point, nx: -dy / length, ny: dx / length };
+      });
+      const radius = 2.5;
+      context!.beginPath();
+      for (let i = 0; i < edges.length; i++) {
+        const p = edges[i];
+        const x = p.x + p.nx * p.width * radius;
+        const y = p.y + p.ny * p.width * radius;
+        if (i === 0) context!.moveTo(x, y);
+        else context!.lineTo(x, y);
+      }
+      for (let i = edges.length - 1; i >= 0; i--) {
+        const p = edges[i];
+        context!.lineTo(p.x - p.nx * p.width * radius, p.y - p.ny * p.width * radius);
+      }
+      context!.closePath();
+      context!.fillStyle = "#e6f8ff";
+      context!.fill();
+      // Paint the round head in the same frame as its tail. A hardware cursor
+      // otherwise runs ahead of the canvas at high pointer speeds.
+      context!.beginPath();
+      context!.arc(half, half, radius, 0, Math.PI * 2);
+      context!.fill();
+      frame = requestAnimationFrame(draw);
+    }
+
+    function move(event: PointerEvent) {
+      if (!eligible.matches || event.pointerType !== "mouse" || !event.isPrimary || event.buttons !== 0 || document.hidden) {
+        deactivate();
+        return;
+      }
+      if (root.dataset.particleCursor !== "active") root.dataset.particleCursor = "active";
+
+      if (!motion.matches) {
+        clearTrail();
+        return;
+      }
+
+      // Preserve native text selection, inputs, resizing and simulation probes.
+      // The style lookup happens only when entering another element, never per frame.
+      if (event.target !== previousTarget) {
+        previousTarget = event.target;
+        const target = event.target instanceof Element ? event.target : null;
+        const cursor = target ? getComputedStyle(target).cursor : "auto";
+        targetAllowsTrail = Boolean(target &&
+          !target.closest("input, textarea, select, [contenteditable]:not([contenteditable='false']), canvas, iframe, [data-native-cursor]") &&
+          (cursor.includes("cursor-particle.svg") || cursor === "pointer" ||
+            (cursor === "none" && root.dataset.particleDrawing === "active")));
+        if (!targetAllowsTrail) clearTrail();
+      }
+      if (!targetAllowsTrail) {
+        clearTrail();
+        return;
+      }
+
+      if (!scale) {
+        scale = Math.min(window.devicePixelRatio || 1, 1.5);
+        canvas!.width = Math.round(size * scale);
+        canvas!.height = Math.round(size * scale);
+        context!.setTransform(scale, 0, 0, scale, 0, 0);
+      }
+      trail.add(event.clientX, event.clientY, performance.now());
+      if (!frame && trail.points.length > 1) frame = requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerdown", deactivate, { passive: true });
+    window.addEventListener("pointerup", (event) => {
+      if (eligible.matches && event.pointerType === "mouse" && event.isPrimary && !document.hidden) {
+        root.dataset.particleCursor = "active";
+      }
+    }, { passive: true });
+    document.addEventListener("pointerleave", deactivate);
+    window.addEventListener("pointercancel", deactivate);
+    window.addEventListener("blur", deactivate);
+    window.addEventListener("pagehide", deactivate);
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("scroll", () => {
+      clearTrail();
+      previousTarget = null;
+    }, { passive: true, capture: true });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) deactivate();
+    });
+    eligible.addEventListener("change", deactivate);
+    motion.addEventListener("change", clearTrail);
+  }
+</script>
+
+<style>
+  .particle-cursor-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    pointer-events: none;
+    overflow: hidden;
+    contain: strict;
+  }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 512px;
+    height: 512px;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce), (forced-colors: active) {
+    .particle-cursor-layer { display: none; }
+  }
+</style>
+
+<style is:global>
+  @media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+    html[data-particle-cursor="active"] body {
+      cursor: url("/images/cursor-particle.svg?v=solid") 12 12, auto;
+    }
+    html[data-particle-cursor="active"][data-particle-drawing="active"] body {
+      cursor: none;
+    }
+    /* Keep familiar link/button affordances and specialised control cursors. */
+    :where(html[data-particle-cursor="active"]) :where(a[href], button:not(:disabled), summary, [role="button"]):not(:where([aria-disabled="true"])) {
+      cursor: pointer;
+    }
+    :where(html[data-particle-cursor="active"]) :where(input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-native-cursor]) {
+      cursor: auto;
+    }
+    :where(html[data-particle-cursor="active"]) :where(button:disabled, [aria-disabled="true"]) {
+      cursor: not-allowed;
+    }
+  }
+</style>
